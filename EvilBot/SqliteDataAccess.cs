@@ -23,15 +23,17 @@ namespace EvilBot
 
         public static void SaveUsername()
         {
-            string whataname = "gaogl";
-            string whatanamer = "ffs";
+            string whatanamer = "swarm";
             using (IDbConnection cnn = new SQLiteConnection(LoadConnectionString()))
             {
                 if(!cnn.Query<string>($"SELECT Username FROM UserPoints WHERE Username = '{whatanamer}'", new DynamicParameters()).ToList().Any())
                 {
                     cnn.Execute($"INSERT INTO UserPoints (Username, Points) VALUES ('{whatanamer}', '5')");
                 }
-                cnn.Execute($"UPDATE UserPoints SET Points = Points + 1 WHERE Username = '{whataname}'");
+                else
+                {
+                    cnn.Execute($"UPDATE UserPoints SET Points = Points + 1 WHERE Username = '{whatanamer}'");
+                }
             }
         }
 
