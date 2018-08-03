@@ -7,6 +7,16 @@ using System.Configuration;
 using System.Data;
 using System.Data.SQLite;
 using Dapper;
+using TwitchLib;
+using TwitchLib.Api.Models.v5.Users;
+using TwitchLib.Api.Models.v5.Streams;
+using TwitchLib.Client;
+using TwitchLib.Client.Enums;
+using TwitchLib.Client.Events;
+using TwitchLib.Client.Extensions;
+using TwitchLib.Client.Models;
+using TwitchLib.Api;
+using TwitchLib.Api.Enums;
 
 namespace EvilBot
 {
@@ -21,18 +31,22 @@ namespace EvilBot
             }
         }
 
-        public static void SaveUsername()
+        public static void AddPointToUsername(List<TwitchLib.Api.Models.Undocumented.Chatters.ChatterFormatted> viewers)
         {
-            string whatanamer = "swarm";
             using (IDbConnection cnn = new SQLiteConnection(LoadConnectionString()))
             {
-                if(!cnn.Query<string>($"SELECT Username FROM UserPoints WHERE Username = '{whatanamer}'", new DynamicParameters()).ToList().Any())
+                for(int i=0; i<viewers.Count; i++)
                 {
-                    cnn.Execute($"INSERT INTO UserPoints (Username, Points) VALUES ('{whatanamer}', '5')");
-                }
-                else
-                {
-                    cnn.Execute($"UPDATE UserPoints SET Points = Points + 1 WHERE Username = '{whatanamer}'");
+
+                    if(!cnn.Query<string>($"SELECT Username FROM UserPoints WHERE Username = '{viewers[i].Username}'", new DynamicParameters()).ToList().Any())
+                    {
+                        cnn.Execute($"INSERT INTO UserPoints (Username, Points) VALUES ('{viewers[i].Username}', '5')");
+                    }
+                    else
+                    {
+                        cnn.Execute($"UPDATE UserPoints SET Points = Points + 5 WHERE Username = '{viewers[i].Username}'");
+                    }
+                    Console.WriteLine("Accessing Database!");
                 }
             }
         }

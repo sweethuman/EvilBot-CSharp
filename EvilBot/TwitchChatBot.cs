@@ -42,9 +42,10 @@ namespace EvilBot
             api.Settings.ClientId = TwitchInfo.ClientID;
             api.Settings.AccessToken = TwitchInfo.BotToken;
 
-            List<string> usernames = SqliteDataAccess.LoadUsernames();
-            Console.WriteLine(usernames[0]);
-            SqliteDataAccess.SaveUsername();
+            //List<string> usernames = SqliteDataAccess.LoadUsernames();
+            //Console.WriteLine(usernames[0]);
+            List<TwitchLib.Api.Models.Undocumented.Chatters.ChatterFormatted> chatusers = api.Undocumented.GetChattersAsync(TwitchInfo.ChannelName).Result;
+            SqliteDataAccess.AddPointToUsername(chatusers);
 
         }
 
