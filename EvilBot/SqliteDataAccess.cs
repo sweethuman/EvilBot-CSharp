@@ -24,7 +24,7 @@ namespace EvilBot
     {
         public static List<string> LoadUsernames()
         {
-            using (IDbConnection cnn = new SQLiteConnection(LoadConnectionString()))
+            using (IDbConnection cnn = new SQLiteConnection(LoadConnectionString("read_only")))
             {
                 var output = cnn.Query<string>("SELECT Username FROM UserPoints", new DynamicParameters());
                 return output.ToList();
