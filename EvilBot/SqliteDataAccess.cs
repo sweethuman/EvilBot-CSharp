@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,12 +23,16 @@ namespace EvilBot
 {
     public class SqliteDataAccess
     {
-        public static List<string> LoadUsernames()
+        public static int RetrievePoints(string username)
         {
             using (IDbConnection cnn = new SQLiteConnection(LoadConnectionString("read_only")))
             {
-                var output = cnn.Query<string>("SELECT Username FROM UserPoints", new DynamicParameters());
-                return output.ToList();
+                var output = cnn.Query<string>($"SELECT Points FROM UserPoints WHERE Username = '{username}' ", new DynamicParameters());
+                if (!output.ToList().Any())
+                {
+                    return -1;
+                }
+                return Int32.Parse(output.ToList()[0]);
             }
         }
 
