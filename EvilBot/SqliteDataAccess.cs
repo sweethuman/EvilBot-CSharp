@@ -27,7 +27,7 @@ namespace EvilBot
         {
             using (IDbConnection cnn = new SQLiteConnection(LoadConnectionString("read_only")))
             {
-                var output = cnn.Query<string>($"SELECT Points FROM UserPoints WHERE Username = '{username}' ", new DynamicParameters());
+                var output = cnn.Query<string>($"SELECT Points FROM UserPoints WHERE Username = '{username}'");
                 if (!output.ToList().Any())
                 {
                     return -1;

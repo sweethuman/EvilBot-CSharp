@@ -27,26 +27,31 @@ namespace EvilBot
         {
             Console.WriteLine("Connecting");
 
+
             client = new TwitchClient();
             client.Initialize(credentials, TwitchInfo.ChannelName);
 
-            /*client.ChatThrottler = new TwitchLib.Client.Services.MessageThrottler(client, 15, TimeSpan.FromSeconds(30));
-            client.WhisperThrottler = new TwitchLib.Client.Services.MessageThrottler(client, 15, TimeSpan.FromSeconds(30));*/
+
+            client.ChatThrottler = new TwitchLib.Client.Services.MessageThrottler(client, 15, TimeSpan.FromSeconds(30));
+            client.WhisperThrottler = new TwitchLib.Client.Services.MessageThrottler(client, 15, TimeSpan.FromSeconds(30));
+            client.ChatThrottler.StartQueue();
+            client.WhisperThrottler.StartQueue();
+
 
             client.OnLog += Client_OnLog;
             client.OnConnectionError += Client_OnConnectionError;
             client.OnChatCommandReceived += Client_OnChatCommandReceived;
             client.OnMessageReceived += Client_OnMessageReceived;
             client.OnWhisperReceived += Client_OnWhisperReceived;
-
-
             client.Connect();
+
 
             api = new TwitchAPI();
             api.Settings.ClientId = TwitchInfo.ClientID;
             api.Settings.AccessToken = TwitchInfo.BotToken;
 
-            Console.WriteLine(SqliteDataAccess.RetrievePoints("icicicicicc"));
+
+            Console.WriteLine(SqliteDataAccess.RetrievePoints("nightbot"));
             List<TwitchLib.Api.Models.Undocumented.Chatters.ChatterFormatted> chatusers = api.Undocumented.GetChattersAsync(TwitchInfo.ChannelName).Result;
             SqliteDataAccess.AddPointToUsername(chatusers);
 
@@ -87,10 +92,10 @@ namespace EvilBot
             }
         }
 
-        private void _timer_Elapsed(object sender, ElapsedEventArgs e)
+        /*private void _timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             Console.WriteLine("Timer Elapsed!");
-        }
+        }*/
 
         private void Client_OnWhisperReceived(object sender, OnWhisperReceivedArgs e)
         {
