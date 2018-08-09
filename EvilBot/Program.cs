@@ -2,9 +2,9 @@
 
 namespace EvilBot
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             TwitchChatBot bot = new TwitchChatBot();
             bot.Connect();
@@ -12,6 +12,6 @@ namespace EvilBot
             Console.ReadLine();
 
             bot.Disconnect();
-           }
+        }
     }
 }

@@ -1,49 +1,22 @@
-﻿using System;
-using System.Collections;
+﻿using Dapper;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Configuration;
 using System.Data;
 using System.Data.SQLite;
-using Dapper;
-using TwitchLib;
-using TwitchLib.Api.Models.v5.Users;
-using TwitchLib.Api.Models.v5.Streams;
-using TwitchLib.Client;
-using TwitchLib.Client.Enums;
-using TwitchLib.Client.Events;
-using TwitchLib.Client.Extensions;
-using TwitchLib.Client.Models;
-using TwitchLib.Api;
-using TwitchLib.Api.Enums;
+using System.Linq;
 
 namespace EvilBot
 {
     public class SqliteDataAccess
     {
-        public static int RetrievePoints(string username)
-        {
-            using (IDbConnection cnn = new SQLiteConnection(LoadConnectionString("read_only")))
-            {
-                var output = cnn.Query<string>($"SELECT Points FROM UserPoints WHERE Username = '{username}'");
-                if (!output.ToList().Any())
-                {
-                    return -1;
-                }
-                return Int32.Parse(output.ToList()[0]);
-            }
-        }
-
         public static void AddPointToUsername(List<TwitchLib.Api.Models.Undocumented.Chatters.ChatterFormatted> viewers)
         {
             using (IDbConnection cnn = new SQLiteConnection(LoadConnectionString()))
             {
-                for(int i=0; i<viewers.Count; i++)
+                for (int i = 0; i < viewers.Count; i++)
                 {
-
-                    if(!cnn.Query<string>($"SELECT Username FROM UserPoints WHERE Username = '{viewers[i].Username}'", new DynamicParameters()).ToList().Any())
+                    if (!cnn.Query<string>($"SELECT Username FROM UserPoints WHERE Username = '{viewers[i].Username}'", new DynamicParameters()).ToList().Any())
                     {
                         cnn.Execute($"INSERT INTO UserPoints (Username, Points) VALUES ('{viewers[i].Username}', '5')");
                     }
@@ -53,6 +26,19 @@ namespace EvilBot
                     }
                     Console.WriteLine("Accessing Database!");
                 }
+            }
+        }
+
+        public static string RetrievePoints(string username)
+        {
+            using (IDbConnection cnn = new SQLiteConnection(LoadConnectionString("read_only")))
+            {
+                var output = cnn.Query<string>($"SELECT Points FROM UserPoints WHERE Username = '{username}'");
+                if (!output.ToList().Any())
+                {
+                    return null;
+                }
+                return output.ToList()[0];
             }
         }
 
