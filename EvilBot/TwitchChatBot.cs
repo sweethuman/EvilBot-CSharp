@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Timers;
 using TwitchLib.Api;
 using TwitchLib.Api.Models.v5.Users;
+using TwitchLib.Api.Models.v5.Chat;
 using TwitchLib.Client;
 using TwitchLib.Client.Events;
 using TwitchLib.Client.Models;
@@ -13,7 +16,7 @@ namespace EvilBot
         private static TwitchAPI api;
         private readonly ConnectionCredentials credentials = new ConnectionCredentials(TwitchInfo.BotUsername, TwitchInfo.BotToken);
         private TwitchClient client;
-        //Timer _timer;
+        private Timer addPointsTimer;
 
         internal void Connect()
         {
@@ -21,30 +24,69 @@ namespace EvilBot
 
             client = new TwitchClient();
             client.Initialize(credentials, TwitchInfo.ChannelName);
+            ApiInitialize();
+            JoinRoomEvilAsync();
 
-            client.ChatThrottler = new TwitchLib.Client.Services.MessageThrottler(client, 15, TimeSpan.FromSeconds(30));
-            client.WhisperThrottler = new TwitchLib.Client.Services.MessageThrottler(client, 15, TimeSpan.FromSeconds(30));
-            client.ChatThrottler.StartQueue();
-            client.WhisperThrottler.StartQueue();
+            ChatThrottlerInitialize();
 
             client.OnLog += Client_OnLog;
+            client.OnSendReceiveData += Client_OnSendReceiveData;
+            client.OnMessageSent += Client_OnMessageSent;
             client.OnConnectionError += Client_OnConnectionError;
             client.OnChatCommandReceived += Client_OnChatCommandReceived;
             client.OnMessageReceived += Client_OnMessageReceived;
             client.OnWhisperReceived += Client_OnWhisperReceived;
             client.Connect();
 
+            addPointsTimer = new Timer(1000 * 60 * 5);
+            addPointsTimer.Elapsed += AddPointsTimer_Elapsed;
+            addPointsTimer.Start();
+
+            //Console.WriteLine(SqliteDataAccess.RetrievePointsAsync("nightbot"));
+        }
+
+        private void Client_OnSendReceiveData(object sender, OnSendReceiveDataArgs e)
+        {
+            Console.WriteLine("$ $ $" + e.Data);
+        }
+
+        private void Client_OnMessageSent(object sender, OnMessageSentArgs e)
+        {
+            Console.WriteLine($" - - - sent channel: {e.SentMessage.Channel}");
+        }
+
+        private static void ApiInitialize()
+        {
             api = new TwitchAPI();
             api.Settings.ClientId = TwitchInfo.ClientID;
             api.Settings.AccessToken = TwitchInfo.BotToken;
+        }
 
-            Console.WriteLine(SqliteDataAccess.RetrievePoints("nightbot"));
-            List<TwitchLib.Api.Models.Undocumented.Chatters.ChatterFormatted> chatusers = api.Undocumented.GetChattersAsync(TwitchInfo.ChannelName).Result;
-            SqliteDataAccess.AddPointToUsername(chatusers);
+        private async Task JoinRoomEvilAsync()
+        {
+            //NOTE finish this moderator room thing
+            string channelidevil = await GetUserIdAsync(TwitchInfo.ChannelName);
+            var roomidevil = await api.Chat.v5.GetChatRoomsByChannelAsync(channelidevil);
+            Console.WriteLine($" - - - channel id: {channelidevil}");
+            Console.WriteLine(" - - 1 " + roomidevil.Rooms[0].Name);
+            Console.WriteLine(" - - 1 " + roomidevil.Rooms[0].Id);
+            Console.WriteLine(" - - 2 " + roomidevil.Rooms[1].Name);
+            Console.WriteLine(" - - 2 " + roomidevil.Rooms[1].Id);
+            client.JoinRoom(channelidevil, roomidevil.Rooms[0].Id);
+        }
 
-            //_timer = new Timer(5000);
-            //_timer.Elapsed += _timer_Elapsed;
-            //_timer.Enabled = true;
+        private void ChatThrottlerInitialize()
+        {
+            client.ChatThrottler = new TwitchLib.Client.Services.MessageThrottler(client, 85, TimeSpan.FromSeconds(30));
+            client.WhisperThrottler = new TwitchLib.Client.Services.MessageThrottler(client, 85, TimeSpan.FromSeconds(30));
+            client.ChatThrottler.StartQueue();
+            client.WhisperThrottler.StartQueue();
+        }
+
+        private async void AddPointsTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            List<TwitchLib.Api.Models.Undocumented.Chatters.ChatterFormatted> chatusers = await api.Undocumented.GetChattersAsync(TwitchInfo.ChannelName);
+            await SqliteDataAccess.AddPointToUsernameAsync(chatusers).ConfigureAwait(false);
         }
 
         internal void Disconnect()
@@ -52,30 +94,32 @@ namespace EvilBot
             Console.WriteLine("Disconnecting");
         }
 
-        private void Client_OnChatCommandReceived(object sender, OnChatCommandReceivedArgs e)
+        private async void Client_OnChatCommandReceived(object sender, OnChatCommandReceivedArgs e)
         {
+            Console.WriteLine($" - - - arg channel: {e.Command.ChatMessage.Channel}!");
             switch (e.Command.CommandText)
             {
                 case "viewers":
-                    client.SendMessage(TwitchInfo.ChannelName, $"Viewer list is: {ViewerList()}");
+                    client.SendMessage(e.Command.ChatMessage.Channel, $"Viewer list is: {ViewerList()}");
                     break;
 
                 case "points":
-                    if (e.Command.ArgumentsAsString == "")
+                    if (string.IsNullOrEmpty(e.Command.ArgumentsAsString))
                     {
-                        string points = SqliteDataAccess.RetrievePoints(e.Command.ChatMessage.Username);
+                        //NOTE this is not working for mod-room, message is not sent and "e.Command.ChatMessage.Channel" gives room id
+                        string points = await SqliteDataAccess.RetrievePointsAsync(e.Command.ChatMessage.Username);
                         if (points != null)
-                            client.SendMessage(TwitchInfo.ChannelName, $"{e.Command.ChatMessage.DisplayName} You have: {points} points! Be active to gain more!");
+                            client.SendMessage(e.Command.ChatMessage.Channel, $"{e.Command.ChatMessage.DisplayName} You have: {points} points! Be active to gain more!");
                         else
-                            client.SendMessage(TwitchInfo.ChannelName, $"{e.Command.ChatMessage.DisplayName} You aren't yet in the database, hang on a little bit more and you'll be added at the next check!");
+                            client.SendMessage(e.Command.ChatMessage.Channel, $"{e.Command.ChatMessage.DisplayName} You aren't yet in the database, hang on a little bit more and you'll be added at the next check!");
                     }
                     else
                     {
-                        string points = SqliteDataAccess.RetrievePoints(e.Command.ArgumentsAsString.TrimStart('@').ToLower());
+                        string points = await SqliteDataAccess.RetrievePointsAsync(e.Command.ArgumentsAsString.TrimStart('@').ToLower());
                         if (points != null)
-                            client.SendMessage(TwitchInfo.ChannelName, $"{e.Command.ArgumentsAsString.TrimStart('@')} has: {points} points!");
+                            client.SendMessage(e.Command.ChatMessage.Channel, $"{e.Command.ArgumentsAsString.TrimStart('@')} has: {points} points!");
                         else
-                            client.SendMessage(TwitchInfo.ChannelName, $"{e.Command.ArgumentsAsString.TrimStart('@')} isn't yet in the database!");
+                            client.SendMessage(e.Command.ChatMessage.Channel, $"{e.Command.ArgumentsAsString.TrimStart('@')} isn't yet in the database!");
                     }
                     break;
 
@@ -84,11 +128,6 @@ namespace EvilBot
                     break;
             }
         }
-
-        /*private void _timer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            Console.WriteLine("Timer Elapsed!");
-        }*/
 
         private void Client_OnConnectionError(object sender, OnConnectionErrorArgs e)
         {
@@ -100,17 +139,31 @@ namespace EvilBot
             Console.WriteLine(e.Data);
         }
 
-        private void Client_OnMessageReceived(object sender, OnMessageReceivedArgs e)
+        private async void Client_OnMessageReceived(object sender, OnMessageReceivedArgs e)
         {
             if (e.ChatMessage.Message.StartsWith("hi", StringComparison.InvariantCultureIgnoreCase))
             {
-                client.SendMessage(TwitchInfo.ChannelName, $"Hey there @{e.ChatMessage.DisplayName}");
+                client.SendMessage(e.ChatMessage.Channel, $"Hey there @{e.ChatMessage.DisplayName}");
             }
             else
-
+            if (e.ChatMessage.Message.StartsWith("salut", StringComparison.InvariantCultureIgnoreCase))
+            {
+                client.SendMessage(e.ChatMessage.Channel, $"Salut @{e.ChatMessage.DisplayName}!");
+            }
+            else
+            if (e.ChatMessage.Message.StartsWith("buna", StringComparison.InvariantCultureIgnoreCase))
+            {
+                client.SendMessage(e.ChatMessage.Channel, $"Buna @{e.ChatMessage.DisplayName}!");
+            }
+            else
+            if (e.ChatMessage.Message.StartsWith("ceau", StringComparison.InvariantCultureIgnoreCase))
+            {
+                client.SendMessage(e.ChatMessage.Channel, $"Ceau @{e.ChatMessage.DisplayName}!");
+            }
+            else
             if (e.ChatMessage.Message.StartsWith("wot", StringComparison.InvariantCultureIgnoreCase))
             {
-                client.SendMessage(TwitchInfo.ChannelName, GetUptime()?.ToString() ?? "Offline");
+                client.SendMessage(e.ChatMessage.Channel, (await GetUptimeAsync())?.ToString() ?? "Offline");
             }
         }
 
@@ -119,9 +172,9 @@ namespace EvilBot
             client.SendWhisper(e.WhisperMessage.Username, $"You said: {e.WhisperMessage.Message}");
         }
 
-        private TimeSpan? GetUptime()
+        private async Task<TimeSpan?> GetUptimeAsync()
         {
-            string userId = GetUserId(TwitchInfo.ChannelName);
+            string userId = await GetUserIdAsync(TwitchInfo.ChannelName);
             if (userId == null)
             {
                 return null;
@@ -129,9 +182,9 @@ namespace EvilBot
             return api.Streams.v5.GetUptimeAsync(userId).Result;
         }
 
-        private string GetUserId(string username)
+        private async Task<string> GetUserIdAsync(string username)
         {
-            User[] userList = api.Users.v5.GetUserByNameAsync(username).Result.Matches;
+            User[] userList = (await api.Users.v5.GetUserByNameAsync(username)).Matches;
             if (username == null || userList.Length == 0)
             {
                 return null;

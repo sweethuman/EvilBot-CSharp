@@ -187,6 +187,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
+    <Compile Include="ProgramLogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SqliteDataAccess.cs" />
     <Compile Include="TwitchChatBot.cs" />
@@ -197,7 +198,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
     <Content Include="TwitchData.db">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
