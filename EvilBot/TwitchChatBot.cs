@@ -43,7 +43,7 @@ namespace EvilBot
             client.OnWhisperReceived += Client_OnWhisperReceived;
             client.Connect();
 
-            addPointsTimer = new Timer(1000 * 60 * 5);
+            addPointsTimer = new Timer(1000 * 60 * 1);
             addPointsTimer.Elapsed += AddPointsTimer_Elapsed;
             addPointsTimer.Start();
 
@@ -125,7 +125,6 @@ namespace EvilBot
                 case "points":
                     if (string.IsNullOrEmpty(e.Command.ArgumentsAsString))
                     {
-                        //NOTE this is not working for mod-room, message is not sent and "e.Command.ChatMessage.Channel" gives room id
                         string points = await SqliteDataAccess.RetrievePointsAsync(e.Command.ChatMessage.Username);
                         if (points != null)
                         {
@@ -168,29 +167,33 @@ namespace EvilBot
 
         private async void Client_OnMessageReceived(object sender, OnMessageReceivedArgs e)
         {
-            if (e.ChatMessage.Message.StartsWith("hi", StringComparison.InvariantCultureIgnoreCase))
+            PointCounter.AddMessagePoint(e.ChatMessage.Username);
+            if (!e.ChatMessage.Message.StartsWith("!"))
             {
-                client.SendMessage(e.ChatMessage.Channel, $"Hey there @{e.ChatMessage.DisplayName}");
-            }
-            else
-            if (e.ChatMessage.Message.StartsWith("salut", StringComparison.InvariantCultureIgnoreCase))
-            {
-                client.SendMessage(e.ChatMessage.Channel, $"Salut @{e.ChatMessage.DisplayName}!");
-            }
-            else
-            if (e.ChatMessage.Message.StartsWith("buna", StringComparison.InvariantCultureIgnoreCase))
-            {
-                client.SendMessage(e.ChatMessage.Channel, $"Buna @{e.ChatMessage.DisplayName}!");
-            }
-            else
-            if (e.ChatMessage.Message.StartsWith("ceau", StringComparison.InvariantCultureIgnoreCase))
-            {
-                client.SendMessage(e.ChatMessage.Channel, $"Ceau @{e.ChatMessage.DisplayName}!");
-            }
-            else
-            if (e.ChatMessage.Message.StartsWith("wot", StringComparison.InvariantCultureIgnoreCase))
-            {
-                client.SendMessage(e.ChatMessage.Channel, (await GetUptimeAsync())?.ToString() ?? "Offline");
+                if (e.ChatMessage.Message.StartsWith("hi", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    client.SendMessage(e.ChatMessage.Channel, $"Hey there @{e.ChatMessage.DisplayName}");
+                }
+                else
+                if (e.ChatMessage.Message.StartsWith("salut", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    client.SendMessage(e.ChatMessage.Channel, $"Salut @{e.ChatMessage.DisplayName}!");
+                }
+                else
+                if (e.ChatMessage.Message.StartsWith("buna", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    client.SendMessage(e.ChatMessage.Channel, $"Buna @{e.ChatMessage.DisplayName}!");
+                }
+                else
+                if (e.ChatMessage.Message.StartsWith("ceau", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    client.SendMessage(e.ChatMessage.Channel, $"Ceau @{e.ChatMessage.DisplayName}!");
+                }
+                else
+                if (e.ChatMessage.Message.StartsWith("wot", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    client.SendMessage(e.ChatMessage.Channel, (await GetUptimeAsync())?.ToString() ?? "Offline");
+                }
             }
         }
 

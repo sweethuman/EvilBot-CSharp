@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -13,19 +14,28 @@ namespace EvilBot
     {
         private IDbConnection RetrieveConnection { get; } = new SQLiteConnection(LoadConnectionString("read_only"));
         private IDbConnection WriteConnection { get; } = new SQLiteConnection(LoadConnectionString());
+        private List<string> temporaryTalkers;
 
         public async Task AddPointToUsernameAsync(List<TwitchLib.Api.Models.Undocumented.Chatters.ChatterFormatted> viewers)
         {
-            //NOTE make it all just run in background or check if it does or what is the best solution
+            int points;
+            temporaryTalkers = PointCounter.Talkers;
+            PointCounter.Talkers = new List<string>();
             for (int i = 0; i < viewers.Count; i++)
-            {   //NOTE this was changed, test the method
+            {
+                points = 1;
                 if (!(await WriteConnection.QueryAsync<string>($"SELECT Username FROM UserPoints WHERE Username = '{viewers[i].Username}'", new DynamicParameters())).Any())
                 {
-                    await WriteConnection.ExecuteAsync($"INSERT INTO UserPoints (Username, Points) VALUES ('{viewers[i].Username}', '5')");
+                    await WriteConnection.ExecuteAsync($"INSERT INTO UserPoints (Username, Points) VALUES ('{viewers[i].Username}', '{points}')");
                 }
                 else
                 {
-                    await WriteConnection.ExecuteAsync($"UPDATE UserPoints SET Points = Points + 5 WHERE Username = '{viewers[i].Username}'");
+                    if (temporaryTalkers.Contains(viewers[i].Username))
+                    {
+                        points = 2;
+                    }
+                    Log.Debug("Updating {Username} with {points} points.", viewers[i].Username, points);
+                    await WriteConnection.ExecuteAsync($"UPDATE UserPoints SET Points = Points + {points} WHERE Username = '{viewers[i].Username}'");
                 }
             }
             Console.WriteLine($"Database updated! Accounts present: {viewers.Count}");
