@@ -19,6 +19,8 @@ namespace EvilBot
         private TwitchClient client;
 
         private Timer addPointsTimer;
+        private Timer addLurkerPointsTimer;
+        private Timer messageRepeater;
 
         private ILoggerFactory loggerFactory = new LoggerFactory();
         public ILogger<TwitchClient> logger;
@@ -47,8 +49,32 @@ namespace EvilBot
             addPointsTimer.Elapsed += AddPointsTimer_Elapsed;
             addPointsTimer.Start();
 
+            addLurkerPointsTimer = new Timer(1000 * 60 * 10);
+            addLurkerPointsTimer.Elapsed += AddLurkerPointsTimer_ElapsedAsync;
+            addLurkerPointsTimer.Start();
+
+            messageRepeater = new Timer(1000 * 60 * 5);
+            messageRepeater.Elapsed += MessageRepeater_Elapsed;
+            messageRepeater.Start();
+
             //JoinRoomEvil();
             //Console.WriteLine(SqliteDataAccess.RetrievePointsAsync("nightbot"));
+        }
+
+        private async void AddLurkerPointsTimer_ElapsedAsync(object sender, ElapsedEventArgs e)
+        {
+            List<TwitchLib.Api.Models.Undocumented.Chatters.ChatterFormatted> chatusers = await api.Undocumented.GetChattersAsync(TwitchInfo.ChannelName);
+            await SqliteDataAccess.AddLurkerPointToUsernameAsync(chatusers).ConfigureAwait(false);
+        }
+
+        private async void AddPointsTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            await SqliteDataAccess.AddPointToUsernameAsync().ConfigureAwait(false);
+        }
+
+        private void MessageRepeater_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            client.SendMessage(TwitchInfo.ChannelName, "/me Incearca !points si vezi cat de activ ai fost");
         }
 
         public void LoggingIntialize()
@@ -101,12 +127,6 @@ namespace EvilBot
             client.WhisperThrottler.StartQueue();
         }
 
-        private async void AddPointsTimer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            List<TwitchLib.Api.Models.Undocumented.Chatters.ChatterFormatted> chatusers = await api.Undocumented.GetChattersAsync(TwitchInfo.ChannelName);
-            await SqliteDataAccess.AddPointToUsernameAsync(chatusers).ConfigureAwait(false);
-        }
-
         internal void Disconnect()
         {
             Console.WriteLine("Disconnecting");
@@ -119,7 +139,7 @@ namespace EvilBot
             {
                 case "viewers":
                     Log.Debug("{Username} asked for Viewers!", e.Command.ChatMessage.Username);
-                    client.SendMessage(e.Command.ChatMessage.Channel, $"Viewer list is: {ViewerList()}");
+                    client.SendMessage(TwitchInfo.ChannelName, "/me Incearca !points si vezi cat de activ ai fost");
                     break;
 
                 case "points":
@@ -147,6 +167,7 @@ namespace EvilBot
                             client.SendMessage(e.Command.ChatMessage.Channel, $"{e.Command.ArgumentsAsString.TrimStart('@')} isn't yet in the database!");
                         }
                     }
+                    Log.Debug("{DisplayName} asked for points!", e.Command.ChatMessage.DisplayName);
                     break;
 
                 default:

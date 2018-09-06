@@ -16,29 +16,42 @@ namespace EvilBot
         private IDbConnection WriteConnection { get; } = new SQLiteConnection(LoadConnectionString());
         private List<string> temporaryTalkers;
 
-        public async Task AddPointToUsernameAsync(List<TwitchLib.Api.Models.Undocumented.Chatters.ChatterFormatted> viewers)
+        public async Task AddLurkerPointToUsernameAsync(List<TwitchLib.Api.Models.Undocumented.Chatters.ChatterFormatted> viewers)
         {
-            int points;
-            temporaryTalkers = PointCounter.Talkers;
-            PointCounter.Talkers = new List<string>();
             for (int i = 0; i < viewers.Count; i++)
             {
-                points = 1;
                 if (!(await WriteConnection.QueryAsync<string>($"SELECT Username FROM UserPoints WHERE Username = '{viewers[i].Username}'", new DynamicParameters())).Any())
                 {
-                    await WriteConnection.ExecuteAsync($"INSERT INTO UserPoints (Username, Points) VALUES ('{viewers[i].Username}', '{points}')");
+                    Log.Debug("New Lurker: {Username}", viewers[i].Username);
+                    await WriteConnection.ExecuteAsync($"INSERT INTO UserPoints (Username, Points) VALUES ('{viewers[i].Username}', '1')");
                 }
                 else
                 {
-                    if (temporaryTalkers.Contains(viewers[i].Username))
-                    {
-                        points = 2;
-                    }
-                    Log.Debug("Updating {Username} with {points} points.", viewers[i].Username, points);
-                    await WriteConnection.ExecuteAsync($"UPDATE UserPoints SET Points = Points + {points} WHERE Username = '{viewers[i].Username}'");
+                    Log.Debug("Updating Lurker: {Username}", viewers[i].Username);
+                    await WriteConnection.ExecuteAsync($"UPDATE UserPoints SET Points = Points + 1 WHERE Username = '{viewers[i].Username}'");
                 }
             }
-            Console.WriteLine($"Database updated! Accounts present: {viewers.Count}");
+            Console.WriteLine($"Database updated! Lurkers present: {viewers.Count}");
+        }
+
+        public async Task AddPointToUsernameAsync()
+        {
+            temporaryTalkers = PointCounter.Talkers;
+            PointCounter.Talkers = new List<string>();
+            for (int i = 0; i < temporaryTalkers.Count; i++)
+            {
+                if (!(await WriteConnection.QueryAsync<string>($"SELECT Username FROM UserPoints WHERE Username = '{temporaryTalkers[i]}'", new DynamicParameters())).Any())
+                {
+                    Log.Debug("New Talker: {Username}", temporaryTalkers[i]);
+                    await WriteConnection.ExecuteAsync($"INSERT INTO UserPoints (Username, Points) VALUES ('{temporaryTalkers[i]}', '1')");
+                }
+                else
+                {
+                    Log.Debug("Updating Talker: {Username}", temporaryTalkers[i]);
+                    await WriteConnection.ExecuteAsync($"UPDATE UserPoints SET Points = Points + 1 WHERE Username = '{temporaryTalkers[i]}'");
+                }
+            }
+            Console.WriteLine($"Database updated! Talkers present: {temporaryTalkers.Count}");
         }
 
         public async Task<string> RetrievePointsAsync(string username)
