@@ -153,6 +153,7 @@ namespace EvilBot
         private void Client_OnConnectionError(object sender, OnConnectionErrorArgs e)
         {
             Console.WriteLine($"Error!!! {e.Error}");
+            Log.Error("Error!!! {Error}", e.Error);
         }
 
         private void Client_OnLog(object sender, OnLogArgs e)
