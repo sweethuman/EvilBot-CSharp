@@ -1,6 +1,5 @@
 ﻿using Dapper;
 using Serilog;
-using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -31,13 +30,12 @@ namespace EvilBot
                     await WriteConnection.ExecuteAsync($"UPDATE UserPoints SET Points = Points + 1 WHERE Username = '{viewers[i].Username}'");
                 }
             }
-            Console.WriteLine($"Database updated! Lurkers present: {viewers.Count}");
+            Log.Debug("Database updated! Lurkers present: {Lurkers}", viewers.Count);
         }
 
         public async Task AddPointToUsernameAsync()
         {
-            temporaryTalkers = PointCounter.Talkers;
-            PointCounter.Talkers = new List<string>();
+            temporaryTalkers = PointCounter.ClearTalkerPoints();
             for (int i = 0; i < temporaryTalkers.Count; i++)
             {
                 if (!(await WriteConnection.QueryAsync<string>($"SELECT Username FROM UserPoints WHERE Username = '{temporaryTalkers[i]}'", new DynamicParameters())).Any())
@@ -51,7 +49,7 @@ namespace EvilBot
                     await WriteConnection.ExecuteAsync($"UPDATE UserPoints SET Points = Points + 1 WHERE Username = '{temporaryTalkers[i]}'");
                 }
             }
-            Console.WriteLine($"Database updated! Talkers present: {temporaryTalkers.Count}");
+            Log.Debug("Database updated! Talkers present: {Talkers}", temporaryTalkers.Count);
         }
 
         public async Task<string> RetrievePointsAsync(string username)

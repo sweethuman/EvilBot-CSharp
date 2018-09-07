@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Serilog;
+﻿using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -22,15 +21,14 @@ namespace EvilBot
         private Timer addLurkerPointsTimer;
         private Timer messageRepeater;
 
-        private ILoggerFactory loggerFactory = new LoggerFactory();
-        public ILogger<TwitchClient> logger;
+        private LoggerManager loggerManager = new LoggerManager();
+
         private SqliteDataAccess SqliteDataAccess { get; } = new SqliteDataAccess();
 
         internal void Connect()
         {
             Console.WriteLine("Connecting");
-            LoggingIntialize();
-            client = new TwitchClient(logger: logger);
+            client = new TwitchClient(logger: loggerManager.logger);
             client.Initialize(credentials, TwitchInfo.ChannelName);
             ApiInitialize();
 
@@ -75,18 +73,6 @@ namespace EvilBot
         private void MessageRepeater_Elapsed(object sender, ElapsedEventArgs e)
         {
             client.SendMessage(TwitchInfo.ChannelName, "/me Incearca !points si vezi cat de activ ai fost");
-        }
-
-        public void LoggingIntialize()
-        {
-            Log.Logger = new LoggerConfiguration()
-                .Enrich.FromLogContext()
-                .WriteTo.Seq("http://localhost:5341")
-                .WriteTo.File("logfile.log", rollingInterval: RollingInterval.Day)
-                .MinimumLevel.Debug()
-                .CreateLogger();
-            loggerFactory.AddSerilog(logger: Log.Logger);
-            logger = loggerFactory.CreateLogger<TwitchClient>();
         }
 
         //private void Client_OnSendReceiveData(object sender, OnSendReceiveDataArgs e)
