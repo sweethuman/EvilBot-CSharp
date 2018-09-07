@@ -19,15 +19,15 @@ namespace EvilBot
         {
             for (int i = 0; i < viewers.Count; i++)
             {
-                if (!(await WriteConnection.QueryAsync<string>($"SELECT Username FROM UserPoints WHERE Username = '{viewers[i].Username}'", new DynamicParameters())).Any())
+                if (!(await WriteConnection.QueryAsync<string>($"SELECT Username FROM UserPoints WHERE Username = '{viewers[i].Username}'", new DynamicParameters()).ConfigureAwait(false)).Any())
                 {
                     Log.Debug("New Lurker: {Username}", viewers[i].Username);
-                    await WriteConnection.ExecuteAsync($"INSERT INTO UserPoints (Username, Points) VALUES ('{viewers[i].Username}', '1')");
+                    await WriteConnection.ExecuteAsync($"INSERT INTO UserPoints (Username, Points) VALUES ('{viewers[i].Username}', '1')").ConfigureAwait(false);
                 }
                 else
                 {
                     Log.Debug("Updating Lurker: {Username}", viewers[i].Username);
-                    await WriteConnection.ExecuteAsync($"UPDATE UserPoints SET Points = Points + 1 WHERE Username = '{viewers[i].Username}'");
+                    await WriteConnection.ExecuteAsync($"UPDATE UserPoints SET Points = Points + 1 WHERE Username = '{viewers[i].Username}'").ConfigureAwait(false);
                 }
             }
             Log.Debug("Database updated! Lurkers present: {Lurkers}", viewers.Count);
@@ -38,15 +38,15 @@ namespace EvilBot
             temporaryTalkers = PointCounter.ClearTalkerPoints();
             for (int i = 0; i < temporaryTalkers.Count; i++)
             {
-                if (!(await WriteConnection.QueryAsync<string>($"SELECT Username FROM UserPoints WHERE Username = '{temporaryTalkers[i]}'", new DynamicParameters())).Any())
+                if (!(await WriteConnection.QueryAsync<string>($"SELECT Username FROM UserPoints WHERE Username = '{temporaryTalkers[i]}'", new DynamicParameters()).ConfigureAwait(false)).Any())
                 {
                     Log.Debug("New Talker: {Username}", temporaryTalkers[i]);
-                    await WriteConnection.ExecuteAsync($"INSERT INTO UserPoints (Username, Points) VALUES ('{temporaryTalkers[i]}', '1')");
+                    await WriteConnection.ExecuteAsync($"INSERT INTO UserPoints (Username, Points) VALUES ('{temporaryTalkers[i]}', '1')").ConfigureAwait(false);
                 }
                 else
                 {
                     Log.Debug("Updating Talker: {Username}", temporaryTalkers[i]);
-                    await WriteConnection.ExecuteAsync($"UPDATE UserPoints SET Points = Points + 1 WHERE Username = '{temporaryTalkers[i]}'");
+                    await WriteConnection.ExecuteAsync($"UPDATE UserPoints SET Points = Points + 1 WHERE Username = '{temporaryTalkers[i]}'").ConfigureAwait(false);
                 }
             }
             Log.Debug("Database updated! Talkers present: {Talkers}", temporaryTalkers.Count);
@@ -54,7 +54,7 @@ namespace EvilBot
 
         public async Task<string> RetrievePointsAsync(string username)
         {
-            var output = await RetrieveConnection.QueryAsync<string>($"SELECT Points FROM UserPoints WHERE Username = '{username}'", new DynamicParameters());
+            var output = await RetrieveConnection.QueryAsync<string>($"SELECT Points FROM UserPoints WHERE Username = '{username}'", new DynamicParameters()).ConfigureAwait(false);
             if (!output.Any()) //NOTE this was changed as well, test this method too
             {
                 return null;

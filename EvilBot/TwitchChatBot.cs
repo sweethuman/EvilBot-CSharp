@@ -21,14 +21,14 @@ namespace EvilBot
         private Timer addLurkerPointsTimer;
         private Timer messageRepeater;
 
-        private LoggerManager loggerManager = new LoggerManager();
+        private readonly LoggerManager loggerManager = new LoggerManager();
 
         public static SqliteDataAccess SqliteDataAccess { get; } = new SqliteDataAccess();
 
         internal void Connect()
         {
             Console.WriteLine("Connecting");
-            client = new TwitchClient(logger: loggerManager.logger);
+            client = new TwitchClient(logger: loggerManager.Logger);
             client.Initialize(credentials, TwitchInfo.ChannelName);
 
             ApiInitialize();
@@ -67,7 +67,7 @@ namespace EvilBot
 
         private async void AddLurkerPointsTimer_ElapsedAsync(object sender, ElapsedEventArgs e)
         {
-            List<TwitchLib.Api.Models.Undocumented.Chatters.ChatterFormatted> chatusers = await api.Undocumented.GetChattersAsync(TwitchInfo.ChannelName);
+            List<TwitchLib.Api.Models.Undocumented.Chatters.ChatterFormatted> chatusers = await api.Undocumented.GetChattersAsync(TwitchInfo.ChannelName).ConfigureAwait(false);
             await SqliteDataAccess.AddLurkerPointToUsernameAsync(chatusers).ConfigureAwait(false);
         }
 
@@ -119,7 +119,7 @@ namespace EvilBot
                 case "points":
                     if (string.IsNullOrEmpty(e.Command.ArgumentsAsString))
                     {
-                        string points = await SqliteDataAccess.RetrievePointsAsync(e.Command.ChatMessage.Username);
+                        string points = await SqliteDataAccess.RetrievePointsAsync(e.Command.ChatMessage.Username).ConfigureAwait(false);
                         if (points != null)
                         {
                             client.SendMessage(e.Command.ChatMessage.Channel, $"{e.Command.ChatMessage.DisplayName} You have: {points} points! Be active to gain more!\n\r");
@@ -131,7 +131,7 @@ namespace EvilBot
                     }
                     else
                     {
-                        string points = await SqliteDataAccess.RetrievePointsAsync(e.Command.ArgumentsAsString.TrimStart('@').ToLower());
+                        string points = await SqliteDataAccess.RetrievePointsAsync(e.Command.ArgumentsAsString.TrimStart('@').ToLower()).ConfigureAwait(false);
                         if (points != null)
                         {
                             client.SendMessage(e.Command.ChatMessage.Channel, $"{e.Command.ArgumentsAsString.TrimStart('@')} has: {points} points!");
@@ -188,7 +188,7 @@ namespace EvilBot
                 else
                 if (e.ChatMessage.Message.StartsWith("wot", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    client.SendMessage(e.ChatMessage.Channel, (await GetUptimeAsync())?.ToString() ?? "Offline");
+                    client.SendMessage(e.ChatMessage.Channel, (await GetUptimeAsync().ConfigureAwait(false))?.ToString() ?? "Offline");
                 }
             }
         }
@@ -200,7 +200,7 @@ namespace EvilBot
 
         private async Task<TimeSpan?> GetUptimeAsync()
         {
-            string userId = await GetUserIdAsync(TwitchInfo.ChannelName);
+            string userId = await GetUserIdAsync(TwitchInfo.ChannelName).ConfigureAwait(false);
             if (userId == null)
             {
                 return null;
@@ -210,7 +210,7 @@ namespace EvilBot
 
         private async Task<string> GetUserIdAsync(string username)
         {
-            User[] userList = (await api.Users.v5.GetUserByNameAsync(username)).Matches;
+            User[] userList = (await api.Users.v5.GetUserByNameAsync(username).ConfigureAwait(false)).Matches;
             if (username == null || userList.Length == 0)
             {
                 return null;

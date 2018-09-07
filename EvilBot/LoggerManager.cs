@@ -6,7 +6,7 @@ namespace EvilBot
 {
     internal class LoggerManager
     {
-        public ILogger<TwitchClient> logger;
+        public ILogger<TwitchClient> Logger { get; set; }
 
         public LoggerManager()
         {
@@ -16,7 +16,7 @@ namespace EvilBot
                 .WriteTo.File("logfile.log", rollingInterval: RollingInterval.Day)
                 .MinimumLevel.Debug()
                 .CreateLogger();
-            logger = new LoggerFactory()
+            Logger = new LoggerFactory()
                 .AddSerilog(logger: serilogLogger)
                 .CreateLogger<TwitchClient>();
 
