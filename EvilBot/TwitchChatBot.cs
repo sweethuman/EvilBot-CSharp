@@ -23,7 +23,7 @@ namespace EvilBot
 
         private LoggerManager loggerManager = new LoggerManager();
 
-        private SqliteDataAccess SqliteDataAccess { get; } = new SqliteDataAccess();
+        public static SqliteDataAccess SqliteDataAccess { get; } = new SqliteDataAccess();
 
         internal void Connect()
         {
