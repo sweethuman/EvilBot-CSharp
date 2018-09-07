@@ -7,12 +7,12 @@ namespace EvilBot
     {
         public static List<string> Talkers { get; private set; } = new List<string>();
 
-        public static void AddMessagePoint(string username)
+        public static void AddMessagePoint(string userID)
         {
             Log.Debug("AddMessagePoint ran");
-            if (!Talkers.Contains(username))
+            if (!Talkers.Contains(userID))
             {
-                Talkers.Add(username);
+                Talkers.Add(userID);
             }
         }
 

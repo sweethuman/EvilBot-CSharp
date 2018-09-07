@@ -1,6 +1,5 @@
 ﻿using Dapper;
 using Serilog;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SQLite;
@@ -13,53 +12,39 @@ namespace EvilBot
     {
         private IDbConnection RetrieveConnection { get; } = new SQLiteConnection(LoadConnectionString("read_only"));
         private IDbConnection WriteConnection { get; } = new SQLiteConnection(LoadConnectionString());
-        private List<string> temporaryTalkers;
 
-        public async Task AddLurkerPointToUsernameAsync(List<TwitchLib.Api.Models.Undocumented.Chatters.ChatterFormatted> viewers)
+        public async Task<string> RetrievePointsAsync(string userID)
         {
-            for (int i = 0; i < viewers.Count; i++)
+            if (userID == null)
             {
-                if (!(await WriteConnection.QueryAsync<string>($"SELECT Username FROM UserPoints WHERE Username = '{viewers[i].Username}'", new DynamicParameters()).ConfigureAwait(false)).Any())
-                {
-                    Log.Debug("New Lurker: {Username}", viewers[i].Username);
-                    await WriteConnection.ExecuteAsync($"INSERT INTO UserPoints (Username, Points) VALUES ('{viewers[i].Username}', '1')").ConfigureAwait(false);
-                }
-                else
-                {
-                    Log.Debug("Updating Lurker: {Username}", viewers[i].Username);
-                    await WriteConnection.ExecuteAsync($"UPDATE UserPoints SET Points = Points + 1 WHERE Username = '{viewers[i].Username}'").ConfigureAwait(false);
-                }
+                return null;
             }
-            Log.Debug("Database updated! Lurkers present: {Lurkers}", viewers.Count);
-        }
 
-        public async Task AddPointToUsernameAsync()
-        {
-            temporaryTalkers = PointCounter.ClearTalkerPoints();
-            for (int i = 0; i < temporaryTalkers.Count; i++)
-            {
-                if (!(await WriteConnection.QueryAsync<string>($"SELECT Username FROM UserPoints WHERE Username = '{temporaryTalkers[i]}'", new DynamicParameters()).ConfigureAwait(false)).Any())
-                {
-                    Log.Debug("New Talker: {Username}", temporaryTalkers[i]);
-                    await WriteConnection.ExecuteAsync($"INSERT INTO UserPoints (Username, Points) VALUES ('{temporaryTalkers[i]}', '1')").ConfigureAwait(false);
-                }
-                else
-                {
-                    Log.Debug("Updating Talker: {Username}", temporaryTalkers[i]);
-                    await WriteConnection.ExecuteAsync($"UPDATE UserPoints SET Points = Points + 1 WHERE Username = '{temporaryTalkers[i]}'").ConfigureAwait(false);
-                }
-            }
-            Log.Debug("Database updated! Talkers present: {Talkers}", temporaryTalkers.Count);
-        }
-
-        public async Task<string> RetrievePointsAsync(string username)
-        {
-            var output = await RetrieveConnection.QueryAsync<string>($"SELECT Points FROM UserPoints WHERE Username = '{username}'", new DynamicParameters()).ConfigureAwait(false);
+            var output = await RetrieveConnection.QueryAsync<string>($"SELECT Points FROM UserPoints WHERE UserID = '{userID}'", new DynamicParameters()).ConfigureAwait(false);
             if (!output.Any()) //NOTE this was changed as well, test this method too
             {
                 return null;
             }
             return output.ToList()[0];
+        }
+
+        public async Task AddPointToUserID(string userID)
+        {
+            if (userID == null)
+            {
+                return;
+            }
+
+            if (!(await WriteConnection.QueryAsync<string>($"SELECT UserID from UserPoints WHERE UserID = '{userID}'", new DynamicParameters()).ConfigureAwait(false)).Any())
+            {
+                Log.Debug("Added a new User to Database with {UserID}", userID);
+                await WriteConnection.ExecuteAsync($"INSERT INTO UserPoints (UserID, Points) VALUES ('{userID}', '1')").ConfigureAwait(false);
+            }
+            else
+            {
+                Log.Debug("Updated a User with {UserID}", userID);
+                await WriteConnection.ExecuteAsync($"UPDATE UserPoints SET Points = Points + 1 WHERE UserID = '{userID}'").ConfigureAwait(false);
+            }
         }
 
         private static string LoadConnectionString(string id = "Default")
