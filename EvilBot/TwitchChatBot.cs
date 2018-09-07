@@ -30,19 +30,18 @@ namespace EvilBot
             Console.WriteLine("Connecting");
             client = new TwitchClient(logger: loggerManager.logger);
             client.Initialize(credentials, TwitchInfo.ChannelName);
+
             ApiInitialize();
-
             ChatThrottlerInitialize();
+            EventIntializer();
 
-            client.OnLog += Client_OnLog;
-            //client.OnSendReceiveData += Client_OnSendReceiveData;
-            client.OnMessageSent += Client_OnMessageSent;
-            client.OnConnectionError += Client_OnConnectionError;
-            client.OnChatCommandReceived += Client_OnChatCommandReceived;
-            client.OnMessageReceived += Client_OnMessageReceived;
-            client.OnWhisperReceived += Client_OnWhisperReceived;
             client.Connect();
 
+            TimerInitializer();
+        }
+
+        private void TimerInitializer()
+        {
             addPointsTimer = new Timer(1000 * 60 * 1);
             addPointsTimer.Elapsed += AddPointsTimer_Elapsed;
             addPointsTimer.Start();
@@ -54,9 +53,16 @@ namespace EvilBot
             messageRepeater = new Timer(1000 * 60 * 5);
             messageRepeater.Elapsed += MessageRepeater_Elapsed;
             messageRepeater.Start();
+        }
 
-            //JoinRoomEvil();
-            //Console.WriteLine(SqliteDataAccess.RetrievePointsAsync("nightbot"));
+        private void EventIntializer()
+        {
+            client.OnLog += Client_OnLog;
+            client.OnMessageSent += Client_OnMessageSent;
+            client.OnConnectionError += Client_OnConnectionError;
+            client.OnChatCommandReceived += Client_OnChatCommandReceived;
+            client.OnMessageReceived += Client_OnMessageReceived;
+            client.OnWhisperReceived += Client_OnWhisperReceived;
         }
 
         private async void AddLurkerPointsTimer_ElapsedAsync(object sender, ElapsedEventArgs e)
@@ -75,11 +81,6 @@ namespace EvilBot
             client.SendMessage(TwitchInfo.ChannelName, "/me Incearca !points si vezi cat de activ ai fost");
         }
 
-        //private void Client_OnSendReceiveData(object sender, OnSendReceiveDataArgs e)
-        //{
-        //    Console.WriteLine("$ $ $" + e.Data);
-        //}
-
         private void Client_OnMessageSent(object sender, OnMessageSentArgs e)
         {
             Console.WriteLine($" - - - sent channel: {e.SentMessage.Channel}");
@@ -91,19 +92,6 @@ namespace EvilBot
             api.Settings.ClientId = TwitchInfo.ClientID;
             api.Settings.AccessToken = TwitchInfo.BotToken;
         }
-
-        //private void JoinRoomEvil()
-        //{
-        //    //NOTE finish this moderator room thing
-        //    string channelidevil = GetUserIdAsync(TwitchInfo.ChannelName).Result;
-        //    var roomidevil = api.Chat.v5.GetChatRoomsByChannelAsync(channelidevil).Result;
-        //    Console.WriteLine($" - - - channel id: {channelidevil}");
-        //    Console.WriteLine(" - - 1 " + roomidevil.Rooms[0].Name);
-        //    Console.WriteLine(" - - 1 " + roomidevil.Rooms[0].Id);
-        //    Console.WriteLine(" - - 2 " + roomidevil.Rooms[1].Name);
-        //    Console.WriteLine(" - - 2 " + roomidevil.Rooms[1].Id);
-        //    client.JoinRoom(channelidevil, roomidevil.Rooms[0].Id);
-        //}
 
         private void ChatThrottlerInitialize()
         {
@@ -227,17 +215,6 @@ namespace EvilBot
                 return null;
             }
             return userList[0].Id;
-        }
-
-        private string ViewerList()
-        {
-            List<TwitchLib.Api.Models.Undocumented.Chatters.ChatterFormatted> chatusers = api.Undocumented.GetChattersAsync(TwitchInfo.ChannelName).Result;
-            var viewers = new System.Text.StringBuilder();
-            for (int i = 0; i < chatusers.Count; i++)
-            {
-                viewers.AppendLine($"@{chatusers[i].Username}");
-            }
-            return viewers.ToString();
         }
     }
 }
