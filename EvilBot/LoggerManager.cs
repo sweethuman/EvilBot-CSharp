@@ -4,7 +4,7 @@ using TwitchLib.Client;
 
 namespace EvilBot
 {
-    internal class LoggerManager
+    public class LoggerManager : ILoggerManager
     {
         public ILogger<TwitchClient> Logger { get; set; }
 

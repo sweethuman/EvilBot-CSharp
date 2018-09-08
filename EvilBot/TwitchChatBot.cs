@@ -17,13 +17,21 @@ namespace EvilBot
         private readonly ConnectionCredentials credentials = new ConnectionCredentials(TwitchInfo.BotUsername, TwitchInfo.BotToken);
         private TwitchClient client;
 
+        public TwitchClient Client
+        {
+            get
+            {
+                return client;
+            }
+        }
+
         private Timer addPointsTimer;
         private Timer addLurkerPointsTimer;
         private Timer messageRepeater;
 
-        private readonly LoggerManager loggerManager = new LoggerManager();
+        private readonly ILoggerManager loggerManager = Factory.GetLoggerManager();
 
-        public static SqliteDataAccess SqliteDataAccess { get; } = new SqliteDataAccess();
+        public static IDataAccess SqliteDataAccess { get; } = Factory.GetDataAccess();
 
         internal void Connect()
         {
@@ -159,6 +167,30 @@ namespace EvilBot
                         }
                     }
                     Log.Debug("{DisplayName} asked for points!", e.Command.ChatMessage.DisplayName);
+                    break;
+
+                case "pointmanage":
+                    int pointNumber;
+                    string userid;
+                    if (e.Command.ChatMessage.UserType >= TwitchLib.Client.Enums.UserType.Moderator)
+                    {
+                        if (!string.IsNullOrEmpty(e.Command.ArgumentsAsString))
+                        {
+                            if (!(e.Command.ArgumentsAsList.Count < 2) && int.TryParse(e.Command.ArgumentsAsList[1], out pointNumber) && (userid = await GetUserIdAsync(e.Command.ArgumentsAsList[0].TrimStart('@')).ConfigureAwait(false)) != null)
+                            {
+                                await SqliteDataAccess.AddPointToUserID(userid, pointNumber).ConfigureAwait(false);
+                                Client.SendMessage(e.Command.ChatMessage.Channel, $"Modified points of {e.Command.ArgumentsAsList[0]} with {e.Command.ArgumentsAsList[1]}");
+                            }
+                            else
+                            {
+                                Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.PointManageText);
+                            }
+                        }
+                        else
+                        {
+                            Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.PointManageText);
+                        }
+                    }
                     break;
 
                 default:

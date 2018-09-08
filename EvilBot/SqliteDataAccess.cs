@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace EvilBot
 {
-    public class SqliteDataAccess
+    public class SqliteDataAccess : IDataAccess
     {
         private IDbConnection RetrieveConnection { get; } = new SQLiteConnection(LoadConnectionString("read_only"));
         private IDbConnection WriteConnection { get; } = new SQLiteConnection(LoadConnectionString());
@@ -28,7 +28,7 @@ namespace EvilBot
             return output.ToList()[0];
         }
 
-        public async Task AddPointToUserID(string userID)
+        public async Task AddPointToUserID(string userID, int points = 1)
         {
             if (userID == null)
             {
@@ -38,12 +38,12 @@ namespace EvilBot
             if (!(await WriteConnection.QueryAsync<string>($"SELECT UserID from UserPoints WHERE UserID = '{userID}'", new DynamicParameters()).ConfigureAwait(false)).Any())
             {
                 Log.Debug("Added a new User to Database with {UserID}", userID);
-                await WriteConnection.ExecuteAsync($"INSERT INTO UserPoints (UserID, Points) VALUES ('{userID}', '1')").ConfigureAwait(false);
+                await WriteConnection.ExecuteAsync($"INSERT INTO UserPoints (UserID, Points) VALUES ('{userID}', '{points}')").ConfigureAwait(false);
             }
             else
             {
                 Log.Debug("Updated a User with {UserID}", userID);
-                await WriteConnection.ExecuteAsync($"UPDATE UserPoints SET Points = Points + 1 WHERE UserID = '{userID}'").ConfigureAwait(false);
+                await WriteConnection.ExecuteAsync($"UPDATE UserPoints SET Points = Points + {points} WHERE UserID = '{userID}'").ConfigureAwait(false);
             }
         }
 
