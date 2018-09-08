@@ -68,10 +68,18 @@ namespace EvilBot
         private async void AddLurkerPointsTimer_ElapsedAsync(object sender, ElapsedEventArgs e)
         {
             List<TwitchLib.Api.Models.Undocumented.Chatters.ChatterFormatted> chatusers = await api.Undocumented.GetChattersAsync(TwitchInfo.ChannelName).ConfigureAwait(false);
+            List<Task> addPointsTasks = new List<Task>();
+            List<Task<string>> userIdTasks = new List<Task<string>>();
             for (int i = 0; i < chatusers.Count; i++)
             {
-                await SqliteDataAccess.AddPointToUserID(await GetUserIdAsync(chatusers[i].Username).ConfigureAwait(false)).ConfigureAwait(false);
+                userIdTasks.Add(GetUserIdAsync(chatusers[i].Username));
             }
+            var userIDList = await Task.WhenAll(userIdTasks);
+            for (int i = 1; i < chatusers.Count; i++)
+            {
+                addPointsTasks.Add(SqliteDataAccess.AddPointToUserID(userIDList[i]));
+            }
+            await Task.WhenAll(addPointsTasks);
             Log.Debug("Database updated! Lurkers present: {Lurkers}", chatusers.Count);
         }
 
@@ -219,6 +227,7 @@ namespace EvilBot
 
         private async Task<string> GetUserIdAsync(string username)
         {
+            Log.Debug("AskedForID for {Username}", username);
             User[] userList = (await api.Users.v5.GetUserByNameAsync(username).ConfigureAwait(false)).Matches;
             if (username == null || userList.Length == 0)
             {
