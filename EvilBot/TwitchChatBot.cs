@@ -62,7 +62,7 @@ namespace EvilBot
             client.OnConnectionError += Client_OnConnectionError;
             client.OnChatCommandReceived += Client_OnChatCommandReceived;
             client.OnMessageReceived += Client_OnMessageReceived;
-            client.OnWhisperReceived += Client_OnWhisperReceived;
+            //client.OnWhisperReceived += Client_OnWhisperReceived;
         }
 
         private async void AddLurkerPointsTimer_ElapsedAsync(object sender, ElapsedEventArgs e)
@@ -74,12 +74,12 @@ namespace EvilBot
             {
                 userIdTasks.Add(GetUserIdAsync(chatusers[i].Username));
             }
-            var userIDList = await Task.WhenAll(userIdTasks);
+            var userIDList = await Task.WhenAll(userIdTasks).ConfigureAwait(false);
             for (int i = 1; i < chatusers.Count; i++)
             {
                 addPointsTasks.Add(SqliteDataAccess.AddPointToUserID(userIDList[i]));
             }
-            await Task.WhenAll(addPointsTasks);
+            await Task.WhenAll(addPointsTasks).ConfigureAwait(false);
             Log.Debug("Database updated! Lurkers present: {Lurkers}", chatusers.Count);
         }
 
@@ -210,10 +210,10 @@ namespace EvilBot
             }
         }
 
-        private void Client_OnWhisperReceived(object sender, OnWhisperReceivedArgs e)
-        {
-            client.SendWhisper(e.WhisperMessage.Username, $"You said: {e.WhisperMessage.Message}");
-        }
+        //private void Client_OnWhisperReceived(object sender, OnWhisperReceivedArgs e)
+        //{
+        //    client.SendWhisper(e.WhisperMessage.Username, $"You said: {e.WhisperMessage.Message}");
+        //}
 
         private async Task<TimeSpan?> GetUptimeAsync()
         {
@@ -225,7 +225,7 @@ namespace EvilBot
             return api.Streams.v5.GetUptimeAsync(userId).Result;
         }
 
-        private async Task<string> GetUserIdAsync(string username)
+        private static async Task<string> GetUserIdAsync(string username)
         {
             Log.Debug("AskedForID for {Username}", username);
             User[] userList = (await api.Users.v5.GetUserByNameAsync(username).ConfigureAwait(false)).Matches;
