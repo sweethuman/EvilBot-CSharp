@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using Serilog;
 using System;
+using System.Collections.Generic;
 using System.Timers;
 using TwitchLib.Api;
 using TwitchLib.Client;
@@ -39,6 +40,8 @@ namespace EvilBot
         private static IDataAccess _dataAccess;
         private static IDataProcessor _dataProcessor;
 
+        public List<string> timedMessages = new List<string>();
+
         public TwitchChatBot(ILoggerManager loggerManager, IDataAccess dataAccess)
         {
             _loggerManager = loggerManager;
@@ -62,7 +65,14 @@ namespace EvilBot
 
             client.Connect();
 
+            TimedMessageInitializer();
             TimerInitializer();
+        }
+
+        private void TimedMessageInitializer()
+        {
+            timedMessages.Add("Incearca !points si vezi cat de activ ai fost");
+            timedMessages.Add("Fii activ ca sa castigi puncte");
         }
 
         private void TimerInitializer()
@@ -91,7 +101,8 @@ namespace EvilBot
 
         private void MessageRepeater_Elapsed(object sender, ElapsedEventArgs e)
         {
-            client.SendMessage(TwitchInfo.ChannelName, "/me Incearca !points si vezi cat de activ ai fost");
+            Random rnd = new Random();
+            client.SendMessage(TwitchInfo.ChannelName, $"/me {timedMessages[rnd.Next(0, timedMessages.Count)]}");
         }
 
         private void Client_OnMessageSent(object sender, OnMessageSentArgs e)
@@ -135,11 +146,11 @@ namespace EvilBot
                         string[] results = await _dataProcessor.GetPointsMinutesAsync(e.Command.ChatMessage.UserId).ConfigureAwait(false);
                         if (results != null)
                         {
-                            client.SendMessage(e.Command.ChatMessage.Channel, $"{e.Command.ChatMessage.DisplayName} You have: {results[0]} points and { Math.Round(double.Parse(results[1], System.Globalization.CultureInfo.InvariantCulture) / 60, 2)} hours! Be active to gain more!\n\r");
+                            client.SendMessage(e.Command.ChatMessage.Channel, $"/me {e.Command.ChatMessage.DisplayName} esti {_dataProcessor.GetRank(results[0])} cu {Math.Round(double.Parse(results[1], System.Globalization.CultureInfo.InvariantCulture) / 60, 1)} ore!\n\r");
                         }
                         else
                         {
-                            client.SendMessage(e.Command.ChatMessage.Channel, $"{e.Command.ChatMessage.DisplayName} You aren't yet in the database, hang on a little bit more and you'll be added at the next check!\n\r");
+                            client.SendMessage(e.Command.ChatMessage.Channel, $"/me {e.Command.ChatMessage.DisplayName} You aren't yet in the database, hang on a little bit more and you'll be added at the next check!\n\r");
                         }
                     }
                     else
@@ -147,11 +158,11 @@ namespace EvilBot
                         string[] results = await _dataProcessor.GetPointsMinutesAsync(await _dataProcessor.GetUserIdAsync(e.Command.ArgumentsAsString.TrimStart('@').ToLower()).ConfigureAwait(false)).ConfigureAwait(false);
                         if (results != null)
                         {
-                            client.SendMessage(e.Command.ChatMessage.Channel, $"{e.Command.ArgumentsAsString.TrimStart('@')} has: {results[0]} points and {Math.Round(double.Parse(results[1], System.Globalization.CultureInfo.InvariantCulture) / 60, 2)} hours!");
+                            client.SendMessage(e.Command.ChatMessage.Channel, $"/me {e.Command.ArgumentsAsString.TrimStart('@')} este {_dataProcessor.GetRank(results[0])} cu {Math.Round(double.Parse(results[1], System.Globalization.CultureInfo.InvariantCulture) / 60, 1)} ore!");
                         }
                         else
                         {
-                            client.SendMessage(e.Command.ChatMessage.Channel, $"{e.Command.ArgumentsAsString.TrimStart('@')} isn't yet in the database!");
+                            client.SendMessage(e.Command.ChatMessage.Channel, $"/me {e.Command.ArgumentsAsString.TrimStart('@')} isn't yet in the database!");
                         }
                     }
                     Log.Debug("{DisplayName} asked for points!", e.Command.ChatMessage.DisplayName);

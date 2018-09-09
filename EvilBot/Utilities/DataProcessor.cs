@@ -11,11 +11,57 @@ namespace EvilBot
     {
         private IDataAccess _dataAccess;
         private ITwitchConnections _twitchChatBot;
+        private List<Tuple<string, int>> ranks = new List<Tuple<string, int>>();
 
         public DataProcessor(IDataAccess dataAccess, ITwitchConnections twitchChatBot)
         {
             _dataAccess = dataAccess;
             _twitchChatBot = twitchChatBot;
+            IntializeRanks();
+        }
+
+        private void IntializeRanks()
+        {
+            ranks.Add(new Tuple<string, int>("Fara Rank", 0));
+            ranks.Add(new Tuple<string, int>("Rookie", 50));
+            ranks.Add(new Tuple<string, int>("Alpha", 500));
+            ranks.Add(new Tuple<string, int>("Thug", 2500));
+            ranks.Add(new Tuple<string, int>("Sage", 6000));
+            ranks.Add(new Tuple<string, int>("Lord", 10000));
+            ranks.Add(new Tuple<string, int>("Initiate", 15000));
+            ranks.Add(new Tuple<string, int>("Veteran", 22000));
+            ranks.Add(new Tuple<string, int>("Emperor", 30000));
+        }
+
+        public string GetRank(string pointsString)
+        {
+            int points;
+            int place = 0;
+            if (int.TryParse(pointsString, out points))
+            {
+                for (int i = 0; i < ranks.Count - 1; i++)
+                {
+                    if (points < ranks[i + 1].Item2)
+                    {
+                        break;
+                    }
+                    place = i + 1;
+                }
+                if (place == 0)
+                {
+                    return $"{ranks[place].Item1} XP: {points}/{ranks[place + 1].Item2}";
+                }
+                if (place == ranks.Count - 1)
+                {
+                    return $"{ranks[place].Item1} (Lvl.{place}) XP: {points}";
+                }
+                return $"{ranks[place].Item1} (Lvl.{place}) XP: {points}/{ranks[place + 1].Item2}";
+            }
+            else
+            {
+                Log.Error("pointsString {pointsString} is not a parsable value to int {GetRank}", pointsString, ToString());
+                return null;
+            }
         }
 
         public async void AddLurkerPointsTimer_ElapsedAsync(object sender, ElapsedEventArgs e)
@@ -74,9 +120,11 @@ namespace EvilBot
                 return null;
             }
 
-            List<Task<string>> tasks = new List<Task<string>>();
-            tasks.Add(_dataAccess.RetrieveRowAsync(userID));
-            tasks.Add(_dataAccess.RetrieveRowAsync(userID, true));
+            List<Task<string>> tasks = new List<Task<string>>
+            {
+                _dataAccess.RetrieveRowAsync(userID),
+                _dataAccess.RetrieveRowAsync(userID, true)
+            };
             var results = await Task.WhenAll(tasks).ConfigureAwait(false);
             if (results == null || results[0] == null)
             {
