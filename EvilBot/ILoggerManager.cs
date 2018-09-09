@@ -5,6 +5,7 @@ namespace EvilBot
 {
     public interface ILoggerManager
     {
-        ILogger<TwitchClient> Logger { get; set; }
+        ILogger<TwitchClient> ClientLogger { get; set; }
+        ILoggerFactory APILoggerFactory { get; set; }
     }
 }

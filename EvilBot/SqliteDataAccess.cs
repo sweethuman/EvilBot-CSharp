@@ -13,14 +13,20 @@ namespace EvilBot
         private IDbConnection RetrieveConnection { get; } = new SQLiteConnection(LoadConnectionString("read_only"));
         private IDbConnection WriteConnection { get; } = new SQLiteConnection(LoadConnectionString());
 
-        public async Task<string> RetrievePointsAsync(string userID)
+        //change bool to string and add an exception handler for when a row i'm asking for doesn't exist
+        public async Task<string> RetrieveRowAsync(string userID, bool retrieveMinutes = false)
         {
             if (userID == null)
             {
                 return null;
             }
+            string column = "Points";
 
-            var output = await RetrieveConnection.QueryAsync<string>($"SELECT Points FROM UserPoints WHERE UserID = '{userID}'", new DynamicParameters()).ConfigureAwait(false);
+            if (retrieveMinutes)
+            {
+                column = "Minutes";
+            }
+            var output = await RetrieveConnection.QueryAsync<string>($"SELECT {column} FROM UserPoints WHERE UserID = '{userID}'", new DynamicParameters()).ConfigureAwait(false);
             if (!output.Any()) //NOTE this was changed as well, test this method too
             {
                 return null;
@@ -28,7 +34,7 @@ namespace EvilBot
             return output.ToList()[0];
         }
 
-        public async Task AddPointToUserID(string userID, int points = 1)
+        public async Task AddPointToUserID(string userID, int points = 1, int minutes = 0)
         {
             if (userID == null)
             {
@@ -38,12 +44,12 @@ namespace EvilBot
             if (!(await WriteConnection.QueryAsync<string>($"SELECT UserID from UserPoints WHERE UserID = '{userID}'", new DynamicParameters()).ConfigureAwait(false)).Any())
             {
                 Log.Debug("Added a new User to Database with {UserID}", userID);
-                await WriteConnection.ExecuteAsync($"INSERT INTO UserPoints (UserID, Points) VALUES ('{userID}', '{points}')").ConfigureAwait(false);
+                await WriteConnection.ExecuteAsync($"INSERT INTO UserPoints (UserID, Points, Minutes) VALUES ('{userID}', '{points}', '{minutes}')").ConfigureAwait(false);
             }
             else
             {
-                Log.Debug("Updated a User with {UserID}", userID);
-                await WriteConnection.ExecuteAsync($"UPDATE UserPoints SET Points = Points + {points} WHERE UserID = '{userID}'").ConfigureAwait(false);
+                Log.Debug("Updated a User with {UserID} with {Minutes}", userID, minutes);
+                await WriteConnection.ExecuteAsync($"UPDATE UserPoints SET Points = Points + {points}, Minutes = Minutes + {minutes} WHERE UserID = '{userID}'").ConfigureAwait(false);
             }
         }
 

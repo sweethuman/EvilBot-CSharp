@@ -36,7 +36,7 @@ namespace EvilBot
         internal void Connect()
         {
             Console.WriteLine("Connecting");
-            client = new TwitchClient(logger: loggerManager.Logger);
+            client = new TwitchClient(logger: loggerManager.ClientLogger);
             client.Initialize(credentials, TwitchInfo.ChannelName);
 
             ApiInitialize();
@@ -83,9 +83,9 @@ namespace EvilBot
                 userIdTasks.Add(GetUserIdAsync(chatusers[i].Username));
             }
             var userIDList = await Task.WhenAll(userIdTasks).ConfigureAwait(false);
-            for (int i = 1; i < chatusers.Count; i++)
+            for (int i = 0; i < chatusers.Count; i++)
             {
-                addPointsTasks.Add(SqliteDataAccess.AddPointToUserID(userIDList[i]));
+                addPointsTasks.Add(SqliteDataAccess.AddPointToUserID(userIDList[i], minutes: 10));
             }
             await Task.WhenAll(addPointsTasks).ConfigureAwait(false);
             Log.Debug("Database updated! Lurkers present: {Lurkers}", chatusers.Count);
@@ -111,9 +111,9 @@ namespace EvilBot
             Console.WriteLine($" - - - sent channel: {e.SentMessage.Channel}");
         }
 
-        private static void ApiInitialize()
+        private void ApiInitialize()
         {
-            api = new TwitchAPI();
+            api = new TwitchAPI(loggerFactory: loggerManager.APILoggerFactory);
             api.Settings.ClientId = TwitchInfo.ClientID;
             api.Settings.AccessToken = TwitchInfo.BotToken;
         }
@@ -144,10 +144,10 @@ namespace EvilBot
                 case "points":
                     if (string.IsNullOrEmpty(e.Command.ArgumentsAsString))
                     {
-                        string points = await SqliteDataAccess.RetrievePointsAsync(e.Command.ChatMessage.UserId).ConfigureAwait(false);
-                        if (points != null)
+                        string[] results = await GetPointsMinutesAsync(e.Command.ChatMessage.UserId).ConfigureAwait(false);
+                        if (results != null)
                         {
-                            client.SendMessage(e.Command.ChatMessage.Channel, $"{e.Command.ChatMessage.DisplayName} You have: {points} points! Be active to gain more!\n\r");
+                            client.SendMessage(e.Command.ChatMessage.Channel, $"{e.Command.ChatMessage.DisplayName} You have: {results[0]} points and { Math.Round(double.Parse(results[1], System.Globalization.CultureInfo.InvariantCulture) / 60, 2)} hours! Be active to gain more!\n\r");
                         }
                         else
                         {
@@ -156,10 +156,10 @@ namespace EvilBot
                     }
                     else
                     {
-                        string points = await SqliteDataAccess.RetrievePointsAsync(await GetUserIdAsync(e.Command.ArgumentsAsString.TrimStart('@').ToLower()).ConfigureAwait(false)).ConfigureAwait(false);
-                        if (points != null)
+                        string[] results = await GetPointsMinutesAsync(await GetUserIdAsync(e.Command.ArgumentsAsString.TrimStart('@').ToLower()).ConfigureAwait(false)).ConfigureAwait(false);
+                        if (results != null)
                         {
-                            client.SendMessage(e.Command.ChatMessage.Channel, $"{e.Command.ArgumentsAsString.TrimStart('@')} has: {points} points!");
+                            client.SendMessage(e.Command.ChatMessage.Channel, $"{e.Command.ArgumentsAsString.TrimStart('@')} has: {results[0]} points and {Math.Round(double.Parse(results[1], System.Globalization.CultureInfo.InvariantCulture) / 60, 2)} hours!");
                         }
                         else
                         {
@@ -266,6 +266,25 @@ namespace EvilBot
                 return null;
             }
             return userList[0].Id;
+        }
+
+        private async Task<string[]> GetPointsMinutesAsync(string userID)
+        {
+            if (userID == null)
+            {
+                return null;
+            }
+
+            List<Task<string>> tasks = new List<Task<string>>();
+            tasks.Add(SqliteDataAccess.RetrieveRowAsync(userID));
+            tasks.Add(SqliteDataAccess.RetrieveRowAsync(userID, true));
+            var results = await Task.WhenAll(tasks);
+            if (results == null || results[0] == null)
+            {
+                return null;
+            }
+
+            return results;
         }
     }
 }
