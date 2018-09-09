@@ -268,13 +268,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Factory.cs" />
-    <Compile Include="IDataAccess.cs" />
-    <Compile Include="ILoggerManager.cs" />
-    <Compile Include="LoggerManager.cs" />
+    <Compile Include="Utilities\IDataAccess.cs" />
+    <Compile Include="Utilities\ILoggerManager.cs" />
+    <Compile Include="Utilities\LoggerManager.cs" />
     <Compile Include="PointCounter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SqliteDataAccess.cs" />
+    <Compile Include="Utilities\SqliteDataAccess.cs" />
     <Compile Include="StandardMessages.cs" />
     <Compile Include="TwitchChatBot.cs" />
     <Compile Include="TwitchInfo.Designer.cs">
