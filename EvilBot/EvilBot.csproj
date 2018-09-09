@@ -53,6 +53,9 @@
     <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Autofac, Version=4.8.1.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autofac.4.8.1\lib\net45\Autofac.dll</HintPath>
+    </Reference>
     <Reference Include="Dapper, Version=1.50.5.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Dapper.1.50.5\lib\net451\Dapper.dll</HintPath>
     </Reference>
@@ -267,9 +270,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Factory.cs" />
-    <Compile Include="Utilities\IDataAccess.cs" />
-    <Compile Include="Utilities\ILoggerManager.cs" />
+    <Compile Include="Application.cs" />
+    <Compile Include="ContainerConfig.cs" />
+    <Compile Include="Utilities\DataProcessor.cs" />
+    <Compile Include="IApplication.cs" />
+    <Compile Include="Utilities\Interfaces\IDataProcessor.cs" />
+    <Compile Include="ITwitchChatBot.cs" />
+    <Compile Include="ITwitchConnections.cs" />
+    <Compile Include="Utilities\Interfaces\IDataAccess.cs" />
+    <Compile Include="Utilities\Interfaces\ILoggerManager.cs" />
     <Compile Include="Utilities\LoggerManager.cs" />
     <Compile Include="PointCounter.cs" />
     <Compile Include="Program.cs" />

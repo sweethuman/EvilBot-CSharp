@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Autofac;
 
 namespace EvilBot
 {
@@ -6,12 +6,19 @@ namespace EvilBot
     {
         private static void Main(string[] args)
         {
-            TwitchChatBot bot = new TwitchChatBot();
-            bot.Connect();
+            var container = ContainerConfig.Config();
+            using (var scope = container.BeginLifetimeScope())
+            {
+                var app = scope.Resolve<IApplication>();
+                app.Run();
+            }
 
-            Console.ReadLine();
+            //TwitchChatBot bot = new TwitchChatBot();
+            //bot.Connect();
 
-            bot.Disconnect();
+            //Console.ReadLine();
+
+            //bot.Disconnect();
         }
     }
 }
