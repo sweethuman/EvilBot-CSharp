@@ -272,8 +272,10 @@
   <ItemGroup>
     <Compile Include="Application.cs" />
     <Compile Include="ContainerConfig.cs" />
+    <Compile Include="Utilities\EventArguments.cs" />
     <Compile Include="Utilities\DataProcessor.cs" />
     <Compile Include="IApplication.cs" />
+    <Compile Include="Utilities\Enums.cs" />
     <Compile Include="Utilities\Interfaces\IDataProcessor.cs" />
     <Compile Include="ITwitchChatBot.cs" />
     <Compile Include="ITwitchConnections.cs" />

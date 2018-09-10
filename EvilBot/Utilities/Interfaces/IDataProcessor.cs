@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Timers;
 
@@ -6,7 +7,9 @@ namespace EvilBot
 {
     internal interface IDataProcessor
     {
-        Task<string[]> GetPointsMinutesAsync(string userID);
+        event EventHandler<RankUpdateEventArgs> RankUpdated;
+
+        Task<List<string>> GetUserAttributesAsync(string userID);
 
         Task<string> GetUserIdAsync(string username);
 
@@ -20,6 +23,6 @@ namespace EvilBot
 
 #pragma warning restore RCS1047 // Non-asynchronous method name should not end with 'Async'.
 
-        string GetRank(string pointsString);
+        string GetRankFormatted(string pointsString);
     }
 }

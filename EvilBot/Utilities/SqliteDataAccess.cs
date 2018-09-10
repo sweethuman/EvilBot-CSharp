@@ -13,19 +13,15 @@ namespace EvilBot
         private IDbConnection RetrieveConnection { get; } = new SQLiteConnection(LoadConnectionString("read_only"));
         private IDbConnection WriteConnection { get; } = new SQLiteConnection(LoadConnectionString());
 
-        //change bool to string and add an exception handler for when a row i'm asking for doesn't exist
-        public async Task<string> RetrieveRowAsync(string userID, bool retrieveMinutes = false)
+        //TODO change bool to enum and add an exception handler for when a row i'm asking for doesn't exist
+        public async Task<string> RetrieveRowAsync(string userID, Enums.DatabaseRow databaseRow = Enums.DatabaseRow.Points)
         {
             if (userID == null)
             {
                 return null;
             }
-            string column = "Points";
+            string column = databaseRow.ToString();
 
-            if (retrieveMinutes)
-            {
-                column = "Minutes";
-            }
             var output = await RetrieveConnection.QueryAsync<string>($"SELECT {column} FROM UserPoints WHERE UserID = '{userID}'", new DynamicParameters()).ConfigureAwait(false);
             if (!output.Any()) //NOTE this was changed as well, test this method too
             {
@@ -34,7 +30,7 @@ namespace EvilBot
             return output.ToList()[0];
         }
 
-        public async Task AddPointToUserID(string userID, int points = 1, int minutes = 0)
+        public async Task ModifierUserIDAsync(string userID, int points = 1, int minutes = 0)
         {
             if (userID == null)
             {
@@ -51,6 +47,17 @@ namespace EvilBot
                 Log.Debug("Updated a User with {UserID} with {Minutes}", userID, minutes);
                 await WriteConnection.ExecuteAsync($"UPDATE UserPoints SET Points = Points + {points}, Minutes = Minutes + {minutes} WHERE UserID = '{userID}'").ConfigureAwait(false);
             }
+        }
+
+        public async Task ModifyUserIDRankAsync(string userID, int rank)
+        {
+            if (userID == null)
+            {
+                return;
+            }
+
+            Log.Debug("Advanced a User with {UserID} with [{Rank}]", userID, rank);
+            await WriteConnection.ExecuteAsync($"UPDATE UserPoints SET Rank = {rank} WHERE UserID = '{userID}'").ConfigureAwait(false);
         }
 
         private static string LoadConnectionString(string id = "Default")

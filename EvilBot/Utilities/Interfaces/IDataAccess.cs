@@ -4,8 +4,8 @@ namespace EvilBot
 {
     public interface IDataAccess
     {
-        Task AddPointToUserID(string userID, int points = 1, int minutes = 0);
+        Task ModifierUserIDAsync(string userID, int points = 1, int minutes = 0);
 
-        Task<string> RetrieveRowAsync(string userID, bool retrieveMinutes = false);
+        Task<string> RetrieveRowAsync(string userID, Enums.DatabaseRow databaseRow = Enums.DatabaseRow.Points);
     }
 }

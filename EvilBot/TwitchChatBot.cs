@@ -73,6 +73,8 @@ namespace EvilBot
         {
             timedMessages.Add("Incearca !points si vezi cat de activ ai fost");
             timedMessages.Add("Fii activ ca sa castigi puncte");
+            timedMessages.Add("Daca iti place, apasa butonul de FOLLOW! Multumesc pentru sustinere!");
+            timedMessages.Add("Subcriberii castiga triplu de puncte!");
         }
 
         private void TimerInitializer()
@@ -97,6 +99,12 @@ namespace EvilBot
             client.OnConnectionError += Client_OnConnectionError;
             client.OnChatCommandReceived += Client_OnChatCommandReceived;
             client.OnMessageReceived += Client_OnMessageReceived;
+            _dataProcessor.RankUpdated += _dataProcessor_RankUpdated;
+        }
+
+        private void _dataProcessor_RankUpdated(object sender, RankUpdateEventArgs e)
+        {
+            client.SendMessage(TwitchInfo.ChannelName, $"/me {e.Name} ai avansat la {e.Rank}");
         }
 
         private void MessageRepeater_Elapsed(object sender, ElapsedEventArgs e)
@@ -143,10 +151,11 @@ namespace EvilBot
                 case "points":
                     if (string.IsNullOrEmpty(e.Command.ArgumentsAsString))
                     {
-                        string[] results = await _dataProcessor.GetPointsMinutesAsync(e.Command.ChatMessage.UserId).ConfigureAwait(false);
+                        List<string> results = await _dataProcessor.GetUserAttributesAsync(e.Command.ChatMessage.UserId).ConfigureAwait(false);
+                        //TODO remove get rank, and get rank directly from database
                         if (results != null)
                         {
-                            client.SendMessage(e.Command.ChatMessage.Channel, $"/me {e.Command.ChatMessage.DisplayName} esti {_dataProcessor.GetRank(results[0])} cu {Math.Round(double.Parse(results[1], System.Globalization.CultureInfo.InvariantCulture) / 60, 1)} ore!\n\r");
+                            client.SendMessage(e.Command.ChatMessage.Channel, $"/me {e.Command.ChatMessage.DisplayName} esti {_dataProcessor.GetRankFormatted(results[0])} cu {Math.Round(double.Parse(results[1], System.Globalization.CultureInfo.InvariantCulture) / 60, 1)} ore!\n\r");
                         }
                         else
                         {
@@ -155,10 +164,10 @@ namespace EvilBot
                     }
                     else
                     {
-                        string[] results = await _dataProcessor.GetPointsMinutesAsync(await _dataProcessor.GetUserIdAsync(e.Command.ArgumentsAsString.TrimStart('@').ToLower()).ConfigureAwait(false)).ConfigureAwait(false);
+                        List<string> results = await _dataProcessor.GetUserAttributesAsync(await _dataProcessor.GetUserIdAsync(e.Command.ArgumentsAsString.TrimStart('@').ToLower()).ConfigureAwait(false)).ConfigureAwait(false);
                         if (results != null)
                         {
-                            client.SendMessage(e.Command.ChatMessage.Channel, $"/me {e.Command.ArgumentsAsString.TrimStart('@')} este {_dataProcessor.GetRank(results[0])} cu {Math.Round(double.Parse(results[1], System.Globalization.CultureInfo.InvariantCulture) / 60, 1)} ore!");
+                            client.SendMessage(e.Command.ChatMessage.Channel, $"/me {e.Command.ArgumentsAsString.TrimStart('@')} este {_dataProcessor.GetRankFormatted(results[0])} cu {Math.Round(double.Parse(results[1], System.Globalization.CultureInfo.InvariantCulture) / 60, 1)} ore!");
                         }
                         else
                         {
@@ -177,7 +186,8 @@ namespace EvilBot
                         {
                             if (!(e.Command.ArgumentsAsList.Count < 2) && int.TryParse(e.Command.ArgumentsAsList[1], out pointNumber) && (userid = await _dataProcessor.GetUserIdAsync(e.Command.ArgumentsAsList[0].TrimStart('@')).ConfigureAwait(false)) != null)
                             {
-                                await _dataAccess.AddPointToUserID(userid, pointNumber).ConfigureAwait(false);
+                                //TODO use the new class here so this will check for rank updates too, maybe
+                                await _dataAccess.ModifierUserIDAsync(userid, pointNumber).ConfigureAwait(false);
                                 Client.SendMessage(e.Command.ChatMessage.Channel, $"Modified points of {e.Command.ArgumentsAsList[0]} with {e.Command.ArgumentsAsList[1]}");
                             }
                             else
