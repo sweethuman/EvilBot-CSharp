@@ -13,6 +13,7 @@ namespace EvilBot
         private IDataAccess _dataAccess;
         private ITwitchConnections _twitchChatBot;
         private List<Tuple<string, int>> ranks = new List<Tuple<string, int>>();
+        public static int RankNumber { get; private set; } = 8;
 
         public event EventHandler<RankUpdateEventArgs> RankUpdated;
 
@@ -39,13 +40,14 @@ namespace EvilBot
             ranks.Add(new Tuple<string, int>("Initiate", 15000));
             ranks.Add(new Tuple<string, int>("Veteran", 22000));
             ranks.Add(new Tuple<string, int>("Emperor", 30000));
+
+            RankNumber = ranks.Count;
         }
 
-        public string GetRankFormatted(string pointsString)
+        public string GetRankFormatted(string rankString, string pointsString)
         {
-            if (int.TryParse(pointsString, out int points))
+            if (int.TryParse(rankString, out int place) && int.TryParse(pointsString, out int points))
             {
-                int place = GetRank(points);
                 if (place == 0)
                 {
                     return $"{ranks[place].Item1} XP: {points}/{ranks[place + 1].Item2}";
@@ -58,7 +60,7 @@ namespace EvilBot
             }
             else
             {
-                Log.Error("pointsString {pointsString} is not a parsable value to int {GetRank}", pointsString, ToString());
+                Log.Error("{rankString} {pointsString} is not a parsable value to int {method}", rankString, pointsString, $"{ToString()} GetRankFormatted");
                 return null;
             }
         }
@@ -87,15 +89,14 @@ namespace EvilBot
                 userIdTasks.Add(GetUserIdAsync(chatusers[i].Username));
             }
             string[] userIDList = await Task.WhenAll(userIdTasks).ConfigureAwait(false);
-            Log.Debug("shit");
-            await AddsToUsersAsync(userIDList.ToList(), minutes: 10);
+            await AddsToUsersAsync(userIDList.ToList(), minutes: 10).ConfigureAwait(false);
             Log.Debug("Database updated! Lurkers present: {Lurkers}", chatusers.Count);
         }
 
         public async void AddPointsTimer_ElapsedAsync(object sender, ElapsedEventArgs e)
         {
             List<string> temporaryTalkers = PointCounter.ClearTalkerPoints();
-            await AddsToUsersAsync(temporaryTalkers);
+            await AddsToUsersAsync(temporaryTalkers).ConfigureAwait(false);
             Log.Debug("Database updated! Talkers present: {Talkers}", temporaryTalkers.Count);
         }
 
@@ -109,9 +110,9 @@ namespace EvilBot
             var userAttributes = (await Task.WhenAll(userAttributesTasks).ConfigureAwait(false)).ToList();
             List<Task<string>> userNameListTasks = new List<Task<string>>();
             List<int> userNameRanks = new List<int>();
+            List<Task> databaseRankUpdateTasks = new List<Task>();
             for (int i = 0; i < userAttributes.Count; i++)
             {
-                Log.Warning($"{i} shit3");
                 if (!int.TryParse(userAttributes[i][0], out int points))
                 {
                     Log.Error("Tried to parse string to int: {string} in {ClassSource}", userAttributes[i][1], $"{ToString()}UpdateRankAsync");
@@ -124,11 +125,13 @@ namespace EvilBot
                 if (currentRank != rank)
                 {
                     userNameRanks.Add(currentRank);
-                    //TODO add tasklist to modify the rank in the database
+                    databaseRankUpdateTasks.Add(_dataAccess.ModifyUserIDRankAsync(userIDList[i], currentRank));
                     userNameListTasks.Add(GetUsernameAsync(userIDList[i]));
                 }
             }
 
+            //NOTE this might have a performance impact because it waits for all queries to complete
+            await Task.WhenAll(databaseRankUpdateTasks).ConfigureAwait(false);
             var userNameList = (await Task.WhenAll(userNameListTasks).ConfigureAwait(false)).ToList();
             for (int i = 0; i < userNameList.Count; i++)
             {
@@ -136,7 +139,6 @@ namespace EvilBot
             }
         }
 
-        //TODO make it support a single string too
         public async Task AddsToUsersAsync(List<string> userIDList, int points = 1, int minutes = 0)
         {
             if (userIDList.Count != 0)
@@ -144,7 +146,6 @@ namespace EvilBot
                 List<Task> addPointsTasks = new List<Task>();
                 for (int dnd = 0; dnd < userIDList.Count; dnd++)
                 {
-                    Log.Warning($"{dnd} shit2");
                     addPointsTasks.Add(_dataAccess.ModifierUserIDAsync(userIDList[dnd], points: points, minutes: minutes));
                 }
                 await Task.WhenAll(addPointsTasks).ConfigureAwait(false);
@@ -181,7 +182,7 @@ namespace EvilBot
             {
                 return null;
             }
-            return user.Name;
+            return user.DisplayName;
         }
 
         public async Task<List<string>> GetUserAttributesAsync(string userID)

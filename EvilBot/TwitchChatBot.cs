@@ -39,13 +39,15 @@ namespace EvilBot
         private readonly ILoggerManager _loggerManager;
         private static IDataAccess _dataAccess;
         private static IDataProcessor _dataProcessor;
+        private static IPollManager _pollManager;
 
         public List<string> timedMessages = new List<string>();
 
-        public TwitchChatBot(ILoggerManager loggerManager, IDataAccess dataAccess)
+        public TwitchChatBot(ILoggerManager loggerManager, IDataAccess dataAccess, IPollManager pollManager)
         {
             _loggerManager = loggerManager;
             _dataAccess = dataAccess;
+            _pollManager = pollManager;
         }
 
         public void Connect()
@@ -71,8 +73,8 @@ namespace EvilBot
 
         private void TimedMessageInitializer()
         {
-            timedMessages.Add("Incearca !points si vezi cat de activ ai fost");
-            timedMessages.Add("Fii activ ca sa castigi puncte");
+            timedMessages.Add("Incearca !rank si vezi cat de activ ai fost");
+            timedMessages.Add("Fii activ ca sa castigi XP");
             timedMessages.Add("Daca iti place, apasa butonul de FOLLOW! Multumesc pentru sustinere!");
             timedMessages.Add("Subcriberii castiga triplu de puncte!");
         }
@@ -148,14 +150,13 @@ namespace EvilBot
                     client.SendMessage(TwitchInfo.ChannelName, "/me Incearca !points si vezi cat de activ ai fost");
                     break;
 
-                case "points":
+                case "rank":
                     if (string.IsNullOrEmpty(e.Command.ArgumentsAsString))
                     {
                         List<string> results = await _dataProcessor.GetUserAttributesAsync(e.Command.ChatMessage.UserId).ConfigureAwait(false);
-                        //TODO remove get rank, and get rank directly from database
                         if (results != null)
                         {
-                            client.SendMessage(e.Command.ChatMessage.Channel, $"/me {e.Command.ChatMessage.DisplayName} esti {_dataProcessor.GetRankFormatted(results[0])} cu {Math.Round(double.Parse(results[1], System.Globalization.CultureInfo.InvariantCulture) / 60, 1)} ore!\n\r");
+                            client.SendMessage(e.Command.ChatMessage.Channel, $"/me {e.Command.ChatMessage.DisplayName} esti {_dataProcessor.GetRankFormatted(results[2], results[0])} cu {Math.Round(double.Parse(results[1], System.Globalization.CultureInfo.InvariantCulture) / 60, 1)} ore!\n\r");
                         }
                         else
                         {
@@ -167,7 +168,7 @@ namespace EvilBot
                         List<string> results = await _dataProcessor.GetUserAttributesAsync(await _dataProcessor.GetUserIdAsync(e.Command.ArgumentsAsString.TrimStart('@').ToLower()).ConfigureAwait(false)).ConfigureAwait(false);
                         if (results != null)
                         {
-                            client.SendMessage(e.Command.ChatMessage.Channel, $"/me {e.Command.ArgumentsAsString.TrimStart('@')} este {_dataProcessor.GetRankFormatted(results[0])} cu {Math.Round(double.Parse(results[1], System.Globalization.CultureInfo.InvariantCulture) / 60, 1)} ore!");
+                            client.SendMessage(e.Command.ChatMessage.Channel, $"/me {e.Command.ArgumentsAsString.TrimStart('@')} este {_dataProcessor.GetRankFormatted(results[2], results[0])} cu {Math.Round(double.Parse(results[1], System.Globalization.CultureInfo.InvariantCulture) / 60, 1)} ore!");
                         }
                         else
                         {
@@ -186,7 +187,6 @@ namespace EvilBot
                         {
                             if (!(e.Command.ArgumentsAsList.Count < 2) && int.TryParse(e.Command.ArgumentsAsList[1], out pointNumber) && (userid = await _dataProcessor.GetUserIdAsync(e.Command.ArgumentsAsList[0].TrimStart('@')).ConfigureAwait(false)) != null)
                             {
-                                //TODO use the new class here so this will check for rank updates too, maybe
                                 await _dataAccess.ModifierUserIDAsync(userid, pointNumber).ConfigureAwait(false);
                                 Client.SendMessage(e.Command.ChatMessage.Channel, $"Modified points of {e.Command.ArgumentsAsList[0]} with {e.Command.ArgumentsAsList[1]}");
                             }
@@ -199,6 +199,60 @@ namespace EvilBot
                         {
                             Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.PointManageText);
                         }
+                    }
+                    break;
+
+                case "pollcreate":
+                    if (e.Command.ChatMessage.UserType >= TwitchLib.Client.Enums.UserType.Moderator)
+                    {
+                        if (!string.IsNullOrEmpty(e.Command.ArgumentsAsString) && !(e.Command.ArgumentsAsList.Count < 2))
+                        {
+                            Client.SendMessage(e.Command.ChatMessage.Channel, $"/me {_pollManager.PollCreate(e.Command.ArgumentsAsList)}");
+                        }
+                        else
+                        {
+                            Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.PollCreateText);
+                        }
+                    }
+                    break;
+
+                case "pollvote":
+                    if (_pollManager.PollActive)
+                    {
+                        if (int.TryParse(e.Command.ArgumentsAsString, out int votedNumber))
+                        {
+                            await _pollManager.PollAddVote(e.Command.ChatMessage.UserId, votedNumber);
+                        }
+                        else
+                        {
+                            Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.PollVoteText);
+                        }
+                    }
+                    else
+                    {
+                        Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.PollNotActiveText);
+                    }
+                    break;
+
+                case "pollstats":
+                    if (_pollManager.PollActive)
+                    {
+                        Client.SendMessage(e.Command.ChatMessage.Channel, $"/me {_pollManager.PollStats()}");
+                    }
+                    else
+                    {
+                        Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.PollNotActiveText);
+                    }
+                    break;
+
+                case "pollend":
+                    if (_pollManager.PollActive)
+                    {
+                        Client.SendMessage(e.Command.ChatMessage.Channel, $"/me {_pollManager.PollEnd()}");
+                    }
+                    else
+                    {
+                        Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.PollNotActiveText);
                     }
                     break;
 

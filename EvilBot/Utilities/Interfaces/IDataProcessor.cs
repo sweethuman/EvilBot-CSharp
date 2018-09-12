@@ -23,6 +23,6 @@ namespace EvilBot
 
 #pragma warning restore RCS1047 // Non-asynchronous method name should not end with 'Async'.
 
-        string GetRankFormatted(string pointsString);
+        string GetRankFormatted(string rankString, string pointsString);
     }
 }

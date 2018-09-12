@@ -272,6 +272,8 @@
   <ItemGroup>
     <Compile Include="Application.cs" />
     <Compile Include="ContainerConfig.cs" />
+    <Compile Include="Utilities\Interfaces\IPollManager.cs" />
+    <Compile Include="Utilities\PollManager.cs" />
     <Compile Include="Utilities\EventArguments.cs" />
     <Compile Include="Utilities\DataProcessor.cs" />
     <Compile Include="IApplication.cs" />
