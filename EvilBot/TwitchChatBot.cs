@@ -2,6 +2,7 @@
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Timers;
 using TwitchLib.Api;
 using TwitchLib.Client;
@@ -145,11 +146,6 @@ namespace EvilBot
             Console.WriteLine($" - - - arg channel: {e.Command.ChatMessage.Channel}!");
             switch (e.Command.CommandText)
             {
-                case "viewers":
-                    Log.Debug("{Username} asked for Viewers!", e.Command.ChatMessage.Username);
-                    client.SendMessage(TwitchInfo.ChannelName, "/me Incearca !points si vezi cat de activ ai fost");
-                    break;
-
                 case "rank":
                     if (string.IsNullOrEmpty(e.Command.ArgumentsAsString))
                     {
@@ -160,7 +156,7 @@ namespace EvilBot
                         }
                         else
                         {
-                            client.SendMessage(e.Command.ChatMessage.Channel, $"/me {e.Command.ChatMessage.DisplayName} You aren't yet in the database, hang on a little bit more and you'll be added at the next check!\n\r");
+                            client.SendMessage(e.Command.ChatMessage.Channel, $"/me {e.Command.ChatMessage.DisplayName} You aren't yet in the database. You'll be added at the next minute check!");
                         }
                     }
                     else
@@ -188,7 +184,7 @@ namespace EvilBot
                             if (!(e.Command.ArgumentsAsList.Count < 2) && int.TryParse(e.Command.ArgumentsAsList[1], out pointNumber) && (userid = await _dataProcessor.GetUserIdAsync(e.Command.ArgumentsAsList[0].TrimStart('@')).ConfigureAwait(false)) != null)
                             {
                                 await _dataAccess.ModifierUserIDAsync(userid, pointNumber).ConfigureAwait(false);
-                                Client.SendMessage(e.Command.ChatMessage.Channel, $"Modified points of {e.Command.ArgumentsAsList[0]} with {e.Command.ArgumentsAsList[1]}");
+                                Client.SendMessage(e.Command.ChatMessage.Channel, $"/me Modified points of {e.Command.ArgumentsAsList[0]} with {e.Command.ArgumentsAsList[1]}");
                             }
                             else
                             {
@@ -205,9 +201,21 @@ namespace EvilBot
                 case "pollcreate":
                     if (e.Command.ChatMessage.UserType >= TwitchLib.Client.Enums.UserType.Moderator)
                     {
-                        if (!string.IsNullOrEmpty(e.Command.ArgumentsAsString) && !(e.Command.ArgumentsAsList.Count < 2))
+                        if (!string.IsNullOrEmpty(e.Command.ArgumentsAsString))
                         {
-                            Client.SendMessage(e.Command.ChatMessage.Channel, $"/me {_pollManager.PollCreate(e.Command.ArgumentsAsList)}");
+                            List<string> options = e.Command.ArgumentsAsString.Split('|').ToList();
+                            for (int i = 0; i < options.Count; i++)
+                            {
+                                options[i] = options[i].TrimEnd(' ').TrimStart(' ');
+                            }
+                            if (!(options.Count < 2))
+                            {
+                                Client.SendMessage(e.Command.ChatMessage.Channel, $"/me {_pollManager.PollCreate(options)}");
+                            }
+                            else
+                            {
+                                Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.PollCreateText);
+                            }
                         }
                         else
                         {
@@ -246,14 +254,21 @@ namespace EvilBot
                     break;
 
                 case "pollend":
-                    if (_pollManager.PollActive)
+                    if (e.Command.ChatMessage.UserType >= TwitchLib.Client.Enums.UserType.Moderator)
                     {
-                        Client.SendMessage(e.Command.ChatMessage.Channel, $"/me {_pollManager.PollEnd()}");
+                        if (_pollManager.PollActive)
+                        {
+                            Client.SendMessage(e.Command.ChatMessage.Channel, $"/me {_pollManager.PollEnd()}");
+                        }
+                        else
+                        {
+                            Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.PollNotActiveText);
+                        }
                     }
-                    else
-                    {
-                        Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.PollNotActiveText);
-                    }
+                    break;
+
+                case "comenzi":
+                    Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.ComenziText);
                     break;
 
                 default:

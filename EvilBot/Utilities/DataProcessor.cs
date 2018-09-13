@@ -81,6 +81,7 @@ namespace EvilBot
 
         public async void AddLurkerPointsTimer_ElapsedAsync(object sender, ElapsedEventArgs e)
         {
+            //in case twitch says something went wrong, it throws exception, catch that exception
             List<TwitchLib.Api.Models.Undocumented.Chatters.ChatterFormatted> chatusers = await _twitchChatBot.Api.Undocumented.GetChattersAsync(TwitchInfo.ChannelName).ConfigureAwait(false);
 
             List<Task<string>> userIdTasks = new List<Task<string>>();

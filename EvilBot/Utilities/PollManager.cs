@@ -10,7 +10,7 @@ namespace EvilBot
         public List<double> PollVotes { get; private set; } = null;
         public bool PollActive { get; private set; } = false;
 
-        private List<double> InfluencePoints { get; set; } = new List<double> { 1, 2, 2.5, 2.75, 3, 3.2, 3.4, 3.5, 3.55 };
+        private List<double> InfluencePoints { get; set; } = new List<double> { 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8 };
         private List<string> UsersWhoVoted;
         private IDataAccess _dataAccess;
 
@@ -33,7 +33,7 @@ namespace EvilBot
             string message = $"Poll Created! Poll Options ";
             for (int i = 0; i < PollItems.Count; i++)
             {
-                message = $"{message} {i + 1}:{PollItems[i]}";
+                message = $"{message} // {i + 1}:{PollItems[i]}";
             }
             return message;
         }
@@ -49,7 +49,7 @@ namespace EvilBot
                     winner = i;
                 }
             }
-            string message = $"A Castigat {PollItems[winner]} cu {PollVotes[winner]} puncte";
+            string message = $"A Castigat || {PollItems[winner]} || cu {PollVotes[winner]} puncte";
             PollItems = null;
             PollVotes = null;
             UsersWhoVoted = null;
@@ -62,7 +62,7 @@ namespace EvilBot
             string message = "Poll Stats:";
             for (int i = 0; i < PollItems.Count; i++)
             {
-                message = $"{message} {PollItems[i]}: {PollVotes[i]}";
+                message = $"{message} // {PollItems[i]}: {PollVotes[i]}";
             }
             return message;
         }
