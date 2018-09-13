@@ -271,6 +271,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Application.cs" />
+    <Compile Include="CommandHelpers.cs" />
     <Compile Include="ContainerConfig.cs" />
     <Compile Include="Utilities\Interfaces\IPollManager.cs" />
     <Compile Include="Utilities\PollManager.cs" />
@@ -284,11 +285,11 @@
     <Compile Include="Utilities\Interfaces\IDataAccess.cs" />
     <Compile Include="Utilities\Interfaces\ILoggerManager.cs" />
     <Compile Include="Utilities\LoggerManager.cs" />
-    <Compile Include="PointCounter.cs" />
+    <Compile Include="Utilities\PointCounter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\SqliteDataAccess.cs" />
-    <Compile Include="StandardMessages.cs" />
+    <Compile Include="Utilities\StandardMessages.cs" />
     <Compile Include="TwitchChatBot.cs" />
     <Compile Include="TwitchInfo.Designer.cs">
       <AutoGen>True</AutoGen>

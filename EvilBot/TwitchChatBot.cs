@@ -174,26 +174,75 @@ namespace EvilBot
                     Log.Debug("{DisplayName} asked for points!", e.Command.ChatMessage.DisplayName);
                     break;
 
-                case "pointmanage":
-                    int pointNumber;
+                case "manage":
                     string userid;
                     if (e.Command.ChatMessage.UserType >= TwitchLib.Client.Enums.UserType.Moderator)
                     {
                         if (!string.IsNullOrEmpty(e.Command.ArgumentsAsString))
                         {
-                            if (!(e.Command.ArgumentsAsList.Count < 2) && int.TryParse(e.Command.ArgumentsAsList[1], out pointNumber) && (userid = await _dataProcessor.GetUserIdAsync(e.Command.ArgumentsAsList[0].TrimStart('@')).ConfigureAwait(false)) != null)
+                            if (!(e.Command.ArgumentsAsList.Count < 2) && (userid = await _dataProcessor.GetUserIdAsync(e.Command.ArgumentsAsList[0].TrimStart('@')).ConfigureAwait(false)) != null)
                             {
-                                await _dataAccess.ModifierUserIDAsync(userid, pointNumber).ConfigureAwait(false);
-                                Client.SendMessage(e.Command.ChatMessage.Channel, $"/me Modified points of {e.Command.ArgumentsAsList[0]} with {e.Command.ArgumentsAsList[1]}");
+                                int pointModifier = 0;
+                                int minuteModifier = 0;
+                                bool twoParams = false;
+                                bool error = false;
+                                List<string> parameters = new List<string>() { e.Command.ArgumentsAsList[1] };
+                                if (e.Command.ArgumentsAsList.Count == 3)
+                                {
+                                    twoParams = true;
+                                    parameters = CommandHelpers.ManageCommandSorter(e.Command.ArgumentsAsList[1], e.Command.ArgumentsAsList[2]);
+                                }
+                                if (parameters[0].EndsWith("m", StringComparison.InvariantCultureIgnoreCase))
+                                {
+                                    parameters[0] = parameters[0].TrimEnd(new char[] { 'm', 'M' });
+
+                                    if (!int.TryParse(parameters[0], out minuteModifier))
+                                    {
+                                        error = true;
+                                        Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.ManageCommandText);
+                                    }
+                                }
+                                else
+                                {
+                                    if (!int.TryParse(parameters[0], out pointModifier))
+                                    {
+                                        error = true;
+                                        Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.ManageCommandText);
+                                    }
+                                }
+
+                                if (twoParams && !error)
+                                {
+                                    if (parameters[1].EndsWith("m", StringComparison.InvariantCultureIgnoreCase))
+                                    {
+                                        parameters[1] = parameters[1].TrimEnd(new char[] { 'm', 'M' });
+
+                                        if (!int.TryParse(parameters[1], out minuteModifier))
+                                        {
+                                            error = true;
+                                            Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.ManageCommandText);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        error = true;
+                                        Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.ManageCommandText);
+                                    }
+                                }
+                                if (!error)
+                                {
+                                    await _dataAccess.ModifierUserIDAsync(userid, pointModifier, minuteModifier).ConfigureAwait(false);
+                                    Client.SendMessage(e.Command.ChatMessage.Channel, $"/me Modified {e.Command.ArgumentsAsList[0]} with {pointModifier} points and {minuteModifier} minutes");
+                                }
                             }
                             else
                             {
-                                Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.PointManageText);
+                                Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.ManageCommandText);
                             }
                         }
                         else
                         {
-                            Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.PointManageText);
+                            Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.ManageCommandText);
                         }
                     }
                     break;
