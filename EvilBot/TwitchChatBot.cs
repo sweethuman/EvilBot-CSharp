@@ -252,10 +252,12 @@ namespace EvilBot
                     {
                         if (!string.IsNullOrEmpty(e.Command.ArgumentsAsString))
                         {
-                            List<string> options = e.Command.ArgumentsAsString.Split('|').ToList();
+                            string arguments = e.Command.ArgumentsAsString.Trim();
+                            arguments = arguments.Trim('|');
+                            List<string> options = arguments.Split('|').ToList();
                             for (int i = 0; i < options.Count; i++)
                             {
-                                options[i] = options[i].TrimEnd(' ').TrimStart(' ');
+                                options[i] = options[i].Trim();
                             }
                             if (!(options.Count < 2))
                             {
