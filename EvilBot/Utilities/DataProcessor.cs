@@ -130,8 +130,6 @@ namespace EvilBot
                     userNameListTasks.Add(GetUsernameAsync(userIDList[i]));
                 }
             }
-
-            //NOTE this might have a performance impact because it waits for all queries to complete
             await Task.WhenAll(databaseRankUpdateTasks).ConfigureAwait(false);
             var userNameList = (await Task.WhenAll(userNameListTasks).ConfigureAwait(false)).ToList();
             for (int i = 0; i < userNameList.Count; i++)
@@ -167,7 +165,16 @@ namespace EvilBot
         public async Task<string> GetUserIdAsync(string username)
         {
             Log.Debug("AskedForID for {Username}", username);
-            User[] userList = (await _twitchChatBot.Api.Users.v5.GetUserByNameAsync(username).ConfigureAwait(false)).Matches;
+            User[] userList;
+            try
+            {
+                userList = (await _twitchChatBot.Api.Users.v5.GetUserByNameAsync(username).ConfigureAwait(false)).Matches;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "GetUserIdAsync blew up with {username}", username);
+                return null;
+            }
             if (username == null || userList.Length == 0)
             {
                 return null;

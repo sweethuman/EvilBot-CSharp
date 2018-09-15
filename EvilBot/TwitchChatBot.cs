@@ -171,7 +171,8 @@ namespace EvilBot
                             client.SendMessage(e.Command.ChatMessage.Channel, $"/me {e.Command.ArgumentsAsString.TrimStart('@')} isn't yet in the database!");
                         }
                     }
-                    Log.Debug("{DisplayName} asked for points!", e.Command.ChatMessage.DisplayName);
+                    //t: add this to every one to log what commands were called
+                    Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.Message);
                     break;
 
                 case "manage":
@@ -344,6 +345,7 @@ namespace EvilBot
             if (!e.ChatMessage.Message.StartsWith("!"))
             {
                 PointCounter.AddMessagePoint(e.ChatMessage.UserId);
+                //TODO optimize this by making it a function
                 if (e.ChatMessage.Message.StartsWith("hi", StringComparison.InvariantCultureIgnoreCase))
                 {
                     client.SendMessage(e.ChatMessage.Channel, $"Hey there @{e.ChatMessage.DisplayName}");

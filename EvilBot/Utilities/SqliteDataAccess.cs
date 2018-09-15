@@ -46,7 +46,7 @@ namespace EvilBot
             }
             else
             {
-                Log.Debug("Updated a User with {UserID} with {Minutes}", userID, minutes);
+                Log.Debug("{userID} modified {minutes}m and {points}", userID, minutes, points);
                 await WriteConnection.ExecuteAsync($"UPDATE UserPoints SET Points = Points + {points}, Minutes = Minutes + {minutes} WHERE UserID = '{userID}'").ConfigureAwait(false);
             }
         }

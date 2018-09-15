@@ -14,7 +14,7 @@ namespace EvilBot
             Serilog.ILogger clientSerilogLogger = new LoggerConfiguration()
                 .Enrich.FromLogContext()
                 .WriteTo.Seq("http://localhost:5341")
-                .WriteTo.File("logfile.log", rollingInterval: RollingInterval.Day)
+                .WriteTo.File("logfile.log", rollingInterval: RollingInterval.Day, shared: true)
                 .MinimumLevel.Debug()
                 .CreateLogger();
             ClientLogger = new LoggerFactory()
@@ -24,7 +24,7 @@ namespace EvilBot
                 .Enrich.FromLogContext()
                 .Enrich.WithProperty("Source", "TwitchAPI", true)
                 .WriteTo.Seq("http://localhost:5341")
-                .WriteTo.File("logfile.log", rollingInterval: RollingInterval.Day)
+                .WriteTo.File("logfile.log", rollingInterval: RollingInterval.Day, shared: true)
                 .MinimumLevel.Debug()
                 .CreateLogger();
             APILoggerFactory = new LoggerFactory()
@@ -34,7 +34,7 @@ namespace EvilBot
                 .Enrich.FromLogContext()
                 .Enrich.WithProperty("Source", "TwitchChatBot", true)
                 .WriteTo.Seq("http://localhost:5341")
-                .WriteTo.File("logfile.log", rollingInterval: RollingInterval.Day)
+                .WriteTo.File("logfile.log", rollingInterval: RollingInterval.Day, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}", shared: true)
                 .MinimumLevel.Debug()
                 .CreateLogger();
         }
