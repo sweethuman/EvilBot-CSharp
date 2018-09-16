@@ -54,6 +54,7 @@ namespace EvilBot
         public void Connect()
         {
             Console.WriteLine("Connecting");
+            Log.Debug("Connecting");
             var container = ContainerConfig.Config();
             using (var scope = container.BeginLifetimeScope())
             {
@@ -72,12 +73,17 @@ namespace EvilBot
             TimerInitializer();
         }
 
+        public void Disconnect()
+        {
+            Console.WriteLine("Disconnecting");
+            Log.Debug("Disconnecting");
+        }
+
         private void TimedMessageInitializer()
         {
             timedMessages.Add("Incearca !rank si vezi cat de activ ai fost");
             timedMessages.Add("Fii activ ca sa castigi XP");
             timedMessages.Add("Daca iti place, apasa butonul de FOLLOW! Multumesc pentru sustinere!");
-            timedMessages.Add("Subcriberii castiga triplu de puncte!");
         }
 
         private void TimerInitializer()
@@ -136,17 +142,13 @@ namespace EvilBot
             client.WhisperThrottler.StartQueue();
         }
 
-        public void Disconnect()
-        {
-            Console.WriteLine("Disconnecting");
-        }
-
         private async void Client_OnChatCommandReceived(object sender, OnChatCommandReceivedArgs e)
         {
             Console.WriteLine($" - - - arg channel: {e.Command.ChatMessage.Channel}!");
             switch (e.Command.CommandText.ToLower())
             {
                 case "rank":
+                    Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.Message);
                     if (string.IsNullOrEmpty(e.Command.ArgumentsAsString))
                     {
                         List<string> results = await _dataProcessor.GetUserAttributesAsync(e.Command.ChatMessage.UserId).ConfigureAwait(false);
@@ -171,11 +173,11 @@ namespace EvilBot
                             client.SendMessage(e.Command.ChatMessage.Channel, $"/me {e.Command.ArgumentsAsString.TrimStart('@')} isn't yet in the database!");
                         }
                     }
-                    Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.Message);
                     break;
 
                 case "manage":
                     string userid;
+                    Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.Message);
                     if (e.Command.ChatMessage.UserType >= TwitchLib.Client.Enums.UserType.Moderator)
                     {
                         if (!string.IsNullOrEmpty(e.Command.ArgumentsAsString))
@@ -245,10 +247,10 @@ namespace EvilBot
                             Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.ManageCommandText);
                         }
                     }
-                    Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.Message);
                     break;
 
                 case "pollcreate":
+                    Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.Message);
                     if (e.Command.ChatMessage.UserType >= TwitchLib.Client.Enums.UserType.Moderator)
                     {
                         if (!string.IsNullOrEmpty(e.Command.ArgumentsAsString) && !e.Command.ArgumentsAsString.Contains("||"))
@@ -274,10 +276,10 @@ namespace EvilBot
                             Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.PollCreateText);
                         }
                     }
-                    Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.Message);
                     break;
 
                 case "pollvote":
+                    Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.Message);
                     if (_pollManager.PollActive)
                     {
                         if (int.TryParse(e.Command.ArgumentsAsString, out int votedNumber))
@@ -293,10 +295,10 @@ namespace EvilBot
                     {
                         Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.PollNotActiveText);
                     }
-                    Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.Message);
                     break;
 
                 case "pollstats":
+                    Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.Message);
                     if (_pollManager.PollActive)
                     {
                         Client.SendMessage(e.Command.ChatMessage.Channel, $"/me {_pollManager.PollStats()}");
@@ -305,10 +307,10 @@ namespace EvilBot
                     {
                         Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.PollNotActiveText);
                     }
-                    Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.Message);
                     break;
 
                 case "pollend":
+                    Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.Message);
                     if (e.Command.ChatMessage.UserType >= TwitchLib.Client.Enums.UserType.Moderator)
                     {
                         if (_pollManager.PollActive)
@@ -320,12 +322,11 @@ namespace EvilBot
                             Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.PollNotActiveText);
                         }
                     }
-                    Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.Message);
                     break;
 
                 case "comenzi":
-                    Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.ComenziText);
                     Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.Message);
+                    Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.ComenziText);
                     break;
 
                 default:

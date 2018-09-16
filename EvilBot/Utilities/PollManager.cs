@@ -21,6 +21,7 @@ namespace EvilBot
 
         public string PollCreate(List<string> optionsList)
         {
+            //t: in case given string is empty or null to not add it to the options
             Log.Debug("PollStared");
             PollItems = optionsList;
             UsersWhoVoted = new List<string>();
@@ -30,6 +31,7 @@ namespace EvilBot
                 PollVotes.Add(0);
             }
             PollActive = true;
+            //t: use string builder for improved performance
             string message = $"Poll Created! Poll Options ";
             for (int i = 0; i < PollItems.Count; i++)
             {

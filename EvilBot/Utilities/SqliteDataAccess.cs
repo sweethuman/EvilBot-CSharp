@@ -13,7 +13,7 @@ namespace EvilBot
         private IDbConnection RetrieveConnection { get; } = new SQLiteConnection(LoadConnectionString("read_only"));
         private IDbConnection WriteConnection { get; } = new SQLiteConnection(LoadConnectionString());
 
-        //t: TEST change bool to enum and add an exception handler for when a row i'm asking for doesn't exist
+        //t: MAKE a function that retrieves all three attributes at once for performance reasons
         public async Task<string> RetrieveRowAsync(string userID, Enums.DatabaseRow databaseRow = Enums.DatabaseRow.Points)
         {
             if (userID == null)
