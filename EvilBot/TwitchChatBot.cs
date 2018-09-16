@@ -144,7 +144,7 @@ namespace EvilBot
         private async void Client_OnChatCommandReceived(object sender, OnChatCommandReceivedArgs e)
         {
             Console.WriteLine($" - - - arg channel: {e.Command.ChatMessage.Channel}!");
-            switch (e.Command.CommandText)
+            switch (e.Command.CommandText.ToLower())
             {
                 case "rank":
                     if (string.IsNullOrEmpty(e.Command.ArgumentsAsString))
@@ -171,7 +171,6 @@ namespace EvilBot
                             client.SendMessage(e.Command.ChatMessage.Channel, $"/me {e.Command.ArgumentsAsString.TrimStart('@')} isn't yet in the database!");
                         }
                     }
-                    //t: add this to every one to log what commands were called
                     Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.Message);
                     break;
 
@@ -246,12 +245,13 @@ namespace EvilBot
                             Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.ManageCommandText);
                         }
                     }
+                    Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.Message);
                     break;
 
                 case "pollcreate":
                     if (e.Command.ChatMessage.UserType >= TwitchLib.Client.Enums.UserType.Moderator)
                     {
-                        if (!string.IsNullOrEmpty(e.Command.ArgumentsAsString))
+                        if (!string.IsNullOrEmpty(e.Command.ArgumentsAsString) && !e.Command.ArgumentsAsString.Contains("||"))
                         {
                             string arguments = e.Command.ArgumentsAsString.Trim();
                             arguments = arguments.Trim('|');
@@ -274,6 +274,7 @@ namespace EvilBot
                             Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.PollCreateText);
                         }
                     }
+                    Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.Message);
                     break;
 
                 case "pollvote":
@@ -292,6 +293,7 @@ namespace EvilBot
                     {
                         Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.PollNotActiveText);
                     }
+                    Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.Message);
                     break;
 
                 case "pollstats":
@@ -303,6 +305,7 @@ namespace EvilBot
                     {
                         Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.PollNotActiveText);
                     }
+                    Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.Message);
                     break;
 
                 case "pollend":
@@ -317,10 +320,12 @@ namespace EvilBot
                             Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.PollNotActiveText);
                         }
                     }
+                    Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.Message);
                     break;
 
                 case "comenzi":
                     Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.ComenziText);
+                    Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.Message);
                     break;
 
                 default:
@@ -340,36 +345,11 @@ namespace EvilBot
             Console.WriteLine(e.Data);
         }
 
-        private async void Client_OnMessageReceived(object sender, OnMessageReceivedArgs e)
+        private void Client_OnMessageReceived(object sender, OnMessageReceivedArgs e)
         {
             if (!e.ChatMessage.Message.StartsWith("!"))
             {
                 PointCounter.AddMessagePoint(e.ChatMessage.UserId);
-                //TODO optimize this by making it a function
-                if (e.ChatMessage.Message.StartsWith("hi", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    client.SendMessage(e.ChatMessage.Channel, $"Hey there @{e.ChatMessage.DisplayName}");
-                }
-                else
-                if (e.ChatMessage.Message.StartsWith("salut", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    client.SendMessage(e.ChatMessage.Channel, $"Salut @{e.ChatMessage.DisplayName}!");
-                }
-                else
-                if (e.ChatMessage.Message.StartsWith("buna", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    client.SendMessage(e.ChatMessage.Channel, $"Buna @{e.ChatMessage.DisplayName}!");
-                }
-                else
-                if (e.ChatMessage.Message.StartsWith("ceau", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    client.SendMessage(e.ChatMessage.Channel, $"Ceau @{e.ChatMessage.DisplayName}!");
-                }
-                else
-                if (e.ChatMessage.Message.StartsWith("wot", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    client.SendMessage(e.ChatMessage.Channel, (await _dataProcessor.GetUptimeAsync().ConfigureAwait(false))?.ToString() ?? "Offline");
-                }
             }
         }
     }
