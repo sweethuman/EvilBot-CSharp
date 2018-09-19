@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
-using TwitchLib.Api.Models.v5.Users;
+using TwitchLib.Api.V5.Models.Users;
 
 namespace EvilBot
 {
@@ -82,7 +82,7 @@ namespace EvilBot
         public async void AddLurkerPointsTimer_ElapsedAsync(object sender, ElapsedEventArgs e)
         {
             //in case twitch says something went wrong, it throws exception, catch that exception
-            List<TwitchLib.Api.Models.Undocumented.Chatters.ChatterFormatted> chatusers = await _twitchChatBot.Api.Undocumented.GetChattersAsync(TwitchInfo.ChannelName).ConfigureAwait(false);
+            List<TwitchLib.Api.Core.Models.Undocumented.Chatters.ChatterFormatted> chatusers = await _twitchChatBot.Api.Undocumented.GetChattersAsync(TwitchInfo.ChannelName).ConfigureAwait(false);
 
             List<Task<string>> userIdTasks = new List<Task<string>>();
             for (int i = 0; i < chatusers.Count; i++)
@@ -159,7 +159,7 @@ namespace EvilBot
             {
                 return null;
             }
-            return _twitchChatBot.Api.Streams.v5.GetUptimeAsync(userId).Result;
+            return _twitchChatBot.Api.V5.Streams.GetUptimeAsync(userId).Result;
         }
 
         public async Task<string> GetUserIdAsync(string username)
@@ -168,7 +168,7 @@ namespace EvilBot
             User[] userList;
             try
             {
-                userList = (await _twitchChatBot.Api.Users.v5.GetUserByNameAsync(username).ConfigureAwait(false)).Matches;
+                userList = (await _twitchChatBot.Api.V5.Users.GetUserByNameAsync(username).ConfigureAwait(false)).Matches;
             }
             catch (Exception ex)
             {
@@ -185,7 +185,7 @@ namespace EvilBot
         public async Task<string> GetUsernameAsync(string userID)
         {
             Log.Debug("AskedForUsername for {Username}", userID);
-            User user = await _twitchChatBot.Api.Users.v5.GetUserByIDAsync(userID).ConfigureAwait(false);
+            User user = await _twitchChatBot.Api.V5.Users.GetUserByIDAsync(userID).ConfigureAwait(false);
             if (userID == null || user == null)
             {
                 return null;

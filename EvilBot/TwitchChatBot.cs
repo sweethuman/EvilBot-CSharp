@@ -8,6 +8,9 @@ using TwitchLib.Api;
 using TwitchLib.Client;
 using TwitchLib.Client.Events;
 using TwitchLib.Client.Models;
+using TwitchLib.Communication.Clients;
+using TwitchLib.Communication.Enums;
+using TwitchLib.Communication.Models;
 
 namespace EvilBot
 {
@@ -60,11 +63,19 @@ namespace EvilBot
             {
                 _dataProcessor = scope.Resolve<IDataProcessor>();
             }
-            client = new TwitchClient(logger: _loggerManager.ClientLogger);
+            var clientOptions = new ClientOptions
+            {
+                ClientType = ClientType.Chat,
+                ReconnectionPolicy = new ReconnectionPolicy(5, 5),
+                UseSsl = true,
+                MessagesAllowedInPeriod = 90,
+                ThrottlingPeriod = TimeSpan.FromSeconds(30)
+            };
+            var customClient = new WebSocketClient(clientOptions);
+            client = new TwitchClient(client: customClient, logger: _loggerManager.ClientLogger);
             client.Initialize(credentials, TwitchInfo.ChannelName);
 
             ApiInitialize();
-            ChatThrottlerInitialize();
             EventIntializer();
 
             client.Connect();
@@ -134,19 +145,15 @@ namespace EvilBot
             api.Settings.AccessToken = TwitchInfo.BotToken;
         }
 
-        private void ChatThrottlerInitialize()
-        {
-            client.ChatThrottler = new TwitchLib.Client.Services.MessageThrottler(client, 85, TimeSpan.FromSeconds(30));
-            client.WhisperThrottler = new TwitchLib.Client.Services.MessageThrottler(client, 85, TimeSpan.FromSeconds(30));
-            client.ChatThrottler.StartQueue();
-            client.WhisperThrottler.StartQueue();
-        }
-
         private async void Client_OnChatCommandReceived(object sender, OnChatCommandReceivedArgs e)
         {
             Console.WriteLine($" - - - arg channel: {e.Command.ChatMessage.Channel}!");
             switch (e.Command.CommandText.ToLower())
             {
+                case "colorme":
+                    client.SendMessage(e.Command.ChatMessage.Channel, "/color Red");
+                    break;
+
                 case "rank":
                     Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.Message);
                     if (string.IsNullOrEmpty(e.Command.ArgumentsAsString))
@@ -338,7 +345,7 @@ namespace EvilBot
         private void Client_OnConnectionError(object sender, OnConnectionErrorArgs e)
         {
             Console.WriteLine($"Error!!! {e.Error}");
-            Log.Error("Error!!! {ErrorMessage}  {ErrorExcenption}", e.Error.Message, e.Error.Exception.Message);
+            Log.Error("Error!!! {ErrorMessage}", e.Error.Message);
         }
 
         private void Client_OnLog(object sender, OnLogArgs e)

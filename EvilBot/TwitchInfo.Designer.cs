@@ -61,7 +61,7 @@ namespace EvilBot {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 81ug3nwke20rvc7rgr19g8ncdl8qah.
+        ///   Looks up a localized string similar to 48efkpjcvpg6v69vhk8v866lktsyce.
         /// </summary>
         internal static string BotToken {
             get {
@@ -70,7 +70,7 @@ namespace EvilBot {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to M0rtuary.
+        ///   Looks up a localized string similar to EvilStarCommunity.
         /// </summary>
         internal static string BotUsername {
             get {
@@ -93,6 +93,33 @@ namespace EvilBot {
         internal static string ClientID {
             get {
                 return ResourceManager.GetString("ClientID", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to r810cmm8ovbvqt2ejpoi3m1wl6l1z8nkvm73n3xf9t5vb8e716.
+        /// </summary>
+        internal static string RefreshToken {
+            get {
+                return ResourceManager.GetString("RefreshToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 81ug3nwke20rvc7rgr19g8ncdl8qah.
+        /// </summary>
+        internal static string SecondBotToken {
+            get {
+                return ResourceManager.GetString("SecondBotToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to M0rtuary.
+        /// </summary>
+        internal static string SecondBotUsername {
+            get {
+                return ResourceManager.GetString("SecondBotUsername", resourceCulture);
             }
         }
     }

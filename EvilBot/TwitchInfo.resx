@@ -118,15 +118,24 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="BotToken" xml:space="preserve">
-    <value>81ug3nwke20rvc7rgr19g8ncdl8qah</value>
+    <value>48efkpjcvpg6v69vhk8v866lktsyce</value>
   </data>
   <data name="BotUsername" xml:space="preserve">
-    <value>M0rtuary</value>
+    <value>EvilStarCommunity</value>
   </data>
   <data name="ChannelName" xml:space="preserve">
     <value>EvilStarCommunity</value>
   </data>
   <data name="ClientID" xml:space="preserve">
     <value>c96zyldxwq27mbuvp2s6kwcgkq5l5k</value>
+  </data>
+  <data name="RefreshToken" xml:space="preserve">
+    <value>r810cmm8ovbvqt2ejpoi3m1wl6l1z8nkvm73n3xf9t5vb8e716</value>
+  </data>
+  <data name="SecondBotToken" xml:space="preserve">
+    <value>81ug3nwke20rvc7rgr19g8ncdl8qah</value>
+  </data>
+  <data name="SecondBotUsername" xml:space="preserve">
+    <value>M0rtuary</value>
   </data>
 </root>
