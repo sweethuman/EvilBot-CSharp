@@ -59,7 +59,14 @@ namespace EvilBot
             }
 
             Log.Debug("Advanced a User with {UserID} with [{Rank}]", userID, rank);
-            await WriteConnection.ExecuteAsync($"UPDATE UserPoints SET Rank = {rank} WHERE UserID = '{userID}'").ConfigureAwait(false);
+            try
+            {
+                await WriteConnection.ExecuteAsync($"UPDATE UserPoints SET Rank = {rank} WHERE UserID = '{userID}'").ConfigureAwait(false);
+            }
+            catch (System.Exception ex)
+            {
+                Log.Error(ex, "ModifyUserIDRankAsync blew up with: {UserID} {Rank}", userID, rank);
+            }
         }
 
         private static string LoadConnectionString(string id = "Default")

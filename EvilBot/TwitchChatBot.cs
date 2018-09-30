@@ -95,6 +95,7 @@ namespace EvilBot
             Log.Debug("Disconnecting");
         }
 
+        //t: add message about subscribers points x2
         private void TimedMessageInitializer()
         {
             timedMessages.Add("Incearca !rank si vezi cat de activ ai fost");
