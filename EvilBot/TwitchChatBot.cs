@@ -57,6 +57,8 @@ namespace EvilBot
             messageRepeaterMinutes = float.Parse(ConfigurationManager.AppSettings.Get("messageRepeaterMinutes"));
         }
 
+        #region TwitchChatBot Initializers
+
         public void Connect()
         {
             Console.WriteLine("Connecting");
@@ -125,6 +127,17 @@ namespace EvilBot
             _dataProcessor.RankUpdated += _dataProcessor_RankUpdated;
         }
 
+        private void ApiInitialize()
+        {
+            api = new TwitchAPI(loggerFactory: _loggerManager.APILoggerFactory);
+            api.Settings.ClientId = TwitchInfo.ClientID;
+            api.Settings.AccessToken = TwitchInfo.BotToken;
+        }
+
+        #endregion TwitchChatBot Initializers
+
+        #region TwitchChatBot EventTriggers
+
         private void _dataProcessor_RankUpdated(object sender, RankUpdateEventArgs e)
         {
             client.SendMessage(TwitchInfo.ChannelName, $"/me {e.Name} ai avansat la {e.Rank}");
@@ -141,12 +154,26 @@ namespace EvilBot
             Console.WriteLine($" - - - sent channel: {e.SentMessage.Channel}");
         }
 
-        private void ApiInitialize()
+        private void Client_OnConnectionError(object sender, OnConnectionErrorArgs e)
         {
-            api = new TwitchAPI(loggerFactory: _loggerManager.APILoggerFactory);
-            api.Settings.ClientId = TwitchInfo.ClientID;
-            api.Settings.AccessToken = TwitchInfo.BotToken;
+            Console.WriteLine($"Error!!! {e.Error}");
+            Log.Error("Error!!! {ErrorMessage}", e.Error.Message);
         }
+
+        private void Client_OnLog(object sender, OnLogArgs e)
+        {
+            Console.WriteLine(e.Data);
+        }
+
+        private void Client_OnMessageReceived(object sender, OnMessageReceivedArgs e)
+        {
+            if (!e.ChatMessage.Message.StartsWith("!"))
+            {
+                PointCounter.AddMessagePoint(e.ChatMessage.UserId);
+            }
+        }
+
+        #endregion TwitchChatBot EventTriggers
 
         private async void Client_OnChatCommandReceived(object sender, OnChatCommandReceivedArgs e)
         {
@@ -342,25 +369,6 @@ namespace EvilBot
                 default:
                     Console.WriteLine($" - - {e.Command.ChatMessage.DisplayName} used an unknow command!(!{e.Command.CommandText})");
                     break;
-            }
-        }
-
-        private void Client_OnConnectionError(object sender, OnConnectionErrorArgs e)
-        {
-            Console.WriteLine($"Error!!! {e.Error}");
-            Log.Error("Error!!! {ErrorMessage}", e.Error.Message);
-        }
-
-        private void Client_OnLog(object sender, OnLogArgs e)
-        {
-            Console.WriteLine(e.Data);
-        }
-
-        private void Client_OnMessageReceived(object sender, OnMessageReceivedArgs e)
-        {
-            if (!e.ChatMessage.Message.StartsWith("!"))
-            {
-                PointCounter.AddMessagePoint(e.ChatMessage.UserId);
             }
         }
     }

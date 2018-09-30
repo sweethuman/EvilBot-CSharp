@@ -15,9 +15,10 @@ namespace EvilBot
         private IDataAccess _dataAccess;
         private ITwitchConnections _twitchChatBot;
         private List<Tuple<string, int>> ranks = new List<Tuple<string, int>>();
-        public static int RankNumber { get; private set; } = 8;
 
         public event EventHandler<RankUpdateEventArgs> RankUpdated;
+
+        public static int RankNumber { get; private set; } = 8;
 
         protected virtual void OnRankUpdated(string Name, string Rank)
         {
@@ -66,6 +67,8 @@ namespace EvilBot
                 return null;
             }
         }
+
+        #region DataProcessor TimedPointManagers
 
         private int GetRank(int points)
         {
@@ -162,6 +165,8 @@ namespace EvilBot
                 await UpdateRankAsync(userIDList).ConfigureAwait(false);
             }
         }
+
+        #endregion DataProcessor TimedPointManagers
 
         public async Task<TimeSpan?> GetUptimeAsync()
         {
