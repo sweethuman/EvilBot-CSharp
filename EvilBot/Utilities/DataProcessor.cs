@@ -1,9 +1,11 @@
 ﻿using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
+using TwitchLib.Api.V5.Models.Subscriptions;
 using TwitchLib.Api.V5.Models.Users;
 
 namespace EvilBot
@@ -83,7 +85,6 @@ namespace EvilBot
         {
             //in case twitch says something went wrong, it throws exception, catch that exception
             List<TwitchLib.Api.Core.Models.Undocumented.Chatters.ChatterFormatted> chatusers = await _twitchChatBot.Api.Undocumented.GetChattersAsync(TwitchInfo.ChannelName).ConfigureAwait(false);
-
             List<Task<string>> userIdTasks = new List<Task<string>>();
             for (int i = 0; i < chatusers.Count; i++)
             {
@@ -102,7 +103,7 @@ namespace EvilBot
         }
 
         private async Task UpdateRankAsync(List<string> userIDList)
-        {   //WARNING GetUserAttributesAsync() also gets minutes, wich I don't currently need and it might cause performance issues if volume is large
+        {   //!WARNING GetUserAttributesAsync() also gets minutes, wich I don't currently need and it might cause performance issues if volume is large
             List<Task<List<string>>> userAttributesTasks = new List<Task<List<string>>>();
             for (int i = 0; i < userIDList.Count; i++)
             {
@@ -142,10 +143,20 @@ namespace EvilBot
         {
             if (userIDList.Count != 0)
             {
+                float pointsMultiplier = float.Parse(ConfigurationManager.AppSettings.Get("pointsMultiplier"));
+                Task<string> channelIdTask = GetUserIdAsync(TwitchInfo.ChannelName);
+                string channelId = await channelIdTask;
+                List<Subscription> channelSubscribers = (await _twitchChatBot.Api.V5.Channels.GetChannelSubscribersAsync(channelId)).Subscriptions.ToList();
+                int pointAdderValue;
                 List<Task> addPointsTasks = new List<Task>();
                 for (int dnd = 0; dnd < userIDList.Count; dnd++)
                 {
-                    addPointsTasks.Add(_dataAccess.ModifierUserIDAsync(userIDList[dnd], points: points, minutes: minutes));
+                    pointAdderValue = points;
+                    if (channelSubscribers.Any(x => x.User.Id == userIDList[dnd]))
+                    {
+                        pointAdderValue = (int)(pointAdderValue * pointsMultiplier);
+                    }
+                    addPointsTasks.Add(_dataAccess.ModifierUserIDAsync(userIDList[dnd], points: pointAdderValue, minutes: minutes));
                 }
                 await Task.WhenAll(addPointsTasks).ConfigureAwait(false);
                 await UpdateRankAsync(userIDList).ConfigureAwait(false);

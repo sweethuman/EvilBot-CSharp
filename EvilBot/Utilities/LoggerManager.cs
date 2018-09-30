@@ -11,6 +11,7 @@ namespace EvilBot
 
         public LoggerManager()
         {
+            //t: NOTE remove logging to seq
             Serilog.ILogger clientSerilogLogger = new LoggerConfiguration()
                 .Enrich.FromLogContext()
                 .WriteTo.Seq("http://localhost:5341")

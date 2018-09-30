@@ -2,6 +2,7 @@
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Timers;
 using TwitchLib.Api;
@@ -39,6 +40,7 @@ namespace EvilBot
         private Timer addPointsTimer;
         private Timer addLurkerPointsTimer;
         private Timer messageRepeater;
+        private float messageRepeaterMinutes;
 
         private readonly ILoggerManager _loggerManager;
         private static IDataAccess _dataAccess;
@@ -52,6 +54,7 @@ namespace EvilBot
             _loggerManager = loggerManager;
             _dataAccess = dataAccess;
             _pollManager = pollManager;
+            messageRepeaterMinutes = float.Parse(ConfigurationManager.AppSettings.Get("messageRepeaterMinutes"));
         }
 
         public void Connect()
@@ -107,7 +110,7 @@ namespace EvilBot
             addLurkerPointsTimer.Elapsed += _dataProcessor.AddLurkerPointsTimer_ElapsedAsync;
             addLurkerPointsTimer.Start();
 
-            messageRepeater = new Timer(1000 * 60 * 5);
+            messageRepeater = new Timer(1000 * 60 * messageRepeaterMinutes);
             messageRepeater.Elapsed += MessageRepeater_Elapsed;
             messageRepeater.Start();
         }
