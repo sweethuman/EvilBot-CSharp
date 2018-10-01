@@ -61,7 +61,6 @@ namespace EvilBot
 
         public void Connect()
         {
-            Console.WriteLine("Connecting");
             Log.Debug("Connecting");
             var container = ContainerConfig.Config();
             using (var scope = container.BeginLifetimeScope())
@@ -91,7 +90,6 @@ namespace EvilBot
 
         public void Disconnect()
         {
-            Console.WriteLine("Disconnecting");
             Log.Debug("Disconnecting");
         }
 
@@ -120,8 +118,6 @@ namespace EvilBot
 
         private void EventIntializer()
         {
-            client.OnLog += Client_OnLog;
-            client.OnMessageSent += Client_OnMessageSent;
             client.OnConnectionError += Client_OnConnectionError;
             client.OnChatCommandReceived += Client_OnChatCommandReceived;
             client.OnMessageReceived += Client_OnMessageReceived;
@@ -150,20 +146,9 @@ namespace EvilBot
             client.SendMessage(TwitchInfo.ChannelName, $"/me {timedMessages[rnd.Next(0, timedMessages.Count)]}");
         }
 
-        private void Client_OnMessageSent(object sender, OnMessageSentArgs e)
-        {
-            Console.WriteLine($" - - - sent channel: {e.SentMessage.Channel}");
-        }
-
         private void Client_OnConnectionError(object sender, OnConnectionErrorArgs e)
         {
-            Console.WriteLine($"Error!!! {e.Error}");
             Log.Error("Error!!! {ErrorMessage}", e.Error.Message);
-        }
-
-        private void Client_OnLog(object sender, OnLogArgs e)
-        {
-            Console.WriteLine(e.Data);
         }
 
         private void Client_OnMessageReceived(object sender, OnMessageReceivedArgs e)
@@ -178,7 +163,6 @@ namespace EvilBot
 
         private async void Client_OnChatCommandReceived(object sender, OnChatCommandReceivedArgs e)
         {
-            Console.WriteLine($" - - - arg channel: {e.Command.ChatMessage.Channel}!");
             switch (e.Command.CommandText.ToLower())
             {
                 case "colorme":
@@ -368,7 +352,6 @@ namespace EvilBot
                     break;
 
                 default:
-                    Console.WriteLine($" - - {e.Command.ChatMessage.DisplayName} used an unknow command!(!{e.Command.CommandText})");
                     break;
             }
         }

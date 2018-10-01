@@ -25,7 +25,7 @@ namespace EvilBot
             var output = await RetrieveConnection.QueryAsync<string>($"SELECT {column} FROM UserPoints WHERE UserID = '{userID}'", new DynamicParameters()).ConfigureAwait(false);
             if (!output.Any())
             {
-                Log.Error("Asked for inexistent userID in database: {userID}", userID);
+                Log.Warning("Asked for inexistent userID in database: {userID}", userID);
                 return null;
             }
             return output.ToList()[0];
@@ -41,13 +41,13 @@ namespace EvilBot
             //on mysql you can do ON DUPLICATE KEY
             if (!(await WriteConnection.QueryAsync<string>($"SELECT UserID from UserPoints WHERE UserID = '{userID}'", new DynamicParameters()).ConfigureAwait(false)).Any())
             {
-                Log.Debug("Added a new User to Database with {UserID}", userID);
                 await WriteConnection.ExecuteAsync($"INSERT INTO UserPoints (UserID, Points, Minutes, Rank) VALUES ('{userID}', '{points}', '{minutes}', '{rank}')").ConfigureAwait(false);
+                Log.Information("Added a new User to Database with {UserID}", userID);
             }
             else
             {
-                Log.Debug("{userID} modified {minutes}m and {points}", userID, minutes, points);
                 await WriteConnection.ExecuteAsync($"UPDATE UserPoints SET Points = Points + {points}, Minutes = Minutes + {minutes} WHERE UserID = '{userID}'").ConfigureAwait(false);
+                Log.Information("{userID} modified {minutes}m and {points}", userID, minutes, points);
             }
         }
 
@@ -58,7 +58,7 @@ namespace EvilBot
                 return;
             }
 
-            Log.Debug("Advanced a User with {UserID} with [{Rank}]", userID, rank);
+            Log.Information("Advanced a User with {UserID} with [{Rank}]", userID, rank);
             try
             {
                 await WriteConnection.ExecuteAsync($"UPDATE UserPoints SET Rank = {rank} WHERE UserID = '{userID}'").ConfigureAwait(false);
