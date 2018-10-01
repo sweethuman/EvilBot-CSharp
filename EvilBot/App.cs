@@ -2,11 +2,11 @@
 
 namespace EvilBot
 {
-    internal class Application : IApplication
+    internal class App : IApplication
     {
         private ITwitchChatBot _twitchChatBot;
 
-        public Application(ITwitchChatBot twitchChatBot)
+        public App(ITwitchChatBot twitchChatBot)
         {
             _twitchChatBot = twitchChatBot;
         }

@@ -7,7 +7,7 @@ namespace EvilBot
         public static IContainer Config()
         {
             var builder = new ContainerBuilder();
-            builder.RegisterType<Application>().As<IApplication>().SingleInstance();
+            builder.RegisterType<App>().As<IApplication>().SingleInstance();
             builder.RegisterType<DataProcessor>().As<IDataProcessor>().SingleInstance();
             builder.RegisterType<SqliteDataAccess>().As<IDataAccess>().SingleInstance();
             builder.RegisterType<LoggerManager>().As<ILoggerManager>().SingleInstance();

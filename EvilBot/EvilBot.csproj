@@ -289,7 +289,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Application.cs" />
+    <Compile Include="App.cs" />
     <Compile Include="CommandHelpers.cs" />
     <Compile Include="ContainerConfig.cs" />
     <Compile Include="Utilities\Interfaces\IPollManager.cs" />
