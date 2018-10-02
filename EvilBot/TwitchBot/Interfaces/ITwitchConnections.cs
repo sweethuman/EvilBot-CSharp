@@ -10,5 +10,7 @@ namespace EvilBot
     {
         TwitchAPI Api { get; }
         TwitchClient Client { get; }
+        void Connect();
+        void Disconnect();
     }
 }

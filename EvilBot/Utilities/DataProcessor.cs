@@ -88,7 +88,7 @@ namespace EvilBot
         public async void AddLurkerPointsTimer_ElapsedAsync(object sender, ElapsedEventArgs e)
         {
             //in case twitch says something went wrong, it throws exception, catch that exception
-            List<UserBase> userList = new List<UserBase>();
+            List<IUserBase> userList = new List<IUserBase>();
             List<TwitchLib.Api.Core.Models.Undocumented.Chatters.ChatterFormatted> chatusers = await _twitchChatBot.Api.Undocumented.GetChattersAsync(TwitchInfo.ChannelName).ConfigureAwait(false);
             List<Task<string>> userIdTasks = new List<Task<string>>();
             for (int i = 0; i < chatusers.Count; i++)
@@ -106,12 +106,12 @@ namespace EvilBot
 
         public async void AddPointsTimer_ElapsedAsync(object sender, ElapsedEventArgs e)
         {
-            List<UserBase> temporaryTalkers = PointCounter.ClearTalkerPoints();
+            List<IUserBase> temporaryTalkers = PointCounter.ClearTalkerPoints();
             await AddsToUsersAsync(temporaryTalkers).ConfigureAwait(false);
             Log.Debug("Database updated! Talkers present: {Talkers}", temporaryTalkers.Count);
         }
 
-        public async Task AddsToUsersAsync(List<UserBase> userList, int points = 1, int minutes = 0)
+        public async Task AddsToUsersAsync(List<IUserBase> userList, int points = 1, int minutes = 0)
         {
             if (userList.Count != 0)
             {
@@ -135,11 +135,11 @@ namespace EvilBot
             }
         }
 
-        private async Task UpdateRankAsync(List<UserBase> userList)
+        private async Task UpdateRankAsync(List<IUserBase> userList)
         {   //!WARNING GetUserAttributesAsync() also gets minutes, wich I don't currently need and it might cause performance issues if volume is large
             List<Task<List<string>>> userAttributesTasks = new List<Task<List<string>>>();
             List<int> userNameRanks = new List<int>();
-            List<UserBase> usersUpdated = new List<UserBase>();
+            List<IUserBase> usersUpdated = new List<IUserBase>();
             List<Task> databaseRankUpdateTasks = new List<Task>();
             for (int i = 0; i < userList.Count; i++)
             {

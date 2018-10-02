@@ -1,6 +1,6 @@
 ﻿namespace EvilBot.DataStructures
 {
-    public class UserBase
+    public class UserBase : IUserBase
     {
         public UserBase(string name, string id)
         {

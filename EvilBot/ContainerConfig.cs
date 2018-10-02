@@ -11,7 +11,8 @@ namespace EvilBot
             builder.RegisterType<DataProcessor>().As<IDataProcessor>().SingleInstance();
             builder.RegisterType<SqliteDataAccess>().As<IDataAccess>().SingleInstance();
             builder.RegisterType<LoggerManager>().As<ILoggerManager>().SingleInstance();
-            builder.RegisterType<TwitchChatBot>().As<ITwitchChatBot>().As<ITwitchConnections>().SingleInstance();
+            builder.RegisterType<TwitchChatBot>().As<ITwitchChatBot>().SingleInstance();
+            builder.RegisterType<TwitchConnections>().As<ITwitchConnections>().SingleInstance();
             builder.RegisterType<PollManager>().As<IPollManager>().SingleInstance();
 
             return builder.Build();

@@ -7,9 +7,9 @@ namespace EvilBot
 {
     internal static class PointCounter
     {
-        public static List<UserBase> Talkers { get; private set; } = new List<UserBase>();
+        public static List<IUserBase> Talkers { get; private set; } = new List<IUserBase>();
 
-        public static void AddMessagePoint(UserBase user)
+        public static void AddMessagePoint(IUserBase user)
         {
             Log.Debug("AddMessagePoint ran for {User}({userID})", user.DisplayName, user.UserId);
             if (!Talkers.Any(x => x.UserId == user.UserId))
@@ -18,10 +18,10 @@ namespace EvilBot
             }
         }
 
-        public static List<UserBase> ClearTalkerPoints()
+        public static List<IUserBase> ClearTalkerPoints()
         {
-            List<UserBase> output = Talkers;
-            Talkers = new List<UserBase>();
+            List<IUserBase> output = Talkers;
+            Talkers = new List<IUserBase>();
             return output;
         }
     }

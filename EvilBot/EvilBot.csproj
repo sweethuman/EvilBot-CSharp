@@ -292,7 +292,9 @@
     <Compile Include="App.cs" />
     <Compile Include="CommandHelpers.cs" />
     <Compile Include="ContainerConfig.cs" />
+    <Compile Include="DataStructures\Interfaces\IUserBase.cs" />
     <Compile Include="DataStructures\UserBase.cs" />
+    <Compile Include="TwitchBot\TwitchConnections.cs" />
     <Compile Include="Utilities\Interfaces\IPollManager.cs" />
     <Compile Include="Utilities\PollManager.cs" />
     <Compile Include="Utilities\EventArguments.cs" />
@@ -300,8 +302,8 @@
     <Compile Include="IApplication.cs" />
     <Compile Include="Utilities\Enums.cs" />
     <Compile Include="Utilities\Interfaces\IDataProcessor.cs" />
-    <Compile Include="ITwitchChatBot.cs" />
-    <Compile Include="ITwitchConnections.cs" />
+    <Compile Include="TwitchBot\Interfaces\ITwitchChatBot.cs" />
+    <Compile Include="TwitchBot\Interfaces\ITwitchConnections.cs" />
     <Compile Include="Utilities\Interfaces\IDataAccess.cs" />
     <Compile Include="Utilities\Interfaces\ILoggerManager.cs" />
     <Compile Include="Utilities\LoggerManager.cs" />
@@ -310,7 +312,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\SqliteDataAccess.cs" />
     <Compile Include="Utilities\StandardMessages.cs" />
-    <Compile Include="TwitchChatBot.cs" />
+    <Compile Include="TwitchBot\TwitchChatBot.cs" />
     <Compile Include="TwitchInfo.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -345,6 +347,9 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="TwitchBot\Processors\Interfaces\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Data.SQLite.Core.1.0.109.1\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.109.1\build\net46\System.Data.SQLite.Core.targets')" />

@@ -1,60 +1,34 @@
-﻿using Autofac;
-using EvilBot.DataStructures;
+﻿using EvilBot.DataStructures;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Timers;
-using TwitchLib.Api;
-using TwitchLib.Client;
 using TwitchLib.Client.Events;
-using TwitchLib.Client.Models;
-using TwitchLib.Communication.Clients;
-using TwitchLib.Communication.Enums;
-using TwitchLib.Communication.Models;
 
 namespace EvilBot
 {
-    internal class TwitchChatBot : ITwitchChatBot, ITwitchConnections
+    internal class TwitchChatBot : ITwitchChatBot
     {
-        private static TwitchAPI api;
-        private readonly ConnectionCredentials credentials = new ConnectionCredentials(TwitchInfo.BotUsername, TwitchInfo.BotToken);
-        private static TwitchClient client;
-
-        public TwitchClient Client
-        {
-            get
-            {
-                return client;
-            }
-        }
-
-        public TwitchAPI Api
-        {
-            get
-            {
-                return api;
-            }
-        }
-
         private Timer addPointsTimer;
         private Timer addLurkerPointsTimer;
         private Timer messageRepeater;
         private float messageRepeaterMinutes;
 
-        private readonly ILoggerManager _loggerManager;
         private static IDataAccess _dataAccess;
         private static IDataProcessor _dataProcessor;
         private static IPollManager _pollManager;
+        private static ITwitchConnections _twitchConnection;
 
         public List<string> timedMessages = new List<string>();
 
-        public TwitchChatBot(ILoggerManager loggerManager, IDataAccess dataAccess, IPollManager pollManager)
+        public TwitchChatBot(IDataAccess dataAccess, IPollManager pollManager, ITwitchConnections twitchConnection, IDataProcessor dataProcessor)
         {
-            _loggerManager = loggerManager;
             _dataAccess = dataAccess;
             _pollManager = pollManager;
+            _twitchConnection = twitchConnection;
+            _dataProcessor = dataProcessor;
             messageRepeaterMinutes = float.Parse(ConfigurationManager.AppSettings.Get("messageRepeaterMinutes"));
         }
 
@@ -62,28 +36,9 @@ namespace EvilBot
 
         public void Connect()
         {
-            Log.Debug("Connecting");
-            var container = ContainerConfig.Config();
-            using (var scope = container.BeginLifetimeScope())
-            {
-                _dataProcessor = scope.Resolve<IDataProcessor>();
-            }
-            var clientOptions = new ClientOptions
-            {
-                ClientType = ClientType.Chat,
-                ReconnectionPolicy = new ReconnectionPolicy(5, 5),
-                UseSsl = true,
-                MessagesAllowedInPeriod = 90,
-                ThrottlingPeriod = TimeSpan.FromSeconds(30)
-            };
-            var customClient = new WebSocketClient(clientOptions);
-            client = new TwitchClient(client: customClient, logger: _loggerManager.ClientLogger);
-            client.Initialize(credentials, TwitchInfo.ChannelName);
+            Log.Debug("Starting EvilBot");
 
-            ApiInitialize();
             EventIntializer();
-
-            client.Connect();
 
             TimedMessageInitializer();
             TimerInitializer();
@@ -94,11 +49,11 @@ namespace EvilBot
             Log.Debug("Disconnecting");
         }
 
-        //t: add message about subscribers points x2
         private void TimedMessageInitializer()
         {
             timedMessages.Add("Incearca !rank si vezi cat de activ ai fost");
             timedMessages.Add("Fii activ ca sa castigi XP");
+            timedMessages.Add("Subscriberii primesc x2 puncte!");
             timedMessages.Add("Daca iti place, apasa butonul de FOLLOW! Multumesc pentru sustinere!");
         }
 
@@ -119,17 +74,10 @@ namespace EvilBot
 
         private void EventIntializer()
         {
-            client.OnConnectionError += Client_OnConnectionError;
-            client.OnChatCommandReceived += Client_OnChatCommandReceived;
-            client.OnMessageReceived += Client_OnMessageReceived;
+            _twitchConnection.Client.OnConnectionError += Client_OnConnectionError;
+            _twitchConnection.Client.OnChatCommandReceived += Client_OnChatCommandReceived;
+            _twitchConnection.Client.OnMessageReceived += Client_OnMessageReceived;
             _dataProcessor.RankUpdated += _dataProcessor_RankUpdated;
-        }
-
-        private void ApiInitialize()
-        {
-            api = new TwitchAPI(loggerFactory: _loggerManager.APILoggerFactory);
-            api.Settings.ClientId = TwitchInfo.ClientID;
-            api.Settings.AccessToken = TwitchInfo.BotToken;
         }
 
         #endregion TwitchChatBot Initializers
@@ -138,13 +86,13 @@ namespace EvilBot
 
         private void _dataProcessor_RankUpdated(object sender, RankUpdateEventArgs e)
         {
-            client.SendMessage(TwitchInfo.ChannelName, $"/me {e.Name} ai avansat la {e.Rank}");
+            _twitchConnection.Client.SendMessage(TwitchInfo.ChannelName, $"/me {e.Name} ai avansat la {e.Rank}");
         }
 
         private void MessageRepeater_Elapsed(object sender, ElapsedEventArgs e)
         {
             Random rnd = new Random();
-            client.SendMessage(TwitchInfo.ChannelName, $"/me {timedMessages[rnd.Next(0, timedMessages.Count)]}");
+            _twitchConnection.Client.SendMessage(TwitchInfo.ChannelName, $"/me {timedMessages[rnd.Next(0, timedMessages.Count)]}");
         }
 
         private void Client_OnConnectionError(object sender, OnConnectionErrorArgs e)
@@ -167,7 +115,7 @@ namespace EvilBot
             switch (e.Command.CommandText.ToLower())
             {
                 case "colorme":
-                    client.SendMessage(e.Command.ChatMessage.Channel, "/color Red");
+                    _twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, "/color Red");
                     break;
 
                 case "rank":
@@ -177,11 +125,11 @@ namespace EvilBot
                         List<string> results = await _dataProcessor.GetUserAttributesAsync(e.Command.ChatMessage.UserId).ConfigureAwait(false);
                         if (results != null)
                         {
-                            client.SendMessage(e.Command.ChatMessage.Channel, $"/me {e.Command.ChatMessage.DisplayName} esti {_dataProcessor.GetRankFormatted(results[2], results[0])} cu {Math.Round(double.Parse(results[1], System.Globalization.CultureInfo.InvariantCulture) / 60, 1)} ore!\n\r");
+                            _twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, $"/me {e.Command.ChatMessage.DisplayName} esti {_dataProcessor.GetRankFormatted(results[2], results[0])} cu {Math.Round(double.Parse(results[1], System.Globalization.CultureInfo.InvariantCulture) / 60, 1)} ore!\n\r");
                         }
                         else
                         {
-                            client.SendMessage(e.Command.ChatMessage.Channel, $"/me {e.Command.ChatMessage.DisplayName} You aren't yet in the database. You'll be added at the next minute check!");
+                            _twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, $"/me {e.Command.ChatMessage.DisplayName} You aren't yet in the database. You'll be added at the next minute check!");
                         }
                     }
                     else
@@ -189,11 +137,11 @@ namespace EvilBot
                         List<string> results = await _dataProcessor.GetUserAttributesAsync(await _dataProcessor.GetUserIdAsync(e.Command.ArgumentsAsString.TrimStart('@').ToLower()).ConfigureAwait(false)).ConfigureAwait(false);
                         if (results != null)
                         {
-                            client.SendMessage(e.Command.ChatMessage.Channel, $"/me {e.Command.ArgumentsAsString.TrimStart('@')} este {_dataProcessor.GetRankFormatted(results[2], results[0])} cu {Math.Round(double.Parse(results[1], System.Globalization.CultureInfo.InvariantCulture) / 60, 1)} ore!");
+                            _twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, $"/me {e.Command.ArgumentsAsString.TrimStart('@')} este {_dataProcessor.GetRankFormatted(results[2], results[0])} cu {Math.Round(double.Parse(results[1], System.Globalization.CultureInfo.InvariantCulture) / 60, 1)} ore!");
                         }
                         else
                         {
-                            client.SendMessage(e.Command.ChatMessage.Channel, $"/me {e.Command.ArgumentsAsString.TrimStart('@')} isn't yet in the database!");
+                            _twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, $"/me {e.Command.ArgumentsAsString.TrimStart('@')} isn't yet in the database!");
                         }
                     }
                     break;
@@ -224,7 +172,7 @@ namespace EvilBot
                                     if (!int.TryParse(parameters[0], out minuteModifier))
                                     {
                                         error = true;
-                                        Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.ManageCommandText);
+                                        _twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.ManageCommandText);
                                     }
                                 }
                                 else
@@ -232,7 +180,7 @@ namespace EvilBot
                                     if (!int.TryParse(parameters[0], out pointModifier))
                                     {
                                         error = true;
-                                        Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.ManageCommandText);
+                                        _twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.ManageCommandText);
                                     }
                                 }
 
@@ -245,29 +193,29 @@ namespace EvilBot
                                         if (!int.TryParse(parameters[1], out minuteModifier))
                                         {
                                             error = true;
-                                            Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.ManageCommandText);
+                                            _twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.ManageCommandText);
                                         }
                                     }
                                     else
                                     {
                                         error = true;
-                                        Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.ManageCommandText);
+                                        _twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.ManageCommandText);
                                     }
                                 }
                                 if (!error)
                                 {
                                     await _dataAccess.ModifierUserIDAsync(userid, pointModifier, minuteModifier).ConfigureAwait(false);
-                                    Client.SendMessage(e.Command.ChatMessage.Channel, $"/me Modified {e.Command.ArgumentsAsList[0]} with {pointModifier} points and {minuteModifier} minutes");
+                                    _twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, $"/me Modified {e.Command.ArgumentsAsList[0]} with {pointModifier} points and {minuteModifier} minutes");
                                 }
                             }
                             else
                             {
-                                Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.ManageCommandText);
+                                _twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.ManageCommandText);
                             }
                         }
                         else
                         {
-                            Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.ManageCommandText);
+                            _twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.ManageCommandText);
                         }
                     }
                     break;
@@ -288,16 +236,16 @@ namespace EvilBot
                             }
                             if (!(options.Count < 2))
                             {
-                                Client.SendMessage(e.Command.ChatMessage.Channel, $"/me {_pollManager.PollCreate(options)}");
+                                _twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, $"/me {_pollManager.PollCreate(options)}");
                             }
                             else
                             {
-                                Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.PollCreateText);
+                                _twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.PollCreateText);
                             }
                         }
                         else
                         {
-                            Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.PollCreateText);
+                            _twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.PollCreateText);
                         }
                     }
                     break;
@@ -312,12 +260,12 @@ namespace EvilBot
                         }
                         else
                         {
-                            Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.PollVoteText);
+                            _twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.PollVoteText);
                         }
                     }
                     else
                     {
-                        Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.PollNotActiveText);
+                        _twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.PollNotActiveText);
                     }
                     break;
 
@@ -325,11 +273,11 @@ namespace EvilBot
                     Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.Message);
                     if (_pollManager.PollActive)
                     {
-                        Client.SendMessage(e.Command.ChatMessage.Channel, $"/me {_pollManager.PollStats()}");
+                        _twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, $"/me {_pollManager.PollStats()}");
                     }
                     else
                     {
-                        Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.PollNotActiveText);
+                        _twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.PollNotActiveText);
                     }
                     break;
 
@@ -339,18 +287,18 @@ namespace EvilBot
                     {
                         if (_pollManager.PollActive)
                         {
-                            Client.SendMessage(e.Command.ChatMessage.Channel, $"/me {_pollManager.PollEnd()}");
+                            _twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, $"/me {_pollManager.PollEnd()}");
                         }
                         else
                         {
-                            Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.PollNotActiveText);
+                            _twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.PollNotActiveText);
                         }
                     }
                     break;
 
                 case "comenzi":
                     Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.Message);
-                    Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.ComenziText);
+                    _twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.ComenziText);
                     break;
 
                 default:
