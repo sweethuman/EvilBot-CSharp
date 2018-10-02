@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using EvilBot.DataStructures;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -155,7 +156,7 @@ namespace EvilBot
         {
             if (!e.ChatMessage.Message.StartsWith("!"))
             {
-                PointCounter.AddMessagePoint(e.ChatMessage.UserId);
+                PointCounter.AddMessagePoint(new UserBase(e.ChatMessage.DisplayName, e.ChatMessage.UserId));
             }
         }
 

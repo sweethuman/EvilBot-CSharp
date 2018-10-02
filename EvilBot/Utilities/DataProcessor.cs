@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using EvilBot.DataStructures;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -87,27 +88,32 @@ namespace EvilBot
         public async void AddLurkerPointsTimer_ElapsedAsync(object sender, ElapsedEventArgs e)
         {
             //in case twitch says something went wrong, it throws exception, catch that exception
+            List<UserBase> userList = new List<UserBase>();
             List<TwitchLib.Api.Core.Models.Undocumented.Chatters.ChatterFormatted> chatusers = await _twitchChatBot.Api.Undocumented.GetChattersAsync(TwitchInfo.ChannelName).ConfigureAwait(false);
             List<Task<string>> userIdTasks = new List<Task<string>>();
             for (int i = 0; i < chatusers.Count; i++)
             {
                 userIdTasks.Add(GetUserIdAsync(chatusers[i].Username));
             }
-            string[] userIDList = await Task.WhenAll(userIdTasks).ConfigureAwait(false);
-            await AddsToUsersAsync(userIDList.ToList(), minutes: 10).ConfigureAwait(false);
+            List<string> userIDList = (await Task.WhenAll(userIdTasks).ConfigureAwait(false)).ToList();
+            for (int i = 0; i < chatusers.Count; i++)
+            {
+                userList.Add(new UserBase(chatusers[i].Username, userIDList[i]));
+            }
+            await AddsToUsersAsync(userList, minutes: 10).ConfigureAwait(false);
             Log.Debug("Database updated! Lurkers present: {Lurkers}", chatusers.Count);
         }
 
         public async void AddPointsTimer_ElapsedAsync(object sender, ElapsedEventArgs e)
         {
-            List<string> temporaryTalkers = PointCounter.ClearTalkerPoints();
+            List<UserBase> temporaryTalkers = PointCounter.ClearTalkerPoints();
             await AddsToUsersAsync(temporaryTalkers).ConfigureAwait(false);
             Log.Debug("Database updated! Talkers present: {Talkers}", temporaryTalkers.Count);
         }
 
-        public async Task AddsToUsersAsync(List<string> userIDList, int points = 1, int minutes = 0)
+        public async Task AddsToUsersAsync(List<UserBase> userList, int points = 1, int minutes = 0)
         {
-            if (userIDList.Count != 0)
+            if (userList.Count != 0)
             {
                 float pointsMultiplier = float.Parse(ConfigurationManager.AppSettings.Get("pointsMultiplier"));
                 Task<string> channelIdTask = GetUserIdAsync(TwitchInfo.ChannelName);
@@ -115,31 +121,31 @@ namespace EvilBot
                 List<Subscription> channelSubscribers = (await _twitchChatBot.Api.V5.Channels.GetChannelSubscribersAsync(channelId)).Subscriptions.ToList();
                 int pointAdderValue;
                 List<Task> addPointsTasks = new List<Task>();
-                for (int dnd = 0; dnd < userIDList.Count; dnd++)
+                for (int i = 0; i < userList.Count; i++)
                 {
                     pointAdderValue = points;
-                    if (channelSubscribers.Any(x => x.User.Id == userIDList[dnd]))
+                    if (channelSubscribers.Any(x => x.User.Id == userList[i].UserId))
                     {
                         pointAdderValue = (int)(pointAdderValue * pointsMultiplier);
                     }
-                    addPointsTasks.Add(_dataAccess.ModifierUserIDAsync(userIDList[dnd], points: pointAdderValue, minutes: minutes));
+                    addPointsTasks.Add(_dataAccess.ModifierUserIDAsync(userList[i].UserId, points: pointAdderValue, minutes: minutes));
                 }
                 await Task.WhenAll(addPointsTasks).ConfigureAwait(false);
-                await UpdateRankAsync(userIDList).ConfigureAwait(false);
+                await UpdateRankAsync(userList).ConfigureAwait(false);
             }
         }
 
-        private async Task UpdateRankAsync(List<string> userIDList)
+        private async Task UpdateRankAsync(List<UserBase> userList)
         {   //!WARNING GetUserAttributesAsync() also gets minutes, wich I don't currently need and it might cause performance issues if volume is large
             List<Task<List<string>>> userAttributesTasks = new List<Task<List<string>>>();
-            for (int i = 0; i < userIDList.Count; i++)
+            List<int> userNameRanks = new List<int>();
+            List<UserBase> usersUpdated = new List<UserBase>();
+            List<Task> databaseRankUpdateTasks = new List<Task>();
+            for (int i = 0; i < userList.Count; i++)
             {
-                userAttributesTasks.Add(GetUserAttributesAsync(userIDList[i]));
+                userAttributesTasks.Add(GetUserAttributesAsync(userList[i].UserId));
             }
             var userAttributes = (await Task.WhenAll(userAttributesTasks).ConfigureAwait(false)).ToList();
-            List<Task<string>> userNameListTasks = new List<Task<string>>();
-            List<int> userNameRanks = new List<int>();
-            List<Task> databaseRankUpdateTasks = new List<Task>();
             for (int i = 0; i < userAttributes.Count; i++)
             {
                 if (!int.TryParse(userAttributes[i][0], out int points))
@@ -154,15 +160,14 @@ namespace EvilBot
                 if (currentRank != rank)
                 {
                     userNameRanks.Add(currentRank);
-                    databaseRankUpdateTasks.Add(_dataAccess.ModifyUserIDRankAsync(userIDList[i], currentRank));
-                    userNameListTasks.Add(GetUsernameAsync(userIDList[i]));
+                    databaseRankUpdateTasks.Add(_dataAccess.ModifyUserIDRankAsync(userList[i].UserId, currentRank));
+                    usersUpdated.Add(userList[i]);
                 }
             }
             await Task.WhenAll(databaseRankUpdateTasks).ConfigureAwait(false);
-            var userNameList = (await Task.WhenAll(userNameListTasks).ConfigureAwait(false)).ToList();
-            for (int i = 0; i < userNameList.Count; i++)
+            for (int i = 0; i < usersUpdated.Count; i++)
             {
-                OnRankUpdated(userNameList[i], $"{ranks[userNameRanks[i]].Item1} (Lvl. {userNameRanks[i]})");
+                OnRankUpdated(usersUpdated[i].DisplayName, $"{ranks[userNameRanks[i]].Item1} (Lvl. {userNameRanks[i]})");
             }
         }
 
