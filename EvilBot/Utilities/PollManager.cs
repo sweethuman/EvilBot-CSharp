@@ -1,5 +1,6 @@
 ﻿using Serilog;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace EvilBot
@@ -22,22 +23,28 @@ namespace EvilBot
         public string PollCreate(List<string> optionsList)
         {
             //t: in case given string is empty or null to not add it to the options
-            Log.Debug("PollStared");
+            Log.Debug("PollStarting");
+            StringBuilder builder = new StringBuilder();
             PollItems = optionsList;
             UsersWhoVoted = new List<string>();
             PollVotes = new List<double>();
+            PollActive = true;
             for (int i = 0; i < PollItems.Count; i++)
             {
                 PollVotes.Add(0);
             }
-            PollActive = true;
-            //t: use string builder for improved performance
-            string message = $"Poll Created! Poll Options ";
+            builder.Append("Poll Created! Poll Options ");
             for (int i = 0; i < PollItems.Count; i++)
             {
-                message = $"{message} // {i + 1}:{PollItems[i]}";
+                builder.AppendFormat(" //{0}:{1}", i + 1, PollItems[i]);
             }
-            return message;
+            //string message = $"Poll Created! Poll Options ";
+            //for (int i = 0; i < PollItems.Count; i++)
+            //{
+            //    message = $"{message} // {i + 1}:{PollItems[i]}";
+            //}
+            Log.Debug("PollStarted");
+            return builder.ToString();
         }
 
         public string PollEnd()
@@ -61,12 +68,18 @@ namespace EvilBot
 
         public string PollStats()
         {
-            string message = "Poll Stats:";
+            StringBuilder builder = new StringBuilder();
+            builder.Append("Poll Stats:");
             for (int i = 0; i < PollItems.Count; i++)
             {
-                message = $"{message} // {PollItems[i]}: {PollVotes[i]}";
+                builder.AppendFormat(" //{0}:{1}", PollItems[i], PollVotes[i]);
             }
-            return message;
+            //string message = "Poll Stats:";
+            //for (int i = 0; i < PollItems.Count; i++)
+            //{
+            //    message = $"{message} // {PollItems[i]}: {PollVotes[i]}";
+            //}
+            return builder.ToString();
         }
 
         //NOTE make sure it doesn't get negative or 0 numbers at optionNumber

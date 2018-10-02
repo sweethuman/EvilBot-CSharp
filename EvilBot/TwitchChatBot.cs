@@ -280,6 +280,7 @@ namespace EvilBot
                         {
                             string arguments = e.Command.ArgumentsAsString.Trim();
                             arguments = arguments.Trim('|');
+                            arguments = arguments.Trim();
                             List<string> options = arguments.Split('|').ToList();
                             for (int i = 0; i < options.Count; i++)
                             {
