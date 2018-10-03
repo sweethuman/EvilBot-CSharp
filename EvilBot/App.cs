@@ -5,8 +5,8 @@ namespace EvilBot
 {
     internal class App : IApplication
     {
-        private ITwitchChatBot _twitchChatBot;
-        private ITwitchConnections _twitchConnection;
+        private readonly ITwitchChatBot _twitchChatBot;
+        private readonly ITwitchConnections _twitchConnection;
 
         public App(ITwitchConnections twitchConnections, ITwitchChatBot twitchChatBot)
         {
@@ -25,7 +25,7 @@ namespace EvilBot
             _twitchConnection.Disconnect();
         }
 
-        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             Log.Fatal(e.ExceptionObject as Exception, "Unhandled exception blew UP");
         }

@@ -16,9 +16,11 @@ namespace EvilBot
         private Timer messageRepeater;
         private float messageRepeaterMinutes;
 
-        private static IDataProcessor _dataProcessor;
-        private static ITwitchConnections _twitchConnection;
-        private static ICommandProcessor _commandProcessor;
+        private int bitsToPointsMultiplier;
+
+        private readonly IDataProcessor _dataProcessor;
+        private readonly ITwitchConnections _twitchConnection;
+        private readonly ICommandProcessor _commandProcessor;
 
         public List<string> timedMessages = new List<string>();
 
@@ -27,7 +29,13 @@ namespace EvilBot
             _twitchConnection = twitchConnection;
             _dataProcessor = dataProcessor;
             _commandProcessor = commandProcessor;
-            messageRepeaterMinutes = float.Parse(ConfigurationManager.AppSettings.Get("messageRepeaterMinutes"));
+        }
+
+        ~TwitchChatBot()
+        {
+            addLurkerPointsTimer.Dispose();
+            addPointsTimer.Dispose();
+            messageRepeater.Dispose();
         }
 
         #region TwitchChatBot Initializers
@@ -35,7 +43,11 @@ namespace EvilBot
         public void Connect()
         {
             Log.Debug("Starting EvilBot");
-
+            messageRepeaterMinutes = float.Parse(ConfigurationManager.AppSettings.Get(nameof(messageRepeaterMinutes)));
+            if (!int.TryParse(ConfigurationManager.AppSettings.Get("bitsToPointsMultipliers"), out bitsToPointsMultiplier))
+            {
+                Log.Error("UNABLE TO PARSE {number} TO BITSPOINTSMULTIPLIER, NOT INT", ConfigurationManager.AppSettings.Get("bitsToPointsMultipliers"));
+            }
             EventIntializer();
 
             TimedMessageInitializer();
@@ -73,7 +85,7 @@ namespace EvilBot
         private void EventIntializer()
         {
             _twitchConnection.Client.OnConnectionError += Client_OnConnectionError;
-            _twitchConnection.Client.OnChatCommandReceived += Client_OnChatCommandReceived;
+            _twitchConnection.Client.OnChatCommandReceived += Client_OnChatCommandReceivedAsync;
             _twitchConnection.Client.OnMessageReceived += Client_OnMessageReceived;
             _dataProcessor.RankUpdated += _dataProcessor_RankUpdated;
         }
@@ -89,11 +101,11 @@ namespace EvilBot
 
         private void MessageRepeater_Elapsed(object sender, ElapsedEventArgs e)
         {
-            Random rnd = new Random();
+            var rnd = new Random();
             _twitchConnection.Client.SendMessage(TwitchInfo.ChannelName, $"/me {timedMessages[rnd.Next(0, timedMessages.Count)]}");
         }
 
-        private void Client_OnConnectionError(object sender, OnConnectionErrorArgs e)
+        private static void Client_OnConnectionError(object sender, OnConnectionErrorArgs e)
         {
             Log.Error("Error!!! {ErrorMessage}", e.Error.Message);
         }
@@ -104,11 +116,17 @@ namespace EvilBot
             {
                 PointCounter.AddMessagePoint(new UserBase(e.ChatMessage.DisplayName, e.ChatMessage.UserId));
             }
+
+            if (e.ChatMessage.Bits != 0)
+            {
+                _dataProcessor.AddToUserAsync(new List<IUserBase> { new UserBase(e.ChatMessage.DisplayName, e.ChatMessage.UserId) }, (e.ChatMessage.Bits * bitsToPointsMultiplier) + 11, subCheck: false);
+                _twitchConnection.Client.SendMessage(e.ChatMessage.Channel, $"/me {e.ChatMessage.DisplayName} HAS BEEN REWARDED {(e.ChatMessage.Bits * bitsToPointsMultiplier) + 11} POINTS!");
+            }
         }
 
         #endregion TwitchChatBot EventTriggers
 
-        private async void Client_OnChatCommandReceived(object sender, OnChatCommandReceivedArgs e)
+        private async void Client_OnChatCommandReceivedAsync(object sender, OnChatCommandReceivedArgs e)
         {
             switch (e.Command.CommandText.ToLower())
             {

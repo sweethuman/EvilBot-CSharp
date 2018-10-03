@@ -13,9 +13,9 @@ namespace EvilBot.Processors
 {
     internal class DataProcessor : IDataProcessor
     {
-        private IDataAccess _dataAccess;
-        private ITwitchConnections _twitchChatBot;
-        private List<Tuple<string, int>> ranks = new List<Tuple<string, int>>();
+        private readonly IDataAccess _dataAccess;
+        private readonly ITwitchConnections _twitchChatBot;
+        private readonly List<Tuple<string, int>> ranks = new List<Tuple<string, int>>();
 
         public event EventHandler<RankUpdateEventArgs> RankUpdated;
 
@@ -73,7 +73,7 @@ namespace EvilBot.Processors
 
         private int GetRank(int points)
         {
-            int place = 0;
+            var place = 0;
             for (int i = 0; i < ranks.Count - 1; i++)
             {
                 if (points < ranks[i + 1].Item2)
@@ -88,39 +88,55 @@ namespace EvilBot.Processors
         public async void AddLurkerPointsTimer_ElapsedAsync(object sender, ElapsedEventArgs e)
         {
             //in case twitch says something went wrong, it throws exception, catch that exception
-            List<IUserBase> userList = new List<IUserBase>();
-            List<TwitchLib.Api.Core.Models.Undocumented.Chatters.ChatterFormatted> chatusers = await _twitchChatBot.Api.Undocumented.GetChattersAsync(TwitchInfo.ChannelName).ConfigureAwait(false);
-            List<Task<string>> userIdTasks = new List<Task<string>>();
+            var userList = new List<IUserBase>();
+            var chatusers = await _twitchChatBot.Api.Undocumented.GetChattersAsync(TwitchInfo.ChannelName).ConfigureAwait(false);
+            var userIdTasks = new List<Task<string>>();
             for (int i = 0; i < chatusers.Count; i++)
             {
                 userIdTasks.Add(GetUserIdAsync(chatusers[i].Username));
             }
-            List<string> userIDList = (await Task.WhenAll(userIdTasks).ConfigureAwait(false)).ToList();
+            var userIDList = (await Task.WhenAll(userIdTasks).ConfigureAwait(false)).ToList();
             for (int i = 0; i < chatusers.Count; i++)
             {
                 userList.Add(new UserBase(chatusers[i].Username, userIDList[i]));
             }
-            await AddsToUsersAsync(userList, minutes: 10).ConfigureAwait(false);
+            await AddToUserAsync(userList, minutes: 10).ConfigureAwait(false);
             Log.Debug("Database updated! Lurkers present: {Lurkers}", chatusers.Count);
         }
 
         public async void AddPointsTimer_ElapsedAsync(object sender, ElapsedEventArgs e)
         {
-            List<IUserBase> temporaryTalkers = PointCounter.ClearTalkerPoints();
-            await AddsToUsersAsync(temporaryTalkers).ConfigureAwait(false);
+            var temporaryTalkers = PointCounter.ClearTalkerPoints();
+            await AddToUserAsync(temporaryTalkers).ConfigureAwait(false);
             Log.Debug("Database updated! Talkers present: {Talkers}", temporaryTalkers.Count);
         }
 
-        public async Task AddsToUsersAsync(List<IUserBase> userList, int points = 1, int minutes = 0)
+        /// <summary>
+        /// Adds Points to the Users asynchronously.
+        /// </summary>
+        /// <param name="userList">The users to add too the defined values.</param>
+        /// <param name="points">The points to add.</param>
+        /// <param name="minutes">The minutes to add.</param>
+        /// <param name="subCheck">if set to <c>true</c> it will check if users are subscribers.</param>
+        /// <returns></returns>
+        public async Task AddToUserAsync(List<IUserBase> userList, int points = 1, int minutes = 0, bool subCheck = true)
         {
             if (userList.Count != 0)
             {
-                float pointsMultiplier = float.Parse(ConfigurationManager.AppSettings.Get("pointsMultiplier"));
-                Task<string> channelIdTask = GetUserIdAsync(TwitchInfo.ChannelName);
-                string channelId = await channelIdTask;
-                List<Subscription> channelSubscribers = (await _twitchChatBot.Api.V5.Channels.GetChannelSubscribersAsync(channelId)).Subscriptions.ToList();
+                var pointsMultiplier = float.Parse(ConfigurationManager.AppSettings.Get("pointsMultiplier"));
+                //t: make sub checking more efficient
+                List<Subscription> channelSubscribers;
+                if (subCheck)
+                {
+                    var channelId = await GetUserIdAsync(TwitchInfo.ChannelName).ConfigureAwait(false);
+                    channelSubscribers = (await _twitchChatBot.Api.V5.Channels.GetChannelSubscribersAsync(channelId).ConfigureAwait(false)).Subscriptions.ToList();
+                }
+                else
+                {
+                    channelSubscribers = new List<Subscription>();
+                }
                 int pointAdderValue;
-                List<Task> addPointsTasks = new List<Task>();
+                var addPointsTasks = new List<Task>();
                 for (int i = 0; i < userList.Count; i++)
                 {
                     pointAdderValue = points;
@@ -137,10 +153,10 @@ namespace EvilBot.Processors
 
         private async Task UpdateRankAsync(List<IUserBase> userList)
         {   //!WARNING GetUserAttributesAsync() also gets minutes, wich I don't currently need and it might cause performance issues if volume is large
-            List<Task<List<string>>> userAttributesTasks = new List<Task<List<string>>>();
-            List<int> userNameRanks = new List<int>();
-            List<IUserBase> usersUpdated = new List<IUserBase>();
-            List<Task> databaseRankUpdateTasks = new List<Task>();
+            var userAttributesTasks = new List<Task<List<string>>>();
+            var userNameRanks = new List<int>();
+            var usersUpdated = new List<IUserBase>();
+            var databaseRankUpdateTasks = new List<Task>();
             for (int i = 0; i < userList.Count; i++)
             {
                 userAttributesTasks.Add(GetUserAttributesAsync(userList[i].UserId));
@@ -156,7 +172,7 @@ namespace EvilBot.Processors
                 {
                     Log.Error("Tried to parse string to int: {string} in {ClassSource}", userAttributes[i][1], $"{ToString()}UpdateRankAsync");
                 }
-                int currentRank = GetRank(points);
+                var currentRank = GetRank(points);
                 if (currentRank != rank)
                 {
                     userNameRanks.Add(currentRank);
@@ -177,7 +193,7 @@ namespace EvilBot.Processors
 
         public async Task<TimeSpan?> GetUptimeAsync()
         {
-            string userId = await GetUserIdAsync(TwitchInfo.ChannelName).ConfigureAwait(false);
+            var userId = await GetUserIdAsync(TwitchInfo.ChannelName).ConfigureAwait(false);
             if (userId == null)
             {
                 return null;
@@ -208,7 +224,7 @@ namespace EvilBot.Processors
         public async Task<string> GetUsernameAsync(string userID)
         {
             Log.Debug("AskedForUsername for {Username}", userID);
-            User user = await _twitchChatBot.Api.V5.Users.GetUserByIDAsync(userID).ConfigureAwait(false);
+            var user = await _twitchChatBot.Api.V5.Users.GetUserByIDAsync(userID).ConfigureAwait(false);
             if (userID == null || user == null)
             {
                 return null;
@@ -223,7 +239,7 @@ namespace EvilBot.Processors
                 return null;
             }
 
-            List<Task<string>> tasks = new List<Task<string>>
+            var tasks = new List<Task<string>>
             {
                 _dataAccess.RetrieveRowAsync(userID),
                 _dataAccess.RetrieveRowAsync(userID, Enums.DatabaseRow.Minutes),

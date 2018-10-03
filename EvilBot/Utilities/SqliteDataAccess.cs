@@ -20,7 +20,7 @@ namespace EvilBot
             {
                 return null;
             }
-            string column = databaseRow.ToString();
+            var column = databaseRow.ToString();
 
             var output = await RetrieveConnection.QueryAsync<string>($"SELECT {column} FROM UserPoints WHERE UserID = '{userID}'", new DynamicParameters()).ConfigureAwait(false);
             if (!output.Any())

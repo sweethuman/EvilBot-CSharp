@@ -11,9 +11,9 @@ namespace EvilBot
         public List<double> PollVotes { get; private set; } = null;
         public bool PollActive { get; private set; } = false;
 
-        private List<double> InfluencePoints { get; set; } = new List<double> { 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8 };
+        private List<double> InfluencePoints { get; } = new List<double> { 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8 };
         private List<string> UsersWhoVoted;
-        private IDataAccess _dataAccess;
+        private readonly IDataAccess _dataAccess;
 
         public PollManager(IDataAccess dataAccess)
         {
@@ -24,7 +24,7 @@ namespace EvilBot
         {
             //t: in case given string is empty or null to not add it to the options
             Log.Debug("PollStarting");
-            StringBuilder builder = new StringBuilder();
+            var builder = new StringBuilder();
             PollItems = optionsList;
             UsersWhoVoted = new List<string>();
             PollVotes = new List<double>();
@@ -38,11 +38,6 @@ namespace EvilBot
             {
                 builder.AppendFormat(" //{0}:{1}", i + 1, PollItems[i]);
             }
-            //string message = $"Poll Created! Poll Options ";
-            //for (int i = 0; i < PollItems.Count; i++)
-            //{
-            //    message = $"{message} // {i + 1}:{PollItems[i]}";
-            //}
             Log.Debug("PollStarted");
             return builder.ToString();
         }
@@ -50,7 +45,7 @@ namespace EvilBot
         public string PollEnd()
         {
             PollActive = false;
-            int winner = 0;
+            var winner = 0;
             for (int i = 1; i < PollItems.Count; i++)
             {
                 if (PollVotes[winner] < PollVotes[i])
@@ -58,7 +53,7 @@ namespace EvilBot
                     winner = i;
                 }
             }
-            string message = $"A Castigat || {PollItems[winner]} || cu {PollVotes[winner]} puncte";
+            var message = $"A Castigat || {PollItems[winner]} || cu {PollVotes[winner]} puncte";
             PollItems = null;
             PollVotes = null;
             UsersWhoVoted = null;
@@ -68,17 +63,12 @@ namespace EvilBot
 
         public string PollStats()
         {
-            StringBuilder builder = new StringBuilder();
+            var builder = new StringBuilder();
             builder.Append("Poll Stats:");
             for (int i = 0; i < PollItems.Count; i++)
             {
                 builder.AppendFormat(" //{0}:{1}", PollItems[i], PollVotes[i]);
             }
-            //string message = "Poll Stats:";
-            //for (int i = 0; i < PollItems.Count; i++)
-            //{
-            //    message = $"{message} // {PollItems[i]}: {PollVotes[i]}";
-            //}
             return builder.ToString();
         }
 
@@ -87,7 +77,7 @@ namespace EvilBot
         {
             if (userID != null && !UsersWhoVoted.Contains(userID) && optionNumber <= PollItems.Count && optionNumber >= 1)
             {
-                string userRank = await _dataAccess.RetrieveRowAsync(userID, Enums.DatabaseRow.Rank).ConfigureAwait(false) ?? "0";
+                var userRank = await _dataAccess.RetrieveRowAsync(userID, Enums.DatabaseRow.Rank).ConfigureAwait(false) ?? "0";
 
                 if (int.TryParse(userRank, out int rank) && rank < InfluencePoints.Count)
                 {

@@ -11,26 +11,12 @@ namespace EvilBot
 {
     internal class TwitchConnections : ITwitchConnections
     {
-        private static TwitchAPI api;
         private readonly ConnectionCredentials credentials = new ConnectionCredentials(TwitchInfo.BotUsername, TwitchInfo.BotToken);
-        private static TwitchClient client;
-        private ILoggerManager _loggerManager;
+        private readonly ILoggerManager _loggerManager;
 
-        public TwitchClient Client
-        {
-            get
-            {
-                return client;
-            }
-        }
+        public TwitchClient Client { get; private set; }
 
-        public TwitchAPI Api
-        {
-            get
-            {
-                return api;
-            }
-        }
+        public TwitchAPI Api { get; private set; }
 
         public TwitchConnections(ILoggerManager loggerManager)
         {
@@ -60,16 +46,16 @@ namespace EvilBot
                 ThrottlingPeriod = TimeSpan.FromSeconds(30)
             };
             var customClient = new WebSocketClient(clientOptions);
-            client = new TwitchClient(client: customClient, logger: _loggerManager.ClientLogger);
-            client.Initialize(credentials, TwitchInfo.ChannelName);
-            client.Connect();
+            Client = new TwitchClient(client: customClient, logger: _loggerManager.ClientLogger);
+            Client.Initialize(credentials, TwitchInfo.ChannelName);
+            Client.Connect();
         }
 
         private void ApiInitialize()
         {
-            api = new TwitchAPI(loggerFactory: _loggerManager.APILoggerFactory);
-            api.Settings.ClientId = TwitchInfo.ClientID;
-            api.Settings.AccessToken = TwitchInfo.BotToken;
+            Api = new TwitchAPI(loggerFactory: _loggerManager.APILoggerFactory);
+            Api.Settings.ClientId = TwitchInfo.ClientID;
+            Api.Settings.AccessToken = TwitchInfo.BotToken;
         }
     }
 }

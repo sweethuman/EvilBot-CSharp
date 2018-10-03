@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EvilBot.DataStructures;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Timers;
@@ -24,5 +25,7 @@ namespace EvilBot.Processors
 #pragma warning restore RCS1047 // Non-asynchronous method name should not end with 'Async'.
 
         string GetRankFormatted(string rankString, string pointsString);
+
+        Task AddToUserAsync(List<IUserBase> userList, int points = 1, int minutes = 0, bool subCheck = true);
     }
 }

@@ -8,9 +8,9 @@ namespace EvilBot.Processors
 {
     internal class CommandProcessor : ICommandProcessor
     {
-        private IDataProcessor _dataProcessor;
-        private IDataAccess _dataAccess;
-        private IPollManager _pollManager;
+        private readonly IDataProcessor _dataProcessor;
+        private readonly IDataAccess _dataAccess;
+        private readonly IPollManager _pollManager;
 
         public CommandProcessor(IDataProcessor dataProcessor, IDataAccess dataAccess, IPollManager pollManager)
         {
@@ -23,7 +23,7 @@ namespace EvilBot.Processors
         {
             if (string.IsNullOrEmpty(e.Command.ArgumentsAsString))
             {
-                List<string> results = await _dataProcessor.GetUserAttributesAsync(e.Command.ChatMessage.UserId).ConfigureAwait(false);
+                var results = await _dataProcessor.GetUserAttributesAsync(e.Command.ChatMessage.UserId).ConfigureAwait(false);
                 if (results != null)
                 {
                     return $"/me {e.Command.ChatMessage.DisplayName} esti {_dataProcessor.GetRankFormatted(results[2], results[0])} cu {Math.Round(double.Parse(results[1], System.Globalization.CultureInfo.InvariantCulture) / 60, 1)} ore!\n\r";
@@ -32,7 +32,7 @@ namespace EvilBot.Processors
             }
             else
             {
-                List<string> results = await _dataProcessor.GetUserAttributesAsync(await _dataProcessor.GetUserIdAsync(e.Command.ArgumentsAsString.TrimStart('@').ToLower()).ConfigureAwait(false)).ConfigureAwait(false);
+                var results = await _dataProcessor.GetUserAttributesAsync(await _dataProcessor.GetUserIdAsync(e.Command.ArgumentsAsString.TrimStart('@').ToLower()).ConfigureAwait(false)).ConfigureAwait(false);
                 if (results != null)
                 {
                     return $"/me {e.Command.ArgumentsAsString.TrimStart('@')} este {_dataProcessor.GetRankFormatted(results[2], results[0])} cu {Math.Round(double.Parse(results[1], System.Globalization.CultureInfo.InvariantCulture) / 60, 1)} ore!";
@@ -46,12 +46,12 @@ namespace EvilBot.Processors
             string userid;
             if (!string.IsNullOrEmpty(e.Command.ArgumentsAsString))
             {
-                if (!(e.Command.ArgumentsAsList.Count < 2) && (userid = await _dataProcessor.GetUserIdAsync(e.Command.ArgumentsAsList[0].TrimStart('@')).ConfigureAwait(false)) != null)
+                if ((e.Command.ArgumentsAsList.Count >= 2) && (userid = await _dataProcessor.GetUserIdAsync(e.Command.ArgumentsAsList[0].TrimStart('@')).ConfigureAwait(false)) != null)
                 {
-                    int pointModifier = 0;
-                    int minuteModifier = 0;
-                    bool twoParams = false;
-                    List<string> parameters = new List<string>() { e.Command.ArgumentsAsList[1] };
+                    var pointModifier = 0;
+                    var minuteModifier = 0;
+                    var twoParams = false;
+                    var parameters = new List<string> { e.Command.ArgumentsAsList[1] };
                     if (e.Command.ArgumentsAsList.Count == 3)
                     {
                         twoParams = true;
@@ -104,15 +104,15 @@ namespace EvilBot.Processors
         {
             if (!string.IsNullOrEmpty(e.Command.ArgumentsAsString) && !e.Command.ArgumentsAsString.Contains("||"))
             {
-                string arguments = e.Command.ArgumentsAsString.Trim();
+                var arguments = e.Command.ArgumentsAsString.Trim();
                 arguments = arguments.Trim('|');
                 arguments = arguments.Trim();
-                List<string> options = arguments.Split('|').ToList();
+                var options = arguments.Split('|').ToList();
                 for (int i = 0; i < options.Count; i++)
                 {
                     options[i] = options[i].Trim();
                 }
-                if (!(options.Count < 2))
+                if (options.Count >= 2)
                 {
                     return $"/me {_pollManager.PollCreate(options)}";
                 }

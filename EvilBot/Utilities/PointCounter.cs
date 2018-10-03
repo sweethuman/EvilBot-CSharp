@@ -20,7 +20,7 @@ namespace EvilBot
 
         public static List<IUserBase> ClearTalkerPoints()
         {
-            List<IUserBase> output = Talkers;
+            var output = Talkers;
             Talkers = new List<IUserBase>();
             return output;
         }
