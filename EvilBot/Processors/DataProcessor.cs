@@ -9,7 +9,7 @@ using System.Timers;
 using TwitchLib.Api.V5.Models.Subscriptions;
 using TwitchLib.Api.V5.Models.Users;
 
-namespace EvilBot
+namespace EvilBot.Processors
 {
     internal class DataProcessor : IDataProcessor
     {

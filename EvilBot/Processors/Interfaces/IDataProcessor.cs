@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Timers;
 
-namespace EvilBot
+namespace EvilBot.Processors
 {
     internal interface IDataProcessor
     {

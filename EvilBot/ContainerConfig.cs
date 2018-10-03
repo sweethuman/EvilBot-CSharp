@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using EvilBot.Processors;
 
 namespace EvilBot
 {
@@ -9,6 +10,7 @@ namespace EvilBot
             var builder = new ContainerBuilder();
             builder.RegisterType<App>().As<IApplication>().SingleInstance();
             builder.RegisterType<DataProcessor>().As<IDataProcessor>().SingleInstance();
+            builder.RegisterType<CommandProcessor>().As<ICommandProcessor>().SingleInstance();
             builder.RegisterType<SqliteDataAccess>().As<IDataAccess>().SingleInstance();
             builder.RegisterType<LoggerManager>().As<ILoggerManager>().SingleInstance();
             builder.RegisterType<TwitchChatBot>().As<ITwitchChatBot>().SingleInstance();

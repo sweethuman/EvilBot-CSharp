@@ -282,14 +282,16 @@
     <Compile Include="ContainerConfig.cs" />
     <Compile Include="DataStructures\Interfaces\IUserBase.cs" />
     <Compile Include="DataStructures\UserBase.cs" />
+    <Compile Include="Processors\CommandProcessors.cs" />
     <Compile Include="TwitchBot\TwitchConnections.cs" />
     <Compile Include="Utilities\Interfaces\IPollManager.cs" />
     <Compile Include="Utilities\PollManager.cs" />
     <Compile Include="Utilities\EventArguments.cs" />
-    <Compile Include="Utilities\DataProcessor.cs" />
+    <Compile Include="Processors\DataProcessor.cs" />
     <Compile Include="IApplication.cs" />
     <Compile Include="Utilities\Enums.cs" />
-    <Compile Include="Utilities\Interfaces\IDataProcessor.cs" />
+    <Compile Include="Processors\ICommandProcessors.cs" />
+    <Compile Include="Processors\Interfaces\IDataProcessor.cs" />
     <Compile Include="TwitchBot\Interfaces\ITwitchChatBot.cs" />
     <Compile Include="TwitchBot\Interfaces\ITwitchConnections.cs" />
     <Compile Include="Utilities\Interfaces\IDataAccess.cs" />
@@ -335,9 +337,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="TwitchBot\Processors\Interfaces\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Data.SQLite.Core.1.0.109.1\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.109.1\build\net46\System.Data.SQLite.Core.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
