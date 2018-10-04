@@ -10,8 +10,14 @@ namespace EvilBot
 {
     public class SqliteDataAccess : IDataAccess
     {
-        private IDbConnection RetrieveConnection { get; } = new SQLiteConnection(LoadConnectionString("read_only"));
-        private IDbConnection WriteConnection { get; } = new SQLiteConnection(LoadConnectionString());
+        private IDbConnection RetrieveConnection { get; }
+        private IDbConnection WriteConnection { get; }
+
+        public SqliteDataAccess()
+        {
+            RetrieveConnection = new SQLiteConnection(LoadConnectionString("read_only"));
+            WriteConnection = new SQLiteConnection(LoadConnectionString());
+        }
 
         //t: MAKE a function that retrieves all three attributes at once for performance reasons
         public async Task<string> RetrieveRowAsync(string userID, Enums.DatabaseRow databaseRow = Enums.DatabaseRow.Points)

@@ -14,13 +14,27 @@ namespace EvilBot
             _twitchConnection = twitchConnections;
         }
 
+        private static void SetConsoleMode()
+        {
+            Console.Title = "EvilBot for Twitch by M0rtuary";
+            Console.TreatControlCAsInput = true;
+        }
+
         public void Run()
         {
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            SetConsoleMode();
             _twitchConnection.Connect();
             _twitchChatBot.Connect();
-
-            Console.ReadLine();
+            var stop = false;
+            do
+            {
+                var keyPress = Console.ReadKey();
+                if (keyPress.Modifiers == (ConsoleModifiers.Control | ConsoleModifiers.Shift | ConsoleModifiers.Alt) && keyPress.Key == ConsoleKey.F6)
+                {
+                    stop = true;
+                }
+            } while (!stop);
 
             _twitchConnection.Disconnect();
         }
