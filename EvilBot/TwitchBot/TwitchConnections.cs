@@ -11,7 +11,7 @@ namespace EvilBot
 {
     internal class TwitchConnections : ITwitchConnections
     {
-        private readonly ConnectionCredentials credentials = new ConnectionCredentials(TwitchInfo.BotUsername, TwitchInfo.BotToken);
+        private readonly ConnectionCredentials _credentials = new ConnectionCredentials(TwitchInfo.BotUsername, TwitchInfo.BotToken);
         private readonly ILoggerManager _loggerManager;
 
         public TwitchClient Client { get; private set; }
@@ -47,7 +47,7 @@ namespace EvilBot
             };
             var customClient = new WebSocketClient(clientOptions);
             Client = new TwitchClient(client: customClient, logger: _loggerManager.ClientLogger);
-            Client.Initialize(credentials, TwitchInfo.ChannelName);
+            Client.Initialize(_credentials, TwitchInfo.ChannelName);
             Client.Connect();
         }
 
