@@ -1,4 +1,4 @@
-﻿namespace EvilBot
+﻿namespace EvilBot.TwitchBot.Interfaces
 {
     public interface ITwitchChatBot
     {

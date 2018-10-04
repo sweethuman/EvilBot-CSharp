@@ -6,6 +6,11 @@ using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
+using EvilBot.DataStructures.Interfaces;
+using EvilBot.Processors.Interfaces;
+using EvilBot.TwitchBot.Interfaces;
+using EvilBot.Utilities;
+using EvilBot.Utilities.Interfaces;
 using TwitchLib.Api.V5.Models.Subscriptions;
 using TwitchLib.Api.V5.Models.Users;
 
@@ -141,7 +146,7 @@ namespace EvilBot.Processors
                     {
                         pointAdderValue = (int)(pointAdderValue * pointsMultiplier);
                     }
-                    addPointsTasks.Add(_dataAccess.ModifierUserIDAsync(userList[i].UserId, points: pointAdderValue, minutes: minutes));
+                    addPointsTasks.Add(_dataAccess.ModifierUserIdAsync(userList[i].UserId, points: pointAdderValue, minutes: minutes));
                 }
                 await Task.WhenAll(addPointsTasks).ConfigureAwait(false);
                 await UpdateRankAsync(userList).ConfigureAwait(false);
@@ -173,7 +178,7 @@ namespace EvilBot.Processors
                 if (currentRank != rank)
                 {
                     userNameRanks.Add(currentRank);
-                    databaseRankUpdateTasks.Add(_dataAccess.ModifyUserIDRankAsync(userList[i].UserId, currentRank));
+                    databaseRankUpdateTasks.Add(_dataAccess.ModifyUserIdRankAsync(userList[i].UserId, currentRank));
                     usersUpdated.Add(userList[i]);
                 }
             }
@@ -218,29 +223,29 @@ namespace EvilBot.Processors
             return userList[0].Id;
         }
 
-        public async Task<string> GetUsernameAsync(string userID)
+        public async Task<string> GetUsernameAsync(string userId)
         {
-            Log.Debug("AskedForUsername for {Username}", userID);
-            var user = await _twitchChatBot.Api.V5.Users.GetUserByIDAsync(userID).ConfigureAwait(false);
-            if (userID == null || user == null)
+            Log.Debug("AskedForUsername for {Username}", userId);
+            var user = await _twitchChatBot.Api.V5.Users.GetUserByIDAsync(userId).ConfigureAwait(false);
+            if (userId == null || user == null)
             {
                 return null;
             }
             return user.DisplayName;
         }
 
-        public async Task<List<string>> GetUserAttributesAsync(string userID)
+        public async Task<List<string>> GetUserAttributesAsync(string userId)
         {
-            if (userID == null)
+            if (userId == null)
             {
                 return null;
             }
 
             var tasks = new List<Task<string>>
             {
-                _dataAccess.RetrieveRowAsync(userID),
-                _dataAccess.RetrieveRowAsync(userID, Enums.DatabaseRow.Minutes),
-                _dataAccess.RetrieveRowAsync(userID, Enums.DatabaseRow.Rank)
+                _dataAccess.RetrieveRowAsync(userId),
+                _dataAccess.RetrieveRowAsync(userId, Enums.DatabaseRow.Minutes),
+                _dataAccess.RetrieveRowAsync(userId, Enums.DatabaseRow.Rank)
             };
             var results = await Task.WhenAll(tasks).ConfigureAwait(false);
             if (results == null || results[0] == null)

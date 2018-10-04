@@ -1,4 +1,6 @@
-﻿namespace EvilBot.DataStructures
+﻿using EvilBot.DataStructures.Interfaces;
+
+namespace EvilBot.DataStructures
 {
     public class UserBase : IUserBase
     {

@@ -1,15 +1,16 @@
-﻿using Serilog;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using EvilBot.Utilities.Interfaces;
+using Serilog;
 
-namespace EvilBot
+namespace EvilBot.Utilities
 {
     public class PollManager : IPollManager
     {
-        public List<string> PollItems { get; set; } = null;
-        public List<double> PollVotes { get; private set; } = null;
-        public bool PollActive { get; private set; } = false;
+        public List<string> PollItems { get; set; }
+        public List<double> PollVotes { get; private set; }
+        public bool PollActive { get; private set; }
 
         private List<double> InfluencePoints { get; } = new List<double> { 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8 };
         private List<string> UsersWhoVoted;

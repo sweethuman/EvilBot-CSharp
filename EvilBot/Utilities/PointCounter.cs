@@ -1,9 +1,9 @@
-﻿using EvilBot.DataStructures;
-using Serilog;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using EvilBot.DataStructures.Interfaces;
+using Serilog;
 
-namespace EvilBot
+namespace EvilBot.Utilities
 {
     internal static class PointCounter
     {

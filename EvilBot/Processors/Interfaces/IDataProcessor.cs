@@ -1,16 +1,17 @@
-﻿using EvilBot.DataStructures;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Timers;
+using EvilBot.DataStructures.Interfaces;
+using EvilBot.Utilities;
 
-namespace EvilBot.Processors
+namespace EvilBot.Processors.Interfaces
 {
     internal interface IDataProcessor
     {
         event EventHandler<RankUpdateEventArgs> RankUpdated;
 
-        Task<List<string>> GetUserAttributesAsync(string userID);
+        Task<List<string>> GetUserAttributesAsync(string userId);
 
         Task<string> GetUserIdAsync(string username);
 

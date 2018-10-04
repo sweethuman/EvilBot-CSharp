@@ -1,5 +1,7 @@
-﻿using Serilog;
-using System;
+﻿using System;
+using EvilBot.TwitchBot.Interfaces;
+using EvilBot.Utilities.Interfaces;
+using Serilog;
 using TwitchLib.Api;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
@@ -7,7 +9,7 @@ using TwitchLib.Communication.Clients;
 using TwitchLib.Communication.Enums;
 using TwitchLib.Communication.Models;
 
-namespace EvilBot
+namespace EvilBot.TwitchBot
 {
     internal class TwitchConnections : ITwitchConnections
     {
@@ -53,7 +55,7 @@ namespace EvilBot
 
         private void ApiInitialize()
         {
-            Api = new TwitchAPI(_loggerManager.APILoggerFactory);
+            Api = new TwitchAPI(_loggerManager.ApiLoggerFactory);
             Api.Settings.ClientId = TwitchInfo.ClientID;
             Api.Settings.AccessToken = TwitchInfo.BotToken;
         }

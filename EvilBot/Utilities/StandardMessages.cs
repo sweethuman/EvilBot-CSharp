@@ -1,4 +1,4 @@
-﻿namespace EvilBot
+﻿namespace EvilBot.Utilities
 {
     public static class StandardMessages
     {

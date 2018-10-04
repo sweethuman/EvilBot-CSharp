@@ -1,13 +1,17 @@
-﻿using EvilBot.DataStructures;
-using EvilBot.Processors;
-using Serilog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Timers;
+using EvilBot.DataStructures;
+using EvilBot.DataStructures.Interfaces;
+using EvilBot.Processors;
+using EvilBot.Processors.Interfaces;
+using EvilBot.TwitchBot.Interfaces;
+using EvilBot.Utilities;
+using Serilog;
 using TwitchLib.Client.Events;
 
-namespace EvilBot
+namespace EvilBot.TwitchBot
 {
     internal class TwitchChatBot : ITwitchChatBot
     {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace EvilBot
+namespace EvilBot.Utilities.Interfaces
 {
     public interface IPollManager
     {
@@ -9,7 +9,7 @@ namespace EvilBot
         List<string> PollItems { get; set; }
         List<double> PollVotes { get; }
 
-        Task PollAddVote(string userID, int optionNumber);
+        Task PollAddVote(string userId, int optionNumber);
 
         string PollCreate(List<string> optionsList);
 

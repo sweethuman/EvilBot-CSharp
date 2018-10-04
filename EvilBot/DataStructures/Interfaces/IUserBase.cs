@@ -1,4 +1,4 @@
-﻿namespace EvilBot.DataStructures
+﻿namespace EvilBot.DataStructures.Interfaces
 {
     public interface IUserBase
     {

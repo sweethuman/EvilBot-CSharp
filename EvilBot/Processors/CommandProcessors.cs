@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using EvilBot.Processors.Interfaces;
+using EvilBot.Utilities;
+using EvilBot.Utilities.Interfaces;
 using TwitchLib.Client.Events;
 
 namespace EvilBot.Processors
@@ -89,7 +92,7 @@ namespace EvilBot.Processors
                     return StandardMessages.ManageCommandText;
                 }
             }
-            await _dataAccess.ModifierUserIDAsync(userid, pointModifier, minuteModifier).ConfigureAwait(false);
+            await _dataAccess.ModifierUserIdAsync(userid, pointModifier, minuteModifier).ConfigureAwait(false);
             return $"/me Modified {e.Command.ArgumentsAsList[0]} with {pointModifier} points and {minuteModifier} minutes";
         }
 

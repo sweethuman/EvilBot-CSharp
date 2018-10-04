@@ -1,13 +1,14 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using EvilBot.Utilities.Interfaces;
+using Microsoft.Extensions.Logging;
 using Serilog;
 using TwitchLib.Client;
 
-namespace EvilBot
+namespace EvilBot.Utilities
 {
     public class LoggerManager : ILoggerManager
     {
         public ILogger<TwitchClient> ClientLogger { get; set; }
-        public ILoggerFactory APILoggerFactory { get; set; }
+        public ILoggerFactory ApiLoggerFactory { get; set; }
 
         public LoggerManager()
         {
@@ -31,7 +32,7 @@ namespace EvilBot
                 .WriteTo.File("logfile.log", rollingInterval: RollingInterval.Day, shared: true)
                 .MinimumLevel.Debug()
                 .CreateLogger();
-            APILoggerFactory = new LoggerFactory()
+            ApiLoggerFactory = new LoggerFactory()
                 .AddSerilog(apiSerilogLogger);
 
             Log.Logger = new LoggerConfiguration()

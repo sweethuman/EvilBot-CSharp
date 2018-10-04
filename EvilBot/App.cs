@@ -1,5 +1,6 @@
 ﻿using Serilog;
 using System;
+using EvilBot.TwitchBot.Interfaces;
 
 namespace EvilBot
 {
