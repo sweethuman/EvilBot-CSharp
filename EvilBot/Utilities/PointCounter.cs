@@ -12,7 +12,7 @@ namespace EvilBot
         public static void AddMessagePoint(IUserBase user)
         {
             Log.Debug("AddMessagePoint ran for {User}({userID})", user.DisplayName, user.UserId);
-            if (!Talkers.Any(x => x.UserId == user.UserId))
+            if (Talkers.All(x => x.UserId != user.UserId))
             {
                 Talkers.Add(user);
             }

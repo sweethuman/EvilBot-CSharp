@@ -29,12 +29,12 @@ namespace EvilBot
             UsersWhoVoted = new List<string>();
             PollVotes = new List<double>();
             PollActive = true;
-            for (int i = 0; i < PollItems.Count; i++)
+            for (var i = 0; i < PollItems.Count; i++)
             {
                 PollVotes.Add(0);
             }
             builder.Append("Poll Created! Poll Options ");
-            for (int i = 0; i < PollItems.Count; i++)
+            for (var i = 0; i < PollItems.Count; i++)
             {
                 builder.AppendFormat(" //{0}:{1}", i + 1, PollItems[i]);
             }
@@ -46,7 +46,7 @@ namespace EvilBot
         {
             PollActive = false;
             var winner = 0;
-            for (int i = 1; i < PollItems.Count; i++)
+            for (var i = 1; i < PollItems.Count; i++)
             {
                 if (PollVotes[winner] < PollVotes[i])
                 {
@@ -65,7 +65,7 @@ namespace EvilBot
         {
             var builder = new StringBuilder();
             builder.Append("Poll Stats:");
-            for (int i = 0; i < PollItems.Count; i++)
+            for (var i = 0; i < PollItems.Count; i++)
             {
                 builder.AppendFormat(" //{0}:{1}", PollItems[i], PollVotes[i]);
             }
@@ -73,17 +73,17 @@ namespace EvilBot
         }
 
         //NOTE make sure it doesn't get negative or 0 numbers at optionNumber
-        public async Task PollAddVote(string userID, int optionNumber)
+        public async Task PollAddVote(string userId, int optionNumber)
         {
-            if (userID != null && !UsersWhoVoted.Contains(userID) && optionNumber <= PollItems.Count && optionNumber >= 1)
+            if (userId != null && !UsersWhoVoted.Contains(userId) && optionNumber <= PollItems.Count && optionNumber >= 1)
             {
-                var userRank = await _dataAccess.RetrieveRowAsync(userID, Enums.DatabaseRow.Rank).ConfigureAwait(false) ?? "0";
+                var userRank = await _dataAccess.RetrieveRowAsync(userId, Enums.DatabaseRow.Rank).ConfigureAwait(false) ?? "0";
 
                 if (int.TryParse(userRank, out int rank) && rank < InfluencePoints.Count)
                 {
                     PollVotes[optionNumber - 1] += InfluencePoints[rank];
-                    UsersWhoVoted.Add(userID);
-                    Log.Debug("{UserID} voted", userID);
+                    UsersWhoVoted.Add(userId);
+                    Log.Debug("{UserID} voted", userId);
                 }
                 else
                 {

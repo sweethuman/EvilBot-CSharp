@@ -17,6 +17,7 @@ namespace EvilBot
         {
             RetrieveConnection = new SQLiteConnection(LoadConnectionString("read_only"));
             WriteConnection = new SQLiteConnection(LoadConnectionString());
+            
         }
 
         //t: MAKE a function that retrieves all three attributes at once for performance reasons

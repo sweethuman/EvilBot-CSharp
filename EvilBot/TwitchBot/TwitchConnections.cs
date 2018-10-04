@@ -46,7 +46,7 @@ namespace EvilBot
                 ThrottlingPeriod = TimeSpan.FromSeconds(30)
             };
             var customClient = new WebSocketClient(clientOptions);
-            Client = new TwitchClient(client: customClient, logger: _loggerManager.ClientLogger);
+            Client = new TwitchClient(customClient, logger: _loggerManager.ClientLogger);
             Client.Initialize(_credentials, TwitchInfo.ChannelName);
             Client.Connect();
         }

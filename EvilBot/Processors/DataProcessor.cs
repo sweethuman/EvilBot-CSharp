@@ -19,11 +19,11 @@ namespace EvilBot.Processors
 
         public event EventHandler<RankUpdateEventArgs> RankUpdated;
 
-        public static int RankNumber { get; private set; } = 8;
+        private static int RankNumber { get; set; } = 8;
 
-        protected virtual void OnRankUpdated(string Name, string Rank)
+        protected virtual void OnRankUpdated(string name, string rank)
         {
-            RankUpdated?.Invoke(this, new RankUpdateEventArgs { Name = Name, Rank = Rank });
+            RankUpdated?.Invoke(this, new RankUpdateEventArgs { Name = name, Rank = rank });
         }
 
         public DataProcessor(IDataAccess dataAccess, ITwitchConnections twitchChatBot)
@@ -62,11 +62,8 @@ namespace EvilBot.Processors
                 }
                 return $"{ranks[place].Item1} (Lvl.{place}) XP: {points}/{ranks[place + 1].Item2}";
             }
-            else
-            {
-                Log.Error("{rankString} {pointsString} is not a parsable value to int {method}", rankString, pointsString, $"{ToString()} GetRankFormatted");
-                return null;
-            }
+            Log.Error("{rankString} {pointsString} is not a parsable value to int {method}", rankString, pointsString, $"{ToString()} GetRankFormatted");
+            return null;
         }
 
         #region DataProcessor TimedPointManagers
@@ -74,7 +71,7 @@ namespace EvilBot.Processors
         private int GetRank(int points)
         {
             var place = 0;
-            for (int i = 0; i < ranks.Count - 1; i++)
+            for (var i = 0; i < ranks.Count - 1; i++)
             {
                 if (points < ranks[i + 1].Item2)
                 {
@@ -91,14 +88,14 @@ namespace EvilBot.Processors
             var userList = new List<IUserBase>();
             var chatusers = await _twitchChatBot.Api.Undocumented.GetChattersAsync(TwitchInfo.ChannelName).ConfigureAwait(false);
             var userIdTasks = new List<Task<string>>();
-            for (int i = 0; i < chatusers.Count; i++)
+            for (var i = 0; i < chatusers.Count; i++)
             {
                 userIdTasks.Add(GetUserIdAsync(chatusers[i].Username));
             }
-            var userIDList = (await Task.WhenAll(userIdTasks).ConfigureAwait(false)).ToList();
-            for (int i = 0; i < chatusers.Count; i++)
+            var userIdList = (await Task.WhenAll(userIdTasks).ConfigureAwait(false)).ToList();
+            for (var i = 0; i < chatusers.Count; i++)
             {
-                userList.Add(new UserBase(chatusers[i].Username, userIDList[i]));
+                userList.Add(new UserBase(chatusers[i].Username, userIdList[i]));
             }
             await AddToUserAsync(userList, minutes: 10).ConfigureAwait(false);
             Log.Debug("Database updated! Lurkers present: {Lurkers}", chatusers.Count);
@@ -137,7 +134,7 @@ namespace EvilBot.Processors
                 }
                 int pointAdderValue;
                 var addPointsTasks = new List<Task>();
-                for (int i = 0; i < userList.Count; i++)
+                for (var i = 0; i < userList.Count; i++)
                 {
                     pointAdderValue = points;
                     if (channelSubscribers.Any(x => x.User.Id == userList[i].UserId))
@@ -181,7 +178,7 @@ namespace EvilBot.Processors
                 }
             }
             await Task.WhenAll(databaseRankUpdateTasks).ConfigureAwait(false);
-            for (int i = 0; i < usersUpdated.Count; i++)
+            for (var i = 0; i < usersUpdated.Count; i++)
             {
                 OnRankUpdated(usersUpdated[i].DisplayName, $"{ranks[userNameRanks[i]].Item1} (Lvl. {userNameRanks[i]})");
             }

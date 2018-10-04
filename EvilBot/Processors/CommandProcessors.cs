@@ -44,79 +44,72 @@ namespace EvilBot.Processors
         public async Task<string> ManageCommandAsync(OnChatCommandReceivedArgs e)
         {
             string userid;
-            if (!string.IsNullOrEmpty(e.Command.ArgumentsAsString))
-            {
-                if ((e.Command.ArgumentsAsList.Count >= 2) && (userid = await _dataProcessor.GetUserIdAsync(e.Command.ArgumentsAsList[0].TrimStart('@')).ConfigureAwait(false)) != null)
-                {
-                    var pointModifier = 0;
-                    var minuteModifier = 0;
-                    var twoParams = false;
-                    var parameters = new List<string> { e.Command.ArgumentsAsList[1] };
-                    if (e.Command.ArgumentsAsList.Count == 3)
-                    {
-                        twoParams = true;
-                        parameters = CommandHelpers.ManageCommandSorter(e.Command.ArgumentsAsList[1], e.Command.ArgumentsAsList[2]);
-                    }
-                    if (parameters[0].EndsWith("m", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        parameters[0] = parameters[0].TrimEnd(new char[] { 'm', 'M' });
-
-                        if (!int.TryParse(parameters[0], out minuteModifier))
-                        {
-                            return StandardMessages.ManageCommandText;
-                        }
-                    }
-                    else
-                    {
-                        if (!int.TryParse(parameters[0], out pointModifier))
-                        {
-                            return StandardMessages.ManageCommandText;
-                        }
-                    }
-
-                    if (twoParams)
-                    {
-                        if (parameters[1].EndsWith("m", StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            parameters[1] = parameters[1].TrimEnd(new char[] { 'm', 'M' });
-
-                            if (!int.TryParse(parameters[1], out minuteModifier))
-                            {
-                                return StandardMessages.ManageCommandText;
-                            }
-                        }
-                        else
-                        {
-                            return StandardMessages.ManageCommandText;
-                        }
-                    }
-                    await _dataAccess.ModifierUserIDAsync(userid, pointModifier, minuteModifier).ConfigureAwait(false);
-                    return $"/me Modified {e.Command.ArgumentsAsList[0]} with {pointModifier} points and {minuteModifier} minutes";
-                }
+            if (string.IsNullOrEmpty(e.Command.ArgumentsAsString)) return StandardMessages.ManageCommandText;
+            if (e.Command.ArgumentsAsList.Count < 2 || (userid = await _dataProcessor.GetUserIdAsync(e.Command.ArgumentsAsList[0].TrimStart('@')).ConfigureAwait(false)) == null) 
                 return StandardMessages.ManageCommandText;
+            var pointModifier = 0;
+            var minuteModifier = 0;
+            var twoParams = false;
+            var parameters = new List<string> { e.Command.ArgumentsAsList[1] };
+            if (e.Command.ArgumentsAsList.Count == 3)
+            {
+                twoParams = true;
+                parameters = CommandHelpers.ManageCommandSorter(e.Command.ArgumentsAsList[1], e.Command.ArgumentsAsList[2]);
             }
-            return StandardMessages.ManageCommandText;
+            if (parameters[0].EndsWith("m", StringComparison.InvariantCultureIgnoreCase))
+            {
+                parameters[0] = parameters[0].TrimEnd('m', 'M');
+
+                if (!int.TryParse(parameters[0], out minuteModifier))
+                {
+                    return StandardMessages.ManageCommandText;
+                }
+            }
+            else
+            {
+                if (!int.TryParse(parameters[0], out pointModifier))
+                {
+                    return StandardMessages.ManageCommandText;
+                }
+            }
+
+            if (twoParams)
+            {
+                if (parameters[1].EndsWith("m", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    parameters[1] = parameters[1].TrimEnd(new char[] { 'm', 'M' });
+
+                    if (!int.TryParse(parameters[1], out minuteModifier))
+                    {
+                        return StandardMessages.ManageCommandText;
+                    }
+                }
+                else
+                {
+                    return StandardMessages.ManageCommandText;
+                }
+            }
+            await _dataAccess.ModifierUserIDAsync(userid, pointModifier, minuteModifier).ConfigureAwait(false);
+            return $"/me Modified {e.Command.ArgumentsAsList[0]} with {pointModifier} points and {minuteModifier} minutes";
         }
 
         #region PollCommands
 
         public string PollCreateCommand(OnChatCommandReceivedArgs e)
         {
-            if (!string.IsNullOrEmpty(e.Command.ArgumentsAsString) && !e.Command.ArgumentsAsString.Contains("||"))
-            {
-                var arguments = e.Command.ArgumentsAsString.Trim();
-                arguments = arguments.Trim('|');
-                arguments = arguments.Trim();
-                var options = arguments.Split('|').ToList();
-                for (int i = 0; i < options.Count; i++)
-                {
-                    options[i] = options[i].Trim();
-                }
-                if (options.Count >= 2)
-                {
-                    return $"/me {_pollManager.PollCreate(options)}";
-                }
+            if (string.IsNullOrEmpty(e.Command.ArgumentsAsString) || e.Command.ArgumentsAsString.Contains("||"))
                 return StandardMessages.PollCreateText;
+            var arguments = e.Command.ArgumentsAsString.Trim();
+            arguments = arguments.Trim('|');
+            arguments = arguments.Trim();
+            var options = arguments.Split('|').ToList();
+            for (var i = 0; i < options.Count; i++)
+            {
+                options[i] = options[i].Trim();
+            }
+            if (options.Count >= 2)
+            {
+                return $"/me {_pollManager.PollCreate(options)}";
             }
             return StandardMessages.PollCreateText;
         }
@@ -137,20 +130,12 @@ namespace EvilBot.Processors
 
         public string PollStatsCommand(OnChatCommandReceivedArgs e)
         {
-            if (_pollManager.PollActive)
-            {
-                return $"/me {_pollManager.PollStats()}";
-            }
-            return StandardMessages.PollNotActiveText;
+            return _pollManager.PollActive ? $"/me {_pollManager.PollStats()}" : StandardMessages.PollNotActiveText;
         }
 
         public string PollEndCommand(OnChatCommandReceivedArgs e)
         {
-            if (_pollManager.PollActive)
-            {
-                return $"/me {_pollManager.PollEnd()}";
-            }
-            return StandardMessages.PollNotActiveText;
+            return _pollManager.PollActive ? $"/me {_pollManager.PollEnd()}" : StandardMessages.PollNotActiveText;
         }
 
         #endregion PollCommands
