@@ -21,7 +21,7 @@ namespace EvilBot
                 .MinimumLevel.Debug()
                 .CreateLogger();
             ClientLogger = new LoggerFactory()
-                .AddSerilog(logger: clientSerilogLogger)
+                .AddSerilog(clientSerilogLogger)
                 .CreateLogger<TwitchClient>();
             Serilog.ILogger apiSerilogLogger = new LoggerConfiguration()
                 .Enrich.FromLogContext()
@@ -32,7 +32,7 @@ namespace EvilBot
                 .MinimumLevel.Debug()
                 .CreateLogger();
             APILoggerFactory = new LoggerFactory()
-                .AddSerilog(logger: apiSerilogLogger);
+                .AddSerilog(apiSerilogLogger);
 
             Log.Logger = new LoggerConfiguration()
                 .Enrich.FromLogContext()

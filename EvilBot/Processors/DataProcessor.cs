@@ -62,7 +62,7 @@ namespace EvilBot.Processors
                 }
                 return $"{ranks[place].Item1} (Lvl.{place}) XP: {points}/{ranks[place + 1].Item2}";
             }
-            Log.Error("{rankString} {pointsString} is not a parsable value to int {method}", rankString, pointsString, $"{ToString()} GetRankFormatted");
+            Log.Error("{rankString} {pointsString} is not a parseable value to int {method}", rankString, pointsString, $"{ToString()} GetRankFormatted");
             return null;
         }
 
@@ -148,13 +148,13 @@ namespace EvilBot.Processors
             }
         }
 
-        private async Task UpdateRankAsync(List<IUserBase> userList)
+        private async Task UpdateRankAsync(IReadOnlyList<IUserBase> userList)
         {   //!WARNING GetUserAttributesAsync() also gets minutes, wich I don't currently need and it might cause performance issues if volume is large
             var userAttributesTasks = new List<Task<List<string>>>();
             var userNameRanks = new List<int>();
             var usersUpdated = new List<IUserBase>();
             var databaseRankUpdateTasks = new List<Task>();
-            for (int i = 0; i < userList.Count; i++)
+            for (var i = 0; i < userList.Count; i++)
             {
                 userAttributesTasks.Add(GetUserAttributesAsync(userList[i].UserId));
             }

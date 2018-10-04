@@ -53,7 +53,7 @@ namespace EvilBot
 
         private void ApiInitialize()
         {
-            Api = new TwitchAPI(loggerFactory: _loggerManager.APILoggerFactory);
+            Api = new TwitchAPI(_loggerManager.APILoggerFactory);
             Api.Settings.ClientId = TwitchInfo.ClientID;
             Api.Settings.AccessToken = TwitchInfo.BotToken;
         }
