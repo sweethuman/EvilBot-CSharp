@@ -53,8 +53,8 @@ namespace EvilBot.TwitchBot
             {
                 Log.Error("UNABLE TO PARSE {number} TO BITSPOINTSMULTIPLIER, NOT INT", ConfigurationManager.AppSettings.Get("bitsToPointsMultipliers"));
             }
+            
             EventIntializer();
-
             TimedMessageInitializer();
             TimerInitializer();
         }
