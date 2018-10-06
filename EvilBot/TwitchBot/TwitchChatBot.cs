@@ -15,18 +15,18 @@ namespace EvilBot.TwitchBot
 {
     internal class TwitchChatBot : ITwitchChatBot
     {
-        private Timer addPointsTimer;
-        private Timer addLurkerPointsTimer;
-        private Timer messageRepeater;
-        private float messageRepeaterMinutes;
+        private Timer _addPointsTimer;
+        private Timer _addLurkerPointsTimer;
+        private Timer _messageRepeater;
+        private float _messageRepeaterMinutes;
 
-        private int bitsToPointsMultiplier;
+        private int _bitsToPointsMultiplier;
 
         private readonly IDataProcessor _dataProcessor;
         private readonly ITwitchConnections _twitchConnection;
         private readonly ICommandProcessor _commandProcessor;
 
-        public List<string> timedMessages = new List<string>();
+        private readonly List<string> _timedMessages = new List<string>();
 
         public TwitchChatBot(ITwitchConnections twitchConnection, IDataProcessor dataProcessor, ICommandProcessor commandProcessor)
         {
@@ -38,9 +38,9 @@ namespace EvilBot.TwitchBot
         ~TwitchChatBot()
         {
             Log.Debug("Disposed of TwitchChatBot");
-            addLurkerPointsTimer.Dispose();
-            addPointsTimer.Dispose();
-            messageRepeater.Dispose();
+            _addLurkerPointsTimer.Dispose();
+            _addPointsTimer.Dispose();
+            _messageRepeater.Dispose();
         }
 
         #region TwitchChatBot Initializers
@@ -48,8 +48,8 @@ namespace EvilBot.TwitchBot
         public void Connect()
         {
             Log.Debug("Starting EvilBot");
-            messageRepeaterMinutes = float.Parse(ConfigurationManager.AppSettings.Get(nameof(messageRepeaterMinutes)));
-            if (!int.TryParse(ConfigurationManager.AppSettings.Get("bitsToPointsMultipliers"), out bitsToPointsMultiplier))
+            _messageRepeaterMinutes = float.Parse(ConfigurationManager.AppSettings.Get(nameof(_messageRepeaterMinutes)));
+            if (!int.TryParse(ConfigurationManager.AppSettings.Get("bitsToPointsMultipliers"), out _bitsToPointsMultiplier))
             {
                 Log.Error("UNABLE TO PARSE {number} TO BITSPOINTSMULTIPLIER, NOT INT", ConfigurationManager.AppSettings.Get("bitsToPointsMultipliers"));
             }
@@ -66,25 +66,25 @@ namespace EvilBot.TwitchBot
 
         private void TimedMessageInitializer()
         {
-            timedMessages.Add("Incearca !rank si vezi cat de activ ai fost");
-            timedMessages.Add("Fii activ ca sa castigi XP");
-            timedMessages.Add("Subscriberii primesc x2 puncte!");
-            timedMessages.Add("Daca iti place, apasa butonul de FOLLOW! Multumesc pentru sustinere!");
+            _timedMessages.Add("Incearca !rank si vezi cat de activ ai fost");
+            _timedMessages.Add("Fii activ ca sa castigi XP");
+            _timedMessages.Add("Subscriberii primesc x2 puncte!");
+            _timedMessages.Add("Daca iti place, apasa butonul de FOLLOW! Multumesc pentru sustinere!");
         }
 
         private void TimerInitializer()
         {
-            addPointsTimer = new Timer(1000 * 60 * 1);
-            addPointsTimer.Elapsed += _dataProcessor.AddPointsTimer_ElapsedAsync;
-            addPointsTimer.Start();
+            _addPointsTimer = new Timer(1000 * 60 * 1);
+            _addPointsTimer.Elapsed += _dataProcessor.AddPointsTimer_ElapsedAsync;
+            _addPointsTimer.Start();
 
-            addLurkerPointsTimer = new Timer(1000 * 60 * 10);
-            addLurkerPointsTimer.Elapsed += _dataProcessor.AddLurkerPointsTimer_ElapsedAsync;
-            addLurkerPointsTimer.Start();
+            _addLurkerPointsTimer = new Timer(1000 * 60 * 10);
+            _addLurkerPointsTimer.Elapsed += _dataProcessor.AddLurkerPointsTimer_ElapsedAsync;
+            _addLurkerPointsTimer.Start();
 
-            messageRepeater = new Timer(1000 * 60 * messageRepeaterMinutes);
-            messageRepeater.Elapsed += MessageRepeater_Elapsed;
-            messageRepeater.Start();
+            _messageRepeater = new Timer(1000 * 60 * _messageRepeaterMinutes);
+            _messageRepeater.Elapsed += MessageRepeater_Elapsed;
+            _messageRepeater.Start();
         }
 
         private void EventIntializer()
@@ -107,7 +107,7 @@ namespace EvilBot.TwitchBot
         private void MessageRepeater_Elapsed(object sender, ElapsedEventArgs e)
         {
             var rnd = new Random();
-            _twitchConnection.Client.SendMessage(TwitchInfo.ChannelName, $"/me {timedMessages[rnd.Next(0, timedMessages.Count)]}");
+            _twitchConnection.Client.SendMessage(TwitchInfo.ChannelName, $"/me {_timedMessages[rnd.Next(0, _timedMessages.Count)]}");
         }
 
         private static void Client_OnConnectionError(object sender, OnConnectionErrorArgs e)
@@ -124,8 +124,8 @@ namespace EvilBot.TwitchBot
 
             if (e.ChatMessage.Bits != 0)
             {
-                _dataProcessor.AddToUserAsync(new List<IUserBase> { new UserBase(e.ChatMessage.DisplayName, e.ChatMessage.UserId) }, (e.ChatMessage.Bits * bitsToPointsMultiplier) + 11, subCheck: false);
-                _twitchConnection.Client.SendMessage(e.ChatMessage.Channel, $"/me {e.ChatMessage.DisplayName} HAS BEEN REWARDED {(e.ChatMessage.Bits * bitsToPointsMultiplier) + 11} POINTS!");
+                _dataProcessor.AddToUserAsync(new List<IUserBase> { new UserBase(e.ChatMessage.DisplayName, e.ChatMessage.UserId) }, (e.ChatMessage.Bits * _bitsToPointsMultiplier) + 11, subCheck: false);
+                _twitchConnection.Client.SendMessage(e.ChatMessage.Channel, $"/me {e.ChatMessage.DisplayName} HAS BEEN REWARDED {(e.ChatMessage.Bits * _bitsToPointsMultiplier) + 11} POINTS!");
             }
         }
 
@@ -181,9 +181,6 @@ namespace EvilBot.TwitchBot
                 case "comenzi":
                     Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.Message);
                     _twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.ComenziText);
-                    break;
-
-                default:
                     break;
             }
         }
