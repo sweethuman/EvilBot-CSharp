@@ -12,13 +12,6 @@ namespace EvilBot
                 var app = scope.Resolve<IApplication>();
                 app.Run();
             }
-
-            //TwitchChatBot bot = new TwitchChatBot();
-            //bot.Connect();
-
-            //Console.ReadLine();
-
-            //bot.Disconnect();
         }
     }
 }
