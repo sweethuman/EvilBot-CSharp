@@ -13,7 +13,7 @@ namespace EvilBot.Utilities
         public bool PollActive { get; private set; }
 
         private List<double> InfluencePoints { get; } = new List<double> { 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8 };
-        private List<string> UsersWhoVoted;
+        private List<string> _usersWhoVoted;
         private readonly IDataAccess _dataAccess;
 
         public PollManager(IDataAccess dataAccess)
@@ -27,7 +27,7 @@ namespace EvilBot.Utilities
             Log.Debug("PollStarting");
             var builder = new StringBuilder();
             PollItems = optionsList;
-            UsersWhoVoted = new List<string>();
+            _usersWhoVoted = new List<string>();
             PollVotes = new List<double>();
             PollActive = true;
             for (var i = 0; i < PollItems.Count; i++)
@@ -57,7 +57,7 @@ namespace EvilBot.Utilities
             var message = $"A Castigat || {PollItems[winner]} || cu {PollVotes[winner]} puncte";
             PollItems = null;
             PollVotes = null;
-            UsersWhoVoted = null;
+            _usersWhoVoted = null;
             Log.Debug("Poll Ended");
             return message;
         }
@@ -76,14 +76,14 @@ namespace EvilBot.Utilities
         //NOTE make sure it doesn't get negative or 0 numbers at optionNumber
         public async Task PollAddVote(string userId, int optionNumber)
         {
-            if (userId != null && !UsersWhoVoted.Contains(userId) && optionNumber <= PollItems.Count && optionNumber >= 1)
+            if (userId != null && !_usersWhoVoted.Contains(userId) && optionNumber <= PollItems.Count && optionNumber >= 1)
             {
                 var userRank = await _dataAccess.RetrieveRowAsync(userId, Enums.DatabaseRow.Rank).ConfigureAwait(false) ?? "0";
 
                 if (int.TryParse(userRank, out int rank) && rank < InfluencePoints.Count)
                 {
                     PollVotes[optionNumber - 1] += InfluencePoints[rank];
-                    UsersWhoVoted.Add(userId);
+                    _usersWhoVoted.Add(userId);
                     Log.Debug("{UserID} voted", userId);
                 }
                 else

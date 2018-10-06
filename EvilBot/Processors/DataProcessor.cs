@@ -20,7 +20,7 @@ namespace EvilBot.Processors
     {
         private readonly IDataAccess _dataAccess;
         private readonly ITwitchConnections _twitchChatBot;
-        private readonly List<Tuple<string, int>> ranks = new List<Tuple<string, int>>();
+        private readonly List<Tuple<string, int>> _ranks = new List<Tuple<string, int>>();
 
         public event EventHandler<RankUpdateEventArgs> RankUpdated;
 
@@ -40,17 +40,17 @@ namespace EvilBot.Processors
 
         private void IntializeRanks()
         {
-            ranks.Add(new Tuple<string, int>("Fara Rank", 0));
-            ranks.Add(new Tuple<string, int>("Rookie", 50));
-            ranks.Add(new Tuple<string, int>("Alpha", 500));
-            ranks.Add(new Tuple<string, int>("Thug", 2500));
-            ranks.Add(new Tuple<string, int>("Sage", 6000));
-            ranks.Add(new Tuple<string, int>("Lord", 10000));
-            ranks.Add(new Tuple<string, int>("Initiate", 15000));
-            ranks.Add(new Tuple<string, int>("Veteran", 22000));
-            ranks.Add(new Tuple<string, int>("Emperor", 30000));
+            _ranks.Add(new Tuple<string, int>("Fara Rank", 0));
+            _ranks.Add(new Tuple<string, int>("Rookie", 50));
+            _ranks.Add(new Tuple<string, int>("Alpha", 500));
+            _ranks.Add(new Tuple<string, int>("Thug", 2500));
+            _ranks.Add(new Tuple<string, int>("Sage", 6000));
+            _ranks.Add(new Tuple<string, int>("Lord", 10000));
+            _ranks.Add(new Tuple<string, int>("Initiate", 15000));
+            _ranks.Add(new Tuple<string, int>("Veteran", 22000));
+            _ranks.Add(new Tuple<string, int>("Emperor", 30000));
 
-            RankNumber = ranks.Count;
+            RankNumber = _ranks.Count;
         }
 
         public string GetRankFormatted(string rankString, string pointsString)
@@ -59,13 +59,13 @@ namespace EvilBot.Processors
             {
                 if (place == 0)
                 {
-                    return $"{ranks[place].Item1} XP: {points}/{ranks[place + 1].Item2}";
+                    return $"{_ranks[place].Item1} XP: {points}/{_ranks[place + 1].Item2}";
                 }
-                if (place == ranks.Count - 1)
+                if (place == _ranks.Count - 1)
                 {
-                    return $"{ranks[place].Item1} (Lvl.{place}) XP: {points}";
+                    return $"{_ranks[place].Item1} (Lvl.{place}) XP: {points}";
                 }
-                return $"{ranks[place].Item1} (Lvl.{place}) XP: {points}/{ranks[place + 1].Item2}";
+                return $"{_ranks[place].Item1} (Lvl.{place}) XP: {points}/{_ranks[place + 1].Item2}";
             }
             Log.Error("{rankString} {pointsString} is not a parseable value to int {method}", rankString, pointsString, $"{ToString()} GetRankFormatted");
             return null;
@@ -76,9 +76,9 @@ namespace EvilBot.Processors
         private int GetRank(int points)
         {
             var place = 0;
-            for (var i = 0; i < ranks.Count - 1; i++)
+            for (var i = 0; i < _ranks.Count - 1; i++)
             {
-                if (points < ranks[i + 1].Item2)
+                if (points < _ranks[i + 1].Item2)
                 {
                     break;
                 }
@@ -185,7 +185,7 @@ namespace EvilBot.Processors
             await Task.WhenAll(databaseRankUpdateTasks).ConfigureAwait(false);
             for (var i = 0; i < usersUpdated.Count; i++)
             {
-                OnRankUpdated(usersUpdated[i].DisplayName, $"{ranks[userNameRanks[i]].Item1} (Lvl. {userNameRanks[i]})");
+                OnRankUpdated(usersUpdated[i].DisplayName, $"{_ranks[userNameRanks[i]].Item1} (Lvl. {userNameRanks[i]})");
             }
         }
 
