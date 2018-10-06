@@ -14,7 +14,8 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
-    <TargetFrameworkProfile />
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <PublishUrl>C:\Users\hacks\Documents\EvilBotBuilds\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
