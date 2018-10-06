@@ -35,10 +35,10 @@ namespace EvilBot.Processors
         {
             _dataAccess = dataAccess;
             _twitchChatBot = twitchChatBot;
-            IntializeRanks();
+            InitializeRanks();
         }
 
-        private void IntializeRanks()
+        private void InitializeRanks()
         {
             _ranks.Add(new Tuple<string, int>("Fara Rank", 0));
             _ranks.Add(new Tuple<string, int>("Rookie", 50));

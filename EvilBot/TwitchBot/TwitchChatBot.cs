@@ -37,7 +37,7 @@ namespace EvilBot.TwitchBot
 
         ~TwitchChatBot()
         {
-            Log.Debug("Disposed of TwitchChatBot");
+            Log.Debug("Disposing of TwitchChatBot");
             _addLurkerPointsTimer.Dispose();
             _addPointsTimer.Dispose();
             _messageRepeater.Dispose();
