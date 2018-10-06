@@ -146,7 +146,7 @@ namespace EvilBot.Processors
                     {
                         pointAdderValue = (int)(pointAdderValue * pointsMultiplier);
                     }
-                    addPointsTasks.Add(_dataAccess.ModifierUserIdAsync(userList[i].UserId, points: pointAdderValue, minutes: minutes));
+                    addPointsTasks.Add(_dataAccess.ModifierUserIdAsync(userList[i].UserId, pointAdderValue, minutes));
                 }
                 await Task.WhenAll(addPointsTasks).ConfigureAwait(false);
                 await UpdateRankAsync(userList).ConfigureAwait(false);

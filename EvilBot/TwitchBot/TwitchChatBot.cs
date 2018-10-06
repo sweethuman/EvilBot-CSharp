@@ -48,7 +48,7 @@ namespace EvilBot.TwitchBot
         public void Connect()
         {
             Log.Debug("Starting EvilBot");
-            _messageRepeaterMinutes = float.Parse(ConfigurationManager.AppSettings.Get(nameof(_messageRepeaterMinutes)));
+            _messageRepeaterMinutes = float.Parse(ConfigurationManager.AppSettings.Get("messageRepeaterMinutes"));
             if (!int.TryParse(ConfigurationManager.AppSettings.Get("bitsToPointsMultipliers"), out _bitsToPointsMultiplier))
             {
                 Log.Error("UNABLE TO PARSE {number} TO BITSPOINTSMULTIPLIER, NOT INT", ConfigurationManager.AppSettings.Get("bitsToPointsMultipliers"));
