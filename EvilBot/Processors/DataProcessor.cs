@@ -166,6 +166,8 @@ namespace EvilBot.Processors
             var userAttributes = (await Task.WhenAll(userAttributesTasks).ConfigureAwait(false)).ToList();
             for (int i = 0; i < userAttributes.Count; i++)
             {
+                
+                //TODO should have bugfix
                 if (!int.TryParse(userAttributes[i][0], out int points))
                 {
                     Log.Error("Tried to parse string to int: {string} in {ClassSource}", userAttributes[i][1], $"{ToString()}UpdateRankAsync");
