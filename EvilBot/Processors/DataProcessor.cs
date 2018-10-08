@@ -97,6 +97,7 @@ namespace EvilBot.Processors
             {
                 userIdTasks.Add(GetUserIdAsync(chatusers[i].Username));
             }
+            //TODO in case it is null somewhere around here it should be cleared
             var userIdList = (await Task.WhenAll(userIdTasks).ConfigureAwait(false)).ToList();
             for (var i = 0; i < chatusers.Count; i++)
             {
@@ -121,6 +122,8 @@ namespace EvilBot.Processors
         /// <param name="minutes">The minutes to add.</param>
         /// <param name="subCheck">if set to <c>true</c> it will check if users are subscribers.</param>
         /// <returns></returns>
+        
+        //TODO make sure this doesn't have a problem with nulls or removes them
         public async Task AddToUserAsync(List<IUserBase> userList, int points = 1, int minutes = 0, bool subCheck = true)
         {
             if (userList.Count != 0)
@@ -166,6 +169,7 @@ namespace EvilBot.Processors
             var userAttributes = (await Task.WhenAll(userAttributesTasks).ConfigureAwait(false)).ToList();
             for (int i = 0; i < userAttributes.Count; i++)
             {
+                //TODO here null should be handled
                 if (!int.TryParse(userAttributes[i][0], out int points))
                 {
                     Log.Error("Tried to parse string to int: {string} in {ClassSource}", userAttributes[i][1], $"{ToString()}UpdateRankAsync");
