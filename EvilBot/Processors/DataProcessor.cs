@@ -92,18 +92,19 @@ namespace EvilBot.Processors
             //in case twitch says something went wrong, it throws exception, catch that exception
             var userList = new List<IUserBase>();
             var chatusers = await _twitchChatBot.Api.Undocumented.GetChattersAsync(TwitchInfo.ChannelName).ConfigureAwait(false);
-            var userIdTasks = new List<Task<string>>();
+            var userIdTasks = new List<Task<User>>();
             for (var i = 0; i < chatusers.Count; i++)
             {
-                userIdTasks.Add(GetUserIdAsync(chatusers[i].Username));
+                userIdTasks.Add(GetUserAsyncByUsername(chatusers[i].Username));
             }
             var userIdList = (await Task.WhenAll(userIdTasks).ConfigureAwait(false)).ToList();
-            for (var i = 0; i < chatusers.Count; i++)
+            userIdList.RemoveAll(x => x == null);
+            for (var i = 0; i < userIdList.Count; i++)
             {
-                userList.Add(new UserBase(chatusers[i].Username, userIdList[i]));
+                userList.Add(new UserBase(userIdList[i].DisplayName, userIdList[i].Id));
             }
             await AddToUserAsync(userList, minutes: 10).ConfigureAwait(false);
-            Log.Debug("Database updated! Lurkers present: {Lurkers}", chatusers.Count);
+            Log.Debug("Database updated! Lurkers present: {Lurkers}", userList.Count);
         }
 
         public async void AddPointsTimer_ElapsedAsync(object sender, ElapsedEventArgs e)
@@ -119,8 +120,9 @@ namespace EvilBot.Processors
         /// <param name="userList">The users to add too the defined values.</param>
         /// <param name="points">The points to add.</param>
         /// <param name="minutes">The minutes to add.</param>
-        /// <param name="subCheck">if set to <c>true</c> it will check if users are subscribers.</param>
+        /// <param name="subCheck">If set to <c>true</c> it will check if users are subscribers.</param>
         /// <returns></returns>
+        //TODO unit test on nulls
         public async Task AddToUserAsync(List<IUserBase> userList, int points = 1, int minutes = 0, bool subCheck = true)
         {
             if (userList.Count != 0)
@@ -166,22 +168,38 @@ namespace EvilBot.Processors
             var userAttributes = (await Task.WhenAll(userAttributesTasks).ConfigureAwait(false)).ToList();
             for (int i = 0; i < userAttributes.Count; i++)
             {
-                
-                //TODO should have bugfix
-                if (!int.TryParse(userAttributes[i][0], out int points))
+                //TODO here null should be handled
+                try
                 {
-                    Log.Error("Tried to parse string to int: {string} in {ClassSource}", userAttributes[i][1], $"{ToString()}UpdateRankAsync");
+                    if (!int.TryParse(userAttributes[i][0], out var points))
+                    {
+                        Log.Error("Tried to parse string to int: {string} in {ClassSource}", userAttributes[i][1],
+                            $"{ToString()}UpdateRankAsync");
+                    }
+
+                    if (!int.TryParse(userAttributes[i][2], out var rank))
+                    {
+                        Log.Error("Tried to parse string to int: {string} in {ClassSource}", userAttributes[i][1],
+                            $"{ToString()}UpdateRankAsync");
+                    }
+
+                    var currentRank = GetRank(points);
+                    if (currentRank != rank)
+                    {
+                        databaseRankUpdateTasks.Add(_dataAccess.ModifyUserIdRankAsync(userList[i].UserId, currentRank));
+                        //make it so that it goes all into a single class
+                        userNameRanks.Add(currentRank);
+                        usersUpdated.Add(userList[i]);
+                    }
                 }
-                if (!int.TryParse(userAttributes[i][2], out int rank))
+                catch (NullReferenceException e)
                 {
-                    Log.Error("Tried to parse string to int: {string} in {ClassSource}", userAttributes[i][1], $"{ToString()}UpdateRankAsync");
+                    Log.Error(e,
+                        "Some null happened, probably userAttributes, prevent from sending the null onward, or check why it was sent {problemSource}", e.Source);
                 }
-                var currentRank = GetRank(points);
-                if (currentRank != rank)
+                catch (Exception e)
                 {
-                    userNameRanks.Add(currentRank);
-                    databaseRankUpdateTasks.Add(_dataAccess.ModifyUserIdRankAsync(userList[i].UserId, currentRank));
-                    usersUpdated.Add(userList[i]);
+                    Log.Error(e, "Ok, this is pretty bad, it's not null so somebody didn't know how to handle stuff {source}", e.Source);
                 }
             }
             await Task.WhenAll(databaseRankUpdateTasks).ConfigureAwait(false);
@@ -204,7 +222,26 @@ namespace EvilBot.Processors
             }
             return _twitchChatBot.Api.V5.Streams.GetUptimeAsync(userId).Result;
         }
-
+        public async Task<User> GetUserAsyncByUsername(string username)
+        {
+            Log.Debug("AskedForID for {Username}", username);
+            User[] userList;
+            try
+            {
+                userList = (await _twitchChatBot.Api.V5.Users.GetUserByNameAsync(username).ConfigureAwait(false)).Matches;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "GetUserIdAsync blew up with {username}", username);
+                return null;
+            }
+            if (username == null || userList.Length == 0)
+            {
+                Log.Warning("User does not exit {username}", username);
+                return null;
+            }
+            return userList[0];
+        }
         public async Task<string> GetUserIdAsync(string username)
         {
             Log.Debug("AskedForID for {Username}", username);
@@ -220,6 +257,7 @@ namespace EvilBot.Processors
             }
             if (username == null || userList.Length == 0)
             {
+                Log.Warning("User does not exit {username}", username);
                 return null;
             }
             return userList[0].Id;
