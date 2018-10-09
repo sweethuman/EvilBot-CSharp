@@ -122,7 +122,7 @@ namespace EvilBot.Processors
         /// <param name="minutes">The minutes to add.</param>
         /// <param name="subCheck">If set to <c>true</c> it will check if users are subscribers.</param>
         /// <returns></returns>
-        //TODO make sure this doesn't have a problem with nulls or removes them
+        //TODO unit test on nulls
         public async Task AddToUserAsync(List<IUserBase> userList, int points = 1, int minutes = 0, bool subCheck = true)
         {
             if (userList.Count != 0)
@@ -169,20 +169,37 @@ namespace EvilBot.Processors
             for (int i = 0; i < userAttributes.Count; i++)
             {
                 //TODO here null should be handled
-                if (!int.TryParse(userAttributes[i][0], out int points))
+                try
                 {
-                    Log.Error("Tried to parse string to int: {string} in {ClassSource}", userAttributes[i][1], $"{ToString()}UpdateRankAsync");
+                    if (!int.TryParse(userAttributes[i][0], out var points))
+                    {
+                        Log.Error("Tried to parse string to int: {string} in {ClassSource}", userAttributes[i][1],
+                            $"{ToString()}UpdateRankAsync");
+                    }
+
+                    if (!int.TryParse(userAttributes[i][2], out var rank))
+                    {
+                        Log.Error("Tried to parse string to int: {string} in {ClassSource}", userAttributes[i][1],
+                            $"{ToString()}UpdateRankAsync");
+                    }
+
+                    var currentRank = GetRank(points);
+                    if (currentRank != rank)
+                    {
+                        databaseRankUpdateTasks.Add(_dataAccess.ModifyUserIdRankAsync(userList[i].UserId, currentRank));
+                        //make it so that it goes all into a single class
+                        userNameRanks.Add(currentRank);
+                        usersUpdated.Add(userList[i]);
+                    }
                 }
-                if (!int.TryParse(userAttributes[i][2], out int rank))
+                catch (NullReferenceException e)
                 {
-                    Log.Error("Tried to parse string to int: {string} in {ClassSource}", userAttributes[i][1], $"{ToString()}UpdateRankAsync");
+                    Log.Error(e,
+                        "Some null happened, probably userAttributes, prevent from sending the null onward, or check why it was sent {problemSource}", e.Source);
                 }
-                var currentRank = GetRank(points);
-                if (currentRank != rank)
+                catch (Exception e)
                 {
-                    userNameRanks.Add(currentRank);
-                    databaseRankUpdateTasks.Add(_dataAccess.ModifyUserIdRankAsync(userList[i].UserId, currentRank));
-                    usersUpdated.Add(userList[i]);
+                    Log.Error(e, "Ok, this is pretty bad, it's not null so somebody didn't know how to handle stuff {source}", e.Source);
                 }
             }
             await Task.WhenAll(databaseRankUpdateTasks).ConfigureAwait(false);
