@@ -4,7 +4,6 @@ using System.Configuration;
 using System.Timers;
 using EvilBot.DataStructures;
 using EvilBot.DataStructures.Interfaces;
-using EvilBot.Processors;
 using EvilBot.Processors.Interfaces;
 using EvilBot.TwitchBot.Interfaces;
 using EvilBot.Utilities;

@@ -8,6 +8,5 @@ namespace EvilBot.Utilities.Interfaces
         void AddToFiler(IUserBase user);
         void RemoveFromFilter(IUserBase user);
         string RetrieveFilteredUsers();
-        bool CheckIfUserFiltered(IUserBase user);
     }
 }

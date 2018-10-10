@@ -14,7 +14,7 @@ namespace EvilBot.Utilities
     {
         //TODO actually implement the check in pointcounter or smth
         //TODO add somewhere code that if FilteredUsers table does not exist to be created
-        private List<IUserBase> FilteredUsers { get; } = new List<IUserBase>();
+        private static List<IUserBase> FilteredUsers { get; } = new List<IUserBase>();
         private readonly IDataAccess _dataAccess;
         private readonly IDataProcessor _dataProcessor;
         public FilterManager(IDataAccess dataAccess, IDataProcessor dataProcessor)
@@ -61,8 +61,12 @@ namespace EvilBot.Utilities
         
         public string RetrieveFilteredUsers()
         {
+            if (FilteredUsers.Count <= 0)
+            {
+                return "/me No users filtered!";
+            }
             var builder = new StringBuilder();
-            builder.Append("Filtered Users are:");
+            builder.Append("/me Filtered Users are:");
             for (var i = 0; i < FilteredUsers.Count; i++)
             {
                 builder.Append($" {FilteredUsers[i].DisplayName},");
@@ -71,7 +75,7 @@ namespace EvilBot.Utilities
             return builder.ToString();
         }
 
-        public bool CheckIfUserFiltered(IUserBase user)
+        public static bool CheckIfUserFiltered(IUserBase user)
         {
             return FilteredUsers.Any(x => x.UserId == user.UserId);
         }
