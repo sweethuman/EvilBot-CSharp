@@ -85,10 +85,11 @@ namespace EvilBot.Utilities
         //TODO add table selector if it is the case
         //TODO function to insert FilteredUser to table
         //TODO function to remove FilteredUser from table
-        public async Task<List<IDatabaseUser>> RetrieveAllUsersFromTable()
+        public async Task<List<IDatabaseUser>> RetrieveAllUsersFromTable(Enums.DatabaseTables table)
         {
+            var retrievingTable = table.ToString();
             var output =
-                (await RetrieveConnection.QueryAsync<DatabaseUser>("SELECT * FROM FilteredUsers", new DynamicParameters())).ToList();
+                (await RetrieveConnection.QueryAsync<DatabaseUser>($"SELECT * FROM {retrievingTable}", new DynamicParameters())).ToList();
             var results = output.ToList<IDatabaseUser>();
             if (output.Any()) return results;
             Log.Warning("{table} table is empty!", "table");

@@ -32,6 +32,6 @@ namespace EvilBot.Utilities.Interfaces
         /// <returns></returns>
         Task ModifyUserIdRankAsync(string userId, int rank);
 
-        Task<List<IDatabaseUser>> RetrieveAllUsersFromTable();
+        Task<List<IDatabaseUser>> RetrieveAllUsersFromTable(Enums.DatabaseTables table);
     }
 }

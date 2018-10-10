@@ -167,7 +167,6 @@ namespace EvilBot.Processors
                     {
                         return $"/me {user.DisplayName} sters din Filtru!";
                     }
-                    //TODO make later to show different text if user already in filter or not
                     return $"/me {user.DisplayName} nu este in Filtru!";
                 }
                 default:
