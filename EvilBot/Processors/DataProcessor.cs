@@ -223,6 +223,7 @@ namespace EvilBot.Processors
         }
         public async Task<User> GetUserAsyncByUsername(string username)
         {
+            username = username.Trim('@');
             Log.Debug("AskedForID for {Username}", username);
             User[] userList;
             try

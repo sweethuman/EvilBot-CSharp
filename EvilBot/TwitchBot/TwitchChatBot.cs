@@ -8,7 +8,9 @@ using EvilBot.Processors;
 using EvilBot.Processors.Interfaces;
 using EvilBot.TwitchBot.Interfaces;
 using EvilBot.Utilities;
+using EvilBot.Utilities.Interfaces;
 using Serilog;
+using TwitchLib.Client.Enums;
 using TwitchLib.Client.Events;
 
 namespace EvilBot.TwitchBot
@@ -25,14 +27,16 @@ namespace EvilBot.TwitchBot
         private readonly IDataProcessor _dataProcessor;
         private readonly ITwitchConnections _twitchConnection;
         private readonly ICommandProcessor _commandProcessor;
+        private readonly IFilterManager _filterManager;
 
         private readonly List<string> _timedMessages = new List<string>();
 
-        public TwitchChatBot(ITwitchConnections twitchConnection, IDataProcessor dataProcessor, ICommandProcessor commandProcessor)
+        public TwitchChatBot(ITwitchConnections twitchConnection, IDataProcessor dataProcessor, ICommandProcessor commandProcessor, IFilterManager filterManager)
         {
             _twitchConnection = twitchConnection;
             _dataProcessor = dataProcessor;
             _commandProcessor = commandProcessor;
+            _filterManager = filterManager;
         }
 
         ~TwitchChatBot()
@@ -57,6 +61,7 @@ namespace EvilBot.TwitchBot
             EventIntializer();
             TimedMessageInitializer();
             TimerInitializer();
+            _filterManager.InitializeFilter();
         }
 
         public void Disconnect()
@@ -136,6 +141,7 @@ namespace EvilBot.TwitchBot
             switch (e.Command.CommandText.ToLower())
             {
                 case "colorme":
+                    Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.Message);
                     _twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, "/color Red");
                     break;
 
@@ -146,7 +152,7 @@ namespace EvilBot.TwitchBot
 
                 case "manage":
                     Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.Message);
-                    if (e.Command.ChatMessage.UserType >= TwitchLib.Client.Enums.UserType.Moderator)
+                    if (e.Command.ChatMessage.UserType >= UserType.Moderator)
                     {
                         _twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, await _commandProcessor.ManageCommandAsync(e).ConfigureAwait(false));
                     }
@@ -154,7 +160,7 @@ namespace EvilBot.TwitchBot
 
                 case "pollcreate":
                     Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.Message);
-                    if (e.Command.ChatMessage.UserType >= TwitchLib.Client.Enums.UserType.Moderator)
+                    if (e.Command.ChatMessage.UserType >= UserType.Moderator)
                     {
                         _twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, _commandProcessor.PollCreateCommand(e));
                     }
@@ -172,7 +178,7 @@ namespace EvilBot.TwitchBot
 
                 case "pollend":
                     Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.Message);
-                    if (e.Command.ChatMessage.UserType >= TwitchLib.Client.Enums.UserType.Moderator)
+                    if (e.Command.ChatMessage.UserType >= UserType.Moderator)
                     {
                         _twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, _commandProcessor.PollEndCommand(e));
                     }
@@ -181,6 +187,14 @@ namespace EvilBot.TwitchBot
                 case "comenzi":
                     Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.Message);
                     _twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.ComenziText);
+                    break;
+                
+                case "filter":
+                    Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.Message);
+                    if (e.Command.ChatMessage.UserType >= UserType.Moderator)
+                    {
+                        _twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, await _commandProcessor.FilterCommand(e));
+                    }
                     break;
             }
         }

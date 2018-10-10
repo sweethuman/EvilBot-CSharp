@@ -6,5 +6,9 @@
         {
             Points, Minutes, Rank
         }
+        public enum DatabaseTables
+        {
+            UserPoints, FilteredUsers
+        }
     }
 }

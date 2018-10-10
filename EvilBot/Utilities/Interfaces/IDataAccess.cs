@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using EvilBot.DataStructures.Database.Interfaces;
 
 namespace EvilBot.Utilities.Interfaces
 {
@@ -29,5 +31,7 @@ namespace EvilBot.Utilities.Interfaces
         /// <param name="rank">The rank.</param>
         /// <returns></returns>
         Task ModifyUserIdRankAsync(string userId, int rank);
+
+        Task<List<IDatabaseUser>> RetrieveAllUsersFromTable();
     }
 }

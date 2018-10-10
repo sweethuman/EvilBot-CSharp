@@ -1,10 +1,13 @@
-﻿using System.Configuration;
+﻿using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Data.SQLite;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using EvilBot.Utilities.Interfaces;
+using EvilBot.DataStructures.Database;
+using EvilBot.DataStructures.Database.Interfaces;
 using Serilog;
 
 namespace EvilBot.Utilities
@@ -77,6 +80,19 @@ namespace EvilBot.Utilities
         private static string LoadConnectionString(string id = "Default")
         {
             return ConfigurationManager.ConnectionStrings[id].ConnectionString;
+        }
+
+        //TODO add table selector if it is the case
+        //TODO function to insert FilteredUser to table
+        //TODO function to remove FilteredUser from table
+        public async Task<List<IDatabaseUser>> RetrieveAllUsersFromTable()
+        {
+            var output =
+                (await RetrieveConnection.QueryAsync<DatabaseUser>("SELECT * FROM FilteredUsers", new DynamicParameters())).ToList();
+            var results = output.ToList<IDatabaseUser>();
+            if (output.Any()) return results;
+            Log.Warning("{table} table is empty!", "table");
+            return null;
         }
     }
 }

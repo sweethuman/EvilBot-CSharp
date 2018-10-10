@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using EvilBot.DataStructures;
 using EvilBot.Processors.Interfaces;
 using EvilBot.Utilities;
 using EvilBot.Utilities.Interfaces;
@@ -14,12 +15,14 @@ namespace EvilBot.Processors
         private readonly IDataProcessor _dataProcessor;
         private readonly IDataAccess _dataAccess;
         private readonly IPollManager _pollManager;
+        private readonly IFilterManager _filterManager;
 
-        public CommandProcessor(IDataProcessor dataProcessor, IDataAccess dataAccess, IPollManager pollManager)
+        public CommandProcessor(IDataProcessor dataProcessor, IDataAccess dataAccess, IPollManager pollManager, IFilterManager filterManager)
         {
             _dataProcessor = dataProcessor;
             _dataAccess = dataAccess;
             _pollManager = pollManager;
+            _filterManager = filterManager;
         }
 
         public async Task<string> RankCommandAsync(OnChatCommandReceivedArgs e)
@@ -136,5 +139,41 @@ namespace EvilBot.Processors
         }
 
         #endregion PollCommands
+
+        #region FilterCommands
+
+        public async Task<string> FilterCommand(OnChatCommandReceivedArgs e)
+        {
+            
+            //TODO fill these up
+            if (e.Command.ArgumentsAsList.Count >= 1 && e.Command.ArgumentsAsList[0] == "get")
+            {
+                return _filterManager.RetrieveFilteredUsers();
+            }
+            if (e.Command.ArgumentsAsList.Count < 2) return StandardMessages.FilterText;
+            switch (e.Command.ArgumentsAsList[0])
+            {
+                case "add":
+                {
+                    var user = await _dataProcessor.GetUserAsyncByUsername(e.Command.ArgumentsAsList[1]);
+                    if (user == null) return StandardMessages.UserMissingText;
+                    _filterManager.AddToFiler(new UserBase(user.DisplayName, user.Id));
+                    //TODO make later to show different text if user already in filter or not
+                    return $"/me {user.DisplayName} added to the Filter!";
+                }
+                case "remove":
+                {
+                    var user = await _dataProcessor.GetUserAsyncByUsername(e.Command.ArgumentsAsList[1]);
+                    if (user == null) return StandardMessages.UserMissingText;
+                    _filterManager.RemoveFromFilter(new UserBase(user.DisplayName, user.Id));
+                    //TODO make later to show different text if user already in filter or not
+                    return $"/me {user.DisplayName} removed from the Filter!";
+                }
+                default:
+                    return StandardMessages.FilterText;
+            }
+        }
+
+        #endregion
     }
 }

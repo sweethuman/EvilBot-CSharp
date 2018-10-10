@@ -21,6 +21,7 @@ namespace EvilBot
             builder.RegisterType<TwitchChatBot>().As<ITwitchChatBot>().SingleInstance();
             builder.RegisterType<TwitchConnections>().As<ITwitchConnections>().SingleInstance();
             builder.RegisterType<PollManager>().As<IPollManager>().SingleInstance();
+            builder.RegisterType<FilterManager>().As<IFilterManager>().SingleInstance();
 
             return builder.Build();
         }
