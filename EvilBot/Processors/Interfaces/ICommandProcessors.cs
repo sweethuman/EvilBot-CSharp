@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using TwitchLib.Client.Events;
 
-namespace EvilBot.Processors
+namespace EvilBot.Processors.Interfaces
 {
     internal interface ICommandProcessor
     {
