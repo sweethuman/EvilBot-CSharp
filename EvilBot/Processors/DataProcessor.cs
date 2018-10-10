@@ -168,7 +168,6 @@ namespace EvilBot.Processors
             var userAttributes = (await Task.WhenAll(userAttributesTasks).ConfigureAwait(false)).ToList();
             for (int i = 0; i < userAttributes.Count; i++)
             {
-                //TODO here null should be handled
                 try
                 {
                     if (!int.TryParse(userAttributes[i][0], out var points))
