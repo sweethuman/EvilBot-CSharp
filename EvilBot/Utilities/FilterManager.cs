@@ -12,7 +12,6 @@ namespace EvilBot.Utilities
 {
     public class FilterManager : IFilterManager
     {
-        //TODO actually implement the check in pointcounter or smth
         //TODO add somewhere code that if FilteredUsers table does not exist to be created
         private static List<IUserBase> FilteredUsers { get; } = new List<IUserBase>();
         private readonly IDataAccess _dataAccess;
@@ -25,7 +24,6 @@ namespace EvilBot.Utilities
         
         public async void InitializeFilter()
         {
-            //TODO make sure to check if retrieved values are null
             var users = await _dataAccess.RetrieveAllUsersFromTable();
             if (users == null) return;
             users.RemoveAll(x => x == null);
@@ -43,7 +41,7 @@ namespace EvilBot.Utilities
             }
         }
 
-        public async void AddToFiler(IUserBase user)
+        public async Task AddToFiler(IUserBase user)
         {
             if (FilteredUsers.All(x => x.UserId != user.UserId))
             {
@@ -53,9 +51,14 @@ namespace EvilBot.Utilities
             //TODO save changes to database
         }
 
-        public async void RemoveFromFilter(IUserBase user)
+        public async Task<bool> RemoveFromFilter(IUserBase user)
         {
-            FilteredUsers.RemoveAll(x => x.UserId == user.UserId);
+            if (FilteredUsers.All(x => x.UserId != user.UserId)) return false;
+            {
+                FilteredUsers.RemoveAll(x => x.UserId == user.UserId);
+                return true;
+            }
+
             //TODO save changes to database
         }
         
@@ -63,10 +66,10 @@ namespace EvilBot.Utilities
         {
             if (FilteredUsers.Count <= 0)
             {
-                return "/me No users filtered!";
+                return "/me Nici un User filtrat!";
             }
             var builder = new StringBuilder();
-            builder.Append("/me Filtered Users are:");
+            builder.Append("/me Useri filtrati:");
             for (var i = 0; i < FilteredUsers.Count; i++)
             {
                 builder.Append($" {FilteredUsers[i].DisplayName},");

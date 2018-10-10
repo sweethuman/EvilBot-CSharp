@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using EvilBot.DataStructures.Interfaces;
 
 namespace EvilBot.Utilities.Interfaces
@@ -5,8 +6,8 @@ namespace EvilBot.Utilities.Interfaces
     public interface IFilterManager
     {
         void InitializeFilter();
-        void AddToFiler(IUserBase user);
-        void RemoveFromFilter(IUserBase user);
+        Task AddToFiler(IUserBase user);
+        Task<bool> RemoveFromFilter(IUserBase user);
         string RetrieveFilteredUsers();
     }
 }

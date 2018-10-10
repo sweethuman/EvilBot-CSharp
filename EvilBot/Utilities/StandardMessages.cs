@@ -8,6 +8,6 @@
         public static string PollNotActiveText { get; } = "/me Nu exista poll activ!";
         public static string ComenziText { get; } = "/me !rank !manage(mod) !pollcreate(mod) !pollvote !pollstats !pollend(mod)";
         public static string FilterText { get; } = "/me !filter add/remove <username>";
-        public static string UserMissingText { get; } = "/me Specified user does not exit!";
+        public static string UserMissingText { get; } = "/me Acest User nu exista!";
     }
 }

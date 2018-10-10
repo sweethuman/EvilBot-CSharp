@@ -144,8 +144,6 @@ namespace EvilBot.Processors
 
         public async Task<string> FilterCommand(OnChatCommandReceivedArgs e)
         {
-            
-            //TODO fill these up
             if (e.Command.ArgumentsAsList.Count >= 1 && e.Command.ArgumentsAsList[0] == "get")
             {
                 return _filterManager.RetrieveFilteredUsers();
@@ -157,17 +155,20 @@ namespace EvilBot.Processors
                 {
                     var user = await _dataProcessor.GetUserAsyncByUsername(e.Command.ArgumentsAsList[1]);
                     if (user == null) return StandardMessages.UserMissingText;
-                    _filterManager.AddToFiler(new UserBase(user.DisplayName, user.Id));
+                    await _filterManager.AddToFiler(new UserBase(user.DisplayName, user.Id));
                     //TODO make later to show different text if user already in filter or not
-                    return $"/me {user.DisplayName} added to the Filter!";
+                    return $"/me {user.DisplayName} adaugat la Filtru!";
                 }
                 case "remove":
                 {
                     var user = await _dataProcessor.GetUserAsyncByUsername(e.Command.ArgumentsAsList[1]);
                     if (user == null) return StandardMessages.UserMissingText;
-                    _filterManager.RemoveFromFilter(new UserBase(user.DisplayName, user.Id));
+                    if (await _filterManager.RemoveFromFilter(new UserBase(user.DisplayName, user.Id)))
+                    {
+                        return $"/me {user.DisplayName} sters din Filtru!";
+                    }
                     //TODO make later to show different text if user already in filter or not
-                    return $"/me {user.DisplayName} removed from the Filter!";
+                    return $"/me {user.DisplayName} nu este in Filtru!";
                 }
                 default:
                     return StandardMessages.FilterText;
