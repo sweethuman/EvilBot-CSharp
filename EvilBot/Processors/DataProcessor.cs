@@ -232,15 +232,31 @@ namespace EvilBot.Processors
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "GetUserIdAsync blew up with {username}", username);
+                Log.Error(ex, "GetUserAsyncByUsername blew up with {username}", username);
                 return null;
             }
-            if (username == null || userList.Length == 0)
+
+            if (userList.Length != 0) return userList[0];
+            Log.Warning("User does not exit {username}", username);
+            return null;
+        }        
+        public async Task<User> GetUserAsyncById(string userId)
+        {
+            Log.Debug("AskedForID for {Username}", userId);
+            User user;
+            try
             {
-                Log.Warning("User does not exit {username}", username);
+                user = await _twitchChatBot.Api.V5.Users.GetUserByIDAsync(userId).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "GetUserAsyncByUsername blew up with {username}", userId);
                 return null;
             }
-            return userList[0];
+            
+            if (user != null) return user;
+            Log.Warning("User does not exit {username}", userId);
+            return null;
         }
         public async Task<string> GetUserIdAsync(string username)
         {
@@ -248,19 +264,18 @@ namespace EvilBot.Processors
             User[] userList;
             try
             {
-                userList = (await _twitchChatBot.Api.V5.Users.GetUserByNameAsync(username).ConfigureAwait(false)).Matches;
+                userList = (await _twitchChatBot.Api.V5.Users.GetUserByNameAsync(username).ConfigureAwait(false))
+                    .Matches;
             }
             catch (Exception ex)
             {
                 Log.Error(ex, "GetUserIdAsync blew up with {username}", username);
                 return null;
             }
-            if (username == null || userList.Length == 0)
-            {
-                Log.Warning("User does not exit {username}", username);
-                return null;
-            }
-            return userList[0].Id;
+
+            if (userList.Length != 0) return userList[0].Id;
+            Log.Warning("User does not exit {username}", username);
+            return null;
         }
 
         public async Task<string> GetUsernameAsync(string userId)

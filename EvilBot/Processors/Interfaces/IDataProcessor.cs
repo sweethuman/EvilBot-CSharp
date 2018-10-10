@@ -4,10 +4,11 @@ using System.Threading.Tasks;
 using System.Timers;
 using EvilBot.DataStructures.Interfaces;
 using EvilBot.Utilities;
+using TwitchLib.Api.V5.Models.Users;
 
 namespace EvilBot.Processors.Interfaces
 {
-    internal interface IDataProcessor
+    public interface IDataProcessor
     {
         event EventHandler<RankUpdateEventArgs> RankUpdated;
 
@@ -28,5 +29,8 @@ namespace EvilBot.Processors.Interfaces
         string GetRankFormatted(string rankString, string pointsString);
 
         Task AddToUserAsync(List<IUserBase> userList, int points = 1, int minutes = 0, bool subCheck = true);
+
+        Task<User> GetUserAsyncByUsername(string username);
+        Task<User> GetUserAsyncById(string userId);
     }
 }
