@@ -2,7 +2,7 @@
 {
     public interface IUserBase
     {
-        string DisplayName { get; }
+        string DisplayName { get; set; }
         string UserId { get; }
     }
 }

@@ -10,7 +10,7 @@ namespace EvilBot.DataStructures
             UserId = id;
         }
 
-        public string DisplayName { get; protected set; }
+        public string DisplayName { get; set; }
         public string UserId { get; protected set; }
     }
 }
