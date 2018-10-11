@@ -90,28 +90,42 @@ namespace EvilBot.Processors
         public async void AddLurkerPointsTimer_ElapsedAsync(object sender, ElapsedEventArgs e)
         {
             //in case twitch says something went wrong, it throws exception, catch that exception
-            var userList = new List<IUserBase>();
-            var chatusers = await _twitchChatBot.Api.Undocumented.GetChattersAsync(TwitchInfo.ChannelName).ConfigureAwait(false);
-            var userIdTasks = new List<Task<User>>();
-            for (var i = 0; i < chatusers.Count; i++)
+            try
             {
-                userIdTasks.Add(GetUserAsyncByUsername(chatusers[i].Username));
+                var userList = new List<IUserBase>();
+                var chatusers = await _twitchChatBot.Api.Undocumented.GetChattersAsync(TwitchInfo.ChannelName).ConfigureAwait(false);
+                var userIdTasks = new List<Task<User>>();
+                for (var i = 0; i < chatusers.Count; i++)
+                {
+                    userIdTasks.Add(GetUserAsyncByUsername(chatusers[i].Username));
+                }
+                var userIdList = (await Task.WhenAll(userIdTasks).ConfigureAwait(false)).ToList();
+                userIdList.RemoveAll(x => x == null);
+                for (var i = 0; i < userIdList.Count; i++)
+                {
+                    userList.Add(new UserBase(userIdList[i].DisplayName, userIdList[i].Id));
+                }
+                await AddToUserAsync(userList, minutes: 10).ConfigureAwait(false);
+                Log.Debug("Database updated! Lurkers present: {Lurkers}", userList.Count);
             }
-            var userIdList = (await Task.WhenAll(userIdTasks).ConfigureAwait(false)).ToList();
-            userIdList.RemoveAll(x => x == null);
-            for (var i = 0; i < userIdList.Count; i++)
+            catch (Exception exception)
             {
-                userList.Add(new UserBase(userIdList[i].DisplayName, userIdList[i].Id));
+                Log.Error(exception, "AddLurkerTimer failed");
             }
-            await AddToUserAsync(userList, minutes: 10).ConfigureAwait(false);
-            Log.Debug("Database updated! Lurkers present: {Lurkers}", userList.Count);
         }
 
         public async void AddPointsTimer_ElapsedAsync(object sender, ElapsedEventArgs e)
         {
             var temporaryTalkers = PointCounter.ClearTalkerPoints();
-            await AddToUserAsync(temporaryTalkers).ConfigureAwait(false);
-            Log.Debug("Database updated! Talkers present: {Talkers}", temporaryTalkers.Count);
+            try
+            {
+                await AddToUserAsync(temporaryTalkers).ConfigureAwait(false);
+                Log.Debug("Database updated! Talkers present: {Talkers}", temporaryTalkers.Count);
+            }
+            catch (Exception exception)
+            {
+                Log.Error(exception, "AddPointsTimer failed");
+            }
         }
 
         /// <summary>
@@ -130,14 +144,25 @@ namespace EvilBot.Processors
                 var pointsMultiplier = float.Parse(ConfigurationManager.AppSettings.Get("pointsMultiplier"));
                 //t: make sub checking more efficient
                 List<Subscription> channelSubscribers;
-                if (subCheck)
+                try
                 {
-                    var channelId = await GetUserIdAsync(TwitchInfo.ChannelName).ConfigureAwait(false);
-                    channelSubscribers = (await _twitchChatBot.Api.V5.Channels.GetChannelSubscribersAsync(channelId).ConfigureAwait(false)).Subscriptions.ToList();
+                    if (subCheck)
+                    {
+                        var channelId = await GetUserIdAsync(TwitchInfo.ChannelName).ConfigureAwait(false);
+                        channelSubscribers =
+                            (await _twitchChatBot.Api.V5.Channels.GetChannelSubscribersAsync(channelId)
+                                .ConfigureAwait(false)).Subscriptions.ToList();
+                    }
+                    else
+                    {
+                        channelSubscribers = new List<Subscription>();
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
                     channelSubscribers = new List<Subscription>();
+                    Log.Error(ex, "Some api call failed in AddToUserAsync");
+                    throw;
                 }
                 int pointAdderValue;
                 var addPointsTasks = new List<Task>();
