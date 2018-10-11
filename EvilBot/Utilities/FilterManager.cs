@@ -41,25 +41,20 @@ namespace EvilBot.Utilities
             }
         }
 
-        public async Task AddToFiler(IUserBase user)
+        public async Task<bool> AddToFiler(IUserBase user)
         {
             if (FilteredUsers.All(x => x.UserId != user.UserId))
             {
                 FilteredUsers.Add(user);
             }
-            //TODO update add if to update username if username changed
-            //TODO save changes to database
+            else FilteredUsers.First(x => x.UserId == user.UserId).DisplayName = user.DisplayName; //NOTE not sure how well this works, but it should.
+            return await _dataAccess.ModifyFilteredUsers(Enums.FilteredUsersDatabaseAction.Insert, user.UserId);
         }
 
         public async Task<bool> RemoveFromFilter(IUserBase user)
         {
-            if (FilteredUsers.All(x => x.UserId != user.UserId)) return false;
-            {
-                FilteredUsers.RemoveAll(x => x.UserId == user.UserId);
-                return true;
-            }
-
-            //TODO save changes to database
+            FilteredUsers.RemoveAll(x => x.UserId == user.UserId);
+            return await _dataAccess.ModifyFilteredUsers(Enums.FilteredUsersDatabaseAction.Remove, user.UserId);
         }
         
         public string RetrieveFilteredUsers()
