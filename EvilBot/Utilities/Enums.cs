@@ -10,5 +10,10 @@
         {
             UserPoints, FilteredUsers
         }
+        
+        public enum FilteredUsersDatabaseAction
+        {
+            Remove, Insert
+        }
     }
 }

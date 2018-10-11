@@ -85,8 +85,33 @@ namespace EvilBot.Utilities
         //TODO add table selector if it is the case
         //TODO function to insert FilteredUser to table
         //TODO function to remove FilteredUser from table
+
+        public async Task<bool> ModifyFilteredUsers(Enums.FilteredUsersDatabaseAction databaseAction, string userId)
+        {
+            switch (databaseAction)
+            {
+                //TODO later add a way to make sure it is correct userid
+                //TODO ADD MORE DOCUMENTATION
+                case Enums.FilteredUsersDatabaseAction.Remove:
+                {
+                    var rowsAffected = await WriteConnection.ExecuteAsync($"DELETE FROM FilteredUsers WHERE UserID = '{userId}'");
+                    return rowsAffected > 0;
+                }
+                case Enums.FilteredUsersDatabaseAction.Insert:
+                {
+                    var rowsAffected =
+                        await WriteConnection.ExecuteAsync($"INSERT INTO FilteredUsers (UserID) VALUES ('{userId}') ON CONFLICT DO NOTHING");
+                    return rowsAffected > 0;
+                }
+                default:
+                    Log.Warning("NOTHING HAPPENED IN MODIFY FILTERED USERS NOTHING!!!! {databaseAction} {userId}", databaseAction.ToString(), userId);
+                    return false;
+            }
+        }
+        
         public async Task<List<IDatabaseUser>> RetrieveAllUsersFromTable(Enums.DatabaseTables table)
         {
+            Log.Debug("Retrieving all users from table {table}", table.ToString());
             var retrievingTable = table.ToString();
             var output =
                 (await RetrieveConnection.QueryAsync<DatabaseUser>($"SELECT * FROM {retrievingTable}", new DynamicParameters())).ToList();
