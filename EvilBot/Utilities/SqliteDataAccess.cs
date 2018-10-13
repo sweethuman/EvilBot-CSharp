@@ -27,14 +27,8 @@ namespace EvilBot.Utilities
         //t: MAKE a function that retrieves all three attributes at once for performance reasons
         public async Task<string> RetrieveRowAsync(string userId, Enums.DatabaseRow databaseRow = Enums.DatabaseRow.Points)
         {
-            if (RetrieveConnection.State != ConnectionState.Open)
-            {
-                RetrieveConnection.Open();
-            }
-            if (userId == null)
-            {
-                return null;
-            }
+            if (RetrieveConnection.State != ConnectionState.Open) RetrieveConnection.Open();
+            if (userId == null) return null;
             var column = databaseRow.ToString();
 
             var output = (await RetrieveConnection.QueryAsync<string>($"SELECT {column} FROM UserPoints WHERE UserID = '{userId}'", new DynamicParameters()).ConfigureAwait(false)).ToList();
@@ -45,38 +39,17 @@ namespace EvilBot.Utilities
 
         public async Task ModifierUserIdAsync(string userId, int points = 1, int minutes = 0, int rank = 0)
         {
-            if (WriteConnection.State != ConnectionState.Open)
-            {
-                WriteConnection.Open();
-            }
-            if (userId == null)
-            {
-                return;
-            }
+            if (WriteConnection.State != ConnectionState.Open) WriteConnection.Open();
+            if (userId == null) return;
+            await WriteConnection.ExecuteAsync($"INSERT INTO UserPoints (UserID, Points, Minutes, Rank) VALUES ('{userId}', '{points}', '{minutes}', '{rank}') ON CONFLICT(UserID) DO UPDATE SET Points = Points + {points}, Minutes = Minutes + {minutes}").ConfigureAwait(false);
+                Log.Information("{userID} modified/added {minutes}m and {points}", userId, minutes, points);
 
-            //on mysql you can do ON DUPLICATE KEY
-            if (!(await WriteConnection.QueryAsync<string>($"SELECT UserID from UserPoints WHERE UserID = '{userId}'", new DynamicParameters()).ConfigureAwait(false)).Any())
-            {
-                await WriteConnection.ExecuteAsync($"INSERT INTO UserPoints (UserID, Points, Minutes, Rank) VALUES ('{userId}', '{points}', '{minutes}', '{rank}')").ConfigureAwait(false);
-                Log.Information("Added a new User to Database with {UserID}", userId);
-            }
-            else
-            {
-                await WriteConnection.ExecuteAsync($"UPDATE UserPoints SET Points = Points + {points}, Minutes = Minutes + {minutes} WHERE UserID = '{userId}'").ConfigureAwait(false);
-                Log.Information("{userID} modified {minutes}m and {points}", userId, minutes, points);
-            }
         }
 
         public async Task ModifyUserIdRankAsync(string userId, int rank)
         {
-            if (WriteConnection.State != ConnectionState.Open)
-            {
-                WriteConnection.Open();
-            }
-            if (userId == null)
-            {
-                return;
-            }
+            if (WriteConnection.State != ConnectionState.Open) WriteConnection.Open();
+            if (userId == null) return;
 
             Log.Information("Advanced a User with {UserID} with [{Rank}]", userId, rank);
             try
@@ -98,10 +71,7 @@ namespace EvilBot.Utilities
 
         public async Task<bool> ModifyFilteredUsers(Enums.FilteredUsersDatabaseAction databaseAction, string userId)
         {
-            if (WriteConnection.State != ConnectionState.Open)
-            {
-                WriteConnection.Open();
-            }
+            if (WriteConnection.State != ConnectionState.Open) WriteConnection.Open();
             switch (databaseAction)
             {
                 //TODO later add a way to make sure it is correct userid
@@ -125,9 +95,7 @@ namespace EvilBot.Utilities
         
         public async Task<List<IDatabaseUser>> RetrieveAllUsersFromTable(Enums.DatabaseTables table)
         {
-            {
-                RetrieveConnection.Open();
-            }
+            if (RetrieveConnection.State != ConnectionState.Open) RetrieveConnection.Open();
             Log.Debug("Retrieving all users from table {table}", table.ToString());
             var retrievingTable = table.ToString();
             var output =
