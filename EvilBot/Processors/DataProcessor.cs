@@ -89,6 +89,7 @@ namespace EvilBot.Processors
 
         public async void AddLurkerPointsTimer_ElapsedAsync(object sender, ElapsedEventArgs e)
         {
+            Log.Debug("Updating Lurkers!");
             //in case twitch says something went wrong, it throws exception, catch that exception
             try
             {
@@ -116,6 +117,7 @@ namespace EvilBot.Processors
 
         public async void AddPointsTimer_ElapsedAsync(object sender, ElapsedEventArgs e)
         {
+            Log.Debug("Updating Talkers!");
             var temporaryTalkers = PointCounter.ClearTalkerPoints();
             try
             {
@@ -135,7 +137,7 @@ namespace EvilBot.Processors
         /// <param name="points">The points to add.</param>
         /// <param name="minutes">The minutes to add.</param>
         /// <param name="subCheck">If set to <c>true</c> it will check if users are subscribers.</param>
-        /// <returns></returns>
+        /// <returns>Just a task.</returns>
         //TODO unit test on nulls
         public async Task AddToUserAsync(List<IUserBase> userList, int points = 1, int minutes = 0, bool subCheck = true)
         {
@@ -187,7 +189,9 @@ namespace EvilBot.Processors
         }
 
         private async Task UpdateRankAsync(IReadOnlyList<IUserBase> userList)
-        {   //!WARNING GetUserAttributesAsync() also gets minutes, wich I don't currently need and it might cause performance issues if volume is large
+        {   
+            Log.Debug("Checking Ranks for {userCount}", userList.Count);
+            //!WARNING GetUserAttributesAsync() also gets minutes, wich I don't currently need and it might cause performance issues if volume is large
             var userAttributesTasks = new List<Task<List<string>>>();
             var userNameRanks = new List<int>();
             var usersUpdated = new List<IUserBase>();
@@ -322,6 +326,7 @@ namespace EvilBot.Processors
 
         public async Task<List<string>> GetUserAttributesAsync(string userId)
         {
+            Log.Debug("Asking for attributes of {userId}", userId);
             if (userId == null)
             {
                 return null;

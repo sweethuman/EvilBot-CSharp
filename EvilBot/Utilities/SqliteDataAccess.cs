@@ -51,7 +51,7 @@ namespace EvilBot.Utilities
             if (WriteConnection.State != ConnectionState.Open) WriteConnection.Open();
             if (userId == null) return;
 
-            Log.Information("Advanced a User with {UserID} with [{Rank}]", userId, rank);
+            Log.Information("Advancing a User with {UserID} with [{Rank}]", userId, rank);
             try
             {
                 await WriteConnection.ExecuteAsync($"UPDATE UserPoints SET Rank = {rank} WHERE UserID = '{userId}'").ConfigureAwait(false);
@@ -72,6 +72,7 @@ namespace EvilBot.Utilities
         public async Task<bool> ModifyFilteredUsers(Enums.FilteredUsersDatabaseAction databaseAction, string userId)
         {
             if (WriteConnection.State != ConnectionState.Open) WriteConnection.Open();
+            Log.Debug("Modifying filtered {userId}", userId);
             switch (databaseAction)
             {
                 //TODO later add a way to make sure it is correct userid
