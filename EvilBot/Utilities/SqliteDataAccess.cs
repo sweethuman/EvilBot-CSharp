@@ -27,6 +27,10 @@ namespace EvilBot.Utilities
         //t: MAKE a function that retrieves all three attributes at once for performance reasons
         public async Task<string> RetrieveRowAsync(string userId, Enums.DatabaseRow databaseRow = Enums.DatabaseRow.Points)
         {
+            if (RetrieveConnection.State != ConnectionState.Open)
+            {
+                RetrieveConnection.Open();
+            }
             if (userId == null)
             {
                 return null;
@@ -41,6 +45,10 @@ namespace EvilBot.Utilities
 
         public async Task ModifierUserIdAsync(string userId, int points = 1, int minutes = 0, int rank = 0)
         {
+            if (WriteConnection.State != ConnectionState.Open)
+            {
+                WriteConnection.Open();
+            }
             if (userId == null)
             {
                 return;
@@ -61,6 +69,10 @@ namespace EvilBot.Utilities
 
         public async Task ModifyUserIdRankAsync(string userId, int rank)
         {
+            if (WriteConnection.State != ConnectionState.Open)
+            {
+                WriteConnection.Open();
+            }
             if (userId == null)
             {
                 return;
