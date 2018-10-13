@@ -82,7 +82,7 @@ namespace EvilBot.TwitchBot
             _addPointsTimer.Elapsed += _dataProcessor.AddPointsTimer_ElapsedAsync;
             _addPointsTimer.Start();
 
-            _addLurkerPointsTimer = new Timer(1000 * 60 * 10);
+            _addLurkerPointsTimer = new Timer(1000 * 60 * 1.5);
             _addLurkerPointsTimer.Elapsed += _dataProcessor.AddLurkerPointsTimer_ElapsedAsync;
             _addLurkerPointsTimer.Start();
 

@@ -143,10 +143,9 @@ namespace EvilBot.Processors
             {
                 for (var i = 0; i < userList.Count; i++)
                 {
-                    if (FilterManager.CheckIfUserFiltered(userList[i]))
-                    {
-                        userList.Remove(userList[i]);
-                    }
+                    if (!FilterManager.CheckIfUserFiltered(userList[i])) continue;
+                    userList.RemoveAll(x => x.UserId == userList[i].UserId);
+                    i--;
                 }
                 var pointsMultiplier = float.Parse(ConfigurationManager.AppSettings.Get("pointsMultiplier"));
                 //t: make sub checking more efficient

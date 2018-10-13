@@ -155,7 +155,7 @@ namespace EvilBot.Processors
                 {
                     var user = await _dataProcessor.GetUserAsyncByUsername(e.Command.ArgumentsAsList[1]);
                     if (user == null) return StandardMessages.UserMissingText;
-                    if (await _filterManager.AddToFiler(new UserBase(user.DisplayName, user.Id)))
+                    if (await _filterManager.AddToFiler(new UserBase(user.DisplayName, user.Id.Trim())))
                     {
                         return $"/me {user.DisplayName} adaugat la Filtru!";
                     }

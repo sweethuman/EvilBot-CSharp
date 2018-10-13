@@ -6,6 +6,7 @@ using EvilBot.DataStructures;
 using EvilBot.DataStructures.Interfaces;
 using EvilBot.Processors.Interfaces;
 using EvilBot.Utilities.Interfaces;
+using Serilog;
 using TwitchLib.Api.V5.Models.Users;
 
 namespace EvilBot.Utilities
@@ -37,7 +38,8 @@ namespace EvilBot.Utilities
             userList.RemoveAll(x => x == null);
             for (var i = 0; i < userList.Count; i++)
             {
-                FilteredUsers.Add(new UserBase(userList[i].DisplayName, userList[i].Id));
+                Log.Debug("{user} {userId} added to the filter", userList[i].DisplayName, userList[i].Id);
+                FilteredUsers.Add(new UserBase(userList[i].DisplayName, userList[i].Id.Trim()));
             }
         }
 
@@ -45,6 +47,7 @@ namespace EvilBot.Utilities
         {
             if (FilteredUsers.All(x => x.UserId != user.UserId))
             {
+                Log.Debug("{user} {userId} added to the filter", user.DisplayName, user.UserId);
                 FilteredUsers.Add(user);
             }
             else FilteredUsers.First(x => x.UserId == user.UserId).DisplayName = user.DisplayName; //NOTE not sure how well this works, but it should.
