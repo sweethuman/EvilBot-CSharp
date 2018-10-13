@@ -25,6 +25,7 @@ namespace EvilBot.Utilities
         
         public async void InitializeFilter()
         {
+            Log.Debug("Initializing filter!");
             var users = await _dataAccess.RetrieveAllUsersFromTable(Enums.DatabaseTables.FilteredUsers);
             if (users == null) return;
             users.RemoveAll(x => x == null);
@@ -38,7 +39,7 @@ namespace EvilBot.Utilities
             userList.RemoveAll(x => x == null);
             for (var i = 0; i < userList.Count; i++)
             {
-                Log.Debug("{user} {userId} added to the filter", userList[i].DisplayName, userList[i].Id);
+                Log.Debug("{user} {userId} adding to the filter", userList[i].DisplayName, userList[i].Id);
                 FilteredUsers.Add(new UserBase(userList[i].DisplayName, userList[i].Id.Trim()));
             }
         }
@@ -47,7 +48,7 @@ namespace EvilBot.Utilities
         {
             if (FilteredUsers.All(x => x.UserId != user.UserId))
             {
-                Log.Debug("{user} {userId} added to the filter", user.DisplayName, user.UserId);
+                Log.Debug("{user} {userId} adding to the filter", user.DisplayName, user.UserId);
                 FilteredUsers.Add(user);
             }
             else FilteredUsers.First(x => x.UserId == user.UserId).DisplayName = user.DisplayName; //NOTE not sure how well this works, but it should.
@@ -56,16 +57,15 @@ namespace EvilBot.Utilities
 
         public async Task<bool> RemoveFromFilter(IUserBase user)
         {
+            Log.Debug("{user} {userId} removing from the filter", user.DisplayName, user.UserId);
             FilteredUsers.RemoveAll(x => x.UserId == user.UserId);
             return await _dataAccess.ModifyFilteredUsers(Enums.FilteredUsersDatabaseAction.Remove, user.UserId);
         }
         
         public string RetrieveFilteredUsers()
         {
-            if (FilteredUsers.Count <= 0)
-            {
-                return "/me Nici un User filtrat!";
-            }
+            Log.Debug("Retrieving FilteredUsers");
+            if (FilteredUsers.Count <= 0) return "/me Nici un User filtrat!";
             var builder = new StringBuilder();
             builder.Append("/me Useri filtrati:");
             for (var i = 0; i < FilteredUsers.Count; i++)
@@ -78,7 +78,9 @@ namespace EvilBot.Utilities
 
         public static bool CheckIfUserFiltered(IUserBase user)
         {
-            return FilteredUsers.Any(x => x.UserId == user.UserId);
+            var stateOfCheck = FilteredUsers.Any(x => x.UserId == user.UserId);
+            Log.Debug("FilterCheck requested for {user} {userID} result: {result}", user.DisplayName, user.DisplayName, stateOfCheck);
+            return stateOfCheck;
         }
     }
 }
