@@ -95,11 +95,13 @@ namespace EvilBot.Utilities
         }
 
         //TODO add table selector if it is the case
-        //TODO function to insert FilteredUser to table
-        //TODO function to remove FilteredUser from table
 
         public async Task<bool> ModifyFilteredUsers(Enums.FilteredUsersDatabaseAction databaseAction, string userId)
         {
+            if (WriteConnection.State != ConnectionState.Open)
+            {
+                WriteConnection.Open();
+            }
             switch (databaseAction)
             {
                 //TODO later add a way to make sure it is correct userid
@@ -123,6 +125,9 @@ namespace EvilBot.Utilities
         
         public async Task<List<IDatabaseUser>> RetrieveAllUsersFromTable(Enums.DatabaseTables table)
         {
+            {
+                RetrieveConnection.Open();
+            }
             Log.Debug("Retrieving all users from table {table}", table.ToString());
             var retrievingTable = table.ToString();
             var output =
