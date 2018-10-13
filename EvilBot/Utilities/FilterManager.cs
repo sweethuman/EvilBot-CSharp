@@ -79,7 +79,7 @@ namespace EvilBot.Utilities
         public static bool CheckIfUserFiltered(IUserBase user)
         {
             var stateOfCheck = FilteredUsers.Any(x => x.UserId == user.UserId);
-            Log.Debug("FilterCheck requested for {user} {userID} result: {result}", user.DisplayName, user.DisplayName, stateOfCheck);
+            Log.Debug("FilterCheck requested for {user} {userID} result: {result}", user.DisplayName, user.UserId, stateOfCheck);
             return stateOfCheck;
         }
     }
