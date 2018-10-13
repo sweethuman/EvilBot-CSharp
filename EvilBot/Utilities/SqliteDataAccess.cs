@@ -103,7 +103,7 @@ namespace EvilBot.Utilities
                 (await RetrieveConnection.QueryAsync<DatabaseUser>($"SELECT * FROM {retrievingTable}", new DynamicParameters())).ToList();
             var results = output.ToList<IDatabaseUser>();
             if (output.Any()) return results;
-            Log.Warning("{table} table is empty!", "table");
+            Log.Warning("{table} table is empty!", table.ToString());
             return null;
         }
     }
