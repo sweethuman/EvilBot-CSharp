@@ -140,8 +140,6 @@ namespace EvilBot.Processors
 
         #endregion PollCommands
 
-        #region FilterCommands
-
         public async Task<string> FilterCommand(OnChatCommandReceivedArgs e)
         {
             if (e.Command.ArgumentsAsList.Count >= 1 && e.Command.ArgumentsAsList[0] == "get")
@@ -175,7 +173,5 @@ namespace EvilBot.Processors
                     return StandardMessages.FilterText;
             }
         }
-
-        #endregion
     }
 }

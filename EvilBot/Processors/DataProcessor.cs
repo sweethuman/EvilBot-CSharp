@@ -339,12 +339,7 @@ namespace EvilBot.Processors
                 _dataAccess.RetrieveRowAsync(userId, Enums.DatabaseRow.Rank)
             };
             var results = await Task.WhenAll(tasks).ConfigureAwait(false);
-            if (results == null || results[0] == null)
-            {
-                return null;
-            }
-
-            return results.ToList();
+            return results?[0] == null ? null : results.ToList();
         }
 
         #endregion DataProcessor GeneralProcessors
