@@ -94,13 +94,17 @@ namespace EvilBot.Utilities
             }
         }
         
-        public async Task<List<IDatabaseUser>> RetrieveAllUsersFromTable(Enums.DatabaseTables table)
+        public async Task<List<IDatabaseUser>> RetrieveUserFromTable(Enums.DatabaseTables table, string userId = null)
         {
             if (RetrieveConnection.State != ConnectionState.Open) RetrieveConnection.Open();
             Log.Debug("Retrieving all users from table {table}", table.ToString());
             var retrievingTable = table.ToString();
-            var output =
-                (await RetrieveConnection.QueryAsync<DatabaseUser>($"SELECT * FROM {retrievingTable}", new DynamicParameters())).ToList();
+            List<DatabaseUser> output;
+            if(userId == null)
+                output = (await RetrieveConnection.QueryAsync<DatabaseUser>($"SELECT * FROM {retrievingTable}", new DynamicParameters())).ToList();
+            else
+                output = (await RetrieveConnection.QueryAsync<DatabaseUser>($"SELECT * FROM {retrievingTable} WHERE UserID = '{userId}'", new DynamicParameters())).ToList();
+            
             var results = output.ToList<IDatabaseUser>();
             if (output.Any()) return results;
             Log.Warning("{table} table is empty!", table.ToString());

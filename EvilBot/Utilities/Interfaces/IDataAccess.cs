@@ -31,14 +31,15 @@ namespace EvilBot.Utilities.Interfaces
         /// <param name="rank">The rank.</param>
         /// <returns></returns>
         Task ModifyUserIdRankAsync(string userId, int rank);
-        
+
         /// <summary>
         /// Retrieves all the users in a certain table.
         /// </summary>
         /// <param name="table">The tables you can retrieve users from.</param>
+        /// <param name="userId">If no userId is given it will retrieve all users.</param>
         /// <remarks>In case of FilteredUsers only Id and UserId is populated.</remarks>
         /// <returns>Returns a container with all the resources it could get. Not guaranteed it will populate all.</returns>
-        Task<List<IDatabaseUser>> RetrieveAllUsersFromTable(Enums.DatabaseTables table);
+        Task<List<IDatabaseUser>> RetrieveUserFromTable(Enums.DatabaseTables table, string userId = null);
 
         /// <summary>
         /// Modifies the list of FilteredUsers in the database.

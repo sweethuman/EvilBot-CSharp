@@ -331,15 +331,11 @@ namespace EvilBot.Processors
             {
                 return null;
             }
-
-            var tasks = new List<Task<string>>
-            {
-                _dataAccess.RetrieveRowAsync(userId),
-                _dataAccess.RetrieveRowAsync(userId, Enums.DatabaseRow.Minutes),
-                _dataAccess.RetrieveRowAsync(userId, Enums.DatabaseRow.Rank)
-            };
-            var results = await Task.WhenAll(tasks).ConfigureAwait(false);
-            return results?[0] == null ? null : results.ToList();
+            
+            var properties = await _dataAccess.RetrieveUserFromTable(Enums.DatabaseTables.UserPoints, userId);
+            if (properties == null) return null;
+            var results = new List<string> {properties[0].Points, properties[0].Minutes, properties[0].Rank};
+            return results[0] == null ? null : results.ToList();
         }
 
         #endregion DataProcessor GeneralProcessors
