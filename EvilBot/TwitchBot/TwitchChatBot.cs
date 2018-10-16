@@ -27,15 +27,17 @@ namespace EvilBot.TwitchBot
         private readonly ITwitchConnections _twitchConnection;
         private readonly ICommandProcessor _commandProcessor;
         private readonly IFilterManager _filterManager;
+        private readonly IDataAccess _dataAccess;
 
         private readonly List<string> _timedMessages = new List<string>();
 
-        public TwitchChatBot(ITwitchConnections twitchConnection, IDataProcessor dataProcessor, ICommandProcessor commandProcessor, IFilterManager filterManager)
+        public TwitchChatBot(ITwitchConnections twitchConnection, IDataAccess dataAccess, IDataProcessor dataProcessor, ICommandProcessor commandProcessor, IFilterManager filterManager)
         {
             _twitchConnection = twitchConnection;
             _dataProcessor = dataProcessor;
             _commandProcessor = commandProcessor;
             _filterManager = filterManager;
+            _dataAccess = dataAccess;
         }
 
         ~TwitchChatBot()
@@ -65,6 +67,7 @@ namespace EvilBot.TwitchBot
 
         public void Disconnect()
         {
+            _dataAccess.Close();
             Log.Debug("Disconnecting");
         }
 

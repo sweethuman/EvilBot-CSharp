@@ -37,6 +37,7 @@ namespace EvilBot
                 }
             } while (!stop);
 
+            _twitchChatBot.Disconnect();
             _twitchConnection.Disconnect();
         }
 

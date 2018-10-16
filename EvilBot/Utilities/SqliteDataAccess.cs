@@ -24,7 +24,6 @@ namespace EvilBot.Utilities
             
         }
 
-        //t: MAKE a function that retrieves all three attributes at once for performance reasons
         public async Task<string> RetrieveRowAsync(string userId, Enums.DatabaseRow databaseRow = Enums.DatabaseRow.Points)
         {
             if (RetrieveConnection.State != ConnectionState.Open) RetrieveConnection.Open();
@@ -43,7 +42,6 @@ namespace EvilBot.Utilities
             if (userId == null) return;
             await WriteConnection.ExecuteAsync($"INSERT INTO UserPoints (UserID, Points, Minutes, Rank) VALUES ('{userId}', '{points}', '{minutes}', '{rank}') ON CONFLICT(UserID) DO UPDATE SET Points = Points + {points}, Minutes = Minutes + {minutes}").ConfigureAwait(false);
                 Log.Information("{userID} modified/added {minutes}m and {points}", userId, minutes, points);
-
         }
 
         public async Task ModifyUserIdRankAsync(string userId, int rank)
@@ -107,8 +105,18 @@ namespace EvilBot.Utilities
             
             var results = output.ToList<IDatabaseUser>();
             if (output.Any()) return results;
-            Log.Warning("{table} table is empty!", table.ToString());
+            Log.Warning("{table} table is empty! for {userId}", table.ToString(), userId);
             return null;
+        }
+
+        public void Close()
+        {
+            Log.Debug("Closing database connections!");
+            WriteConnection.Close();
+            RetrieveConnection.Close();
+            WriteConnection.Dispose();
+            RetrieveConnection.Dispose();
+            Log.Debug("Closed database success!");
         }
     }
 }
