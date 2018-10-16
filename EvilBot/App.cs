@@ -31,7 +31,7 @@ namespace EvilBot
             do
             {
                 var keyPress = Console.ReadKey();
-                if (keyPress.Modifiers == (ConsoleModifiers.Control | ConsoleModifiers.Shift | ConsoleModifiers.Alt) && keyPress.Key == ConsoleKey.F6)
+                if (keyPress.Modifiers == (ConsoleModifiers.Control | ConsoleModifiers.Shift) && keyPress.Key == ConsoleKey.Oem3)
                 {
                     stop = true;
                 }
