@@ -132,7 +132,7 @@ namespace EvilBot.TwitchBot
             if (e.ChatMessage.Bits != 0)
             {
                 _dataProcessor.AddToUserAsync(new List<IUserBase> { new UserBase(e.ChatMessage.DisplayName, e.ChatMessage.UserId) }, (e.ChatMessage.Bits * _bitsToPointsMultiplier) + 11, subCheck: false);
-                _twitchConnection.Client.SendMessage(e.ChatMessage.Channel, $"/me {e.ChatMessage.DisplayName} HAS BEEN REWARDED {(e.ChatMessage.Bits * _bitsToPointsMultiplier) + 11} POINTS!");
+                _twitchConnection.Client.SendMessage(e.ChatMessage.Channel, $"/me {e.ChatMessage.DisplayName} a fost recompensat {(e.ChatMessage.Bits * _bitsToPointsMultiplier) + 11} puncte! Bravo!");
             }
         }
 
@@ -144,7 +144,7 @@ namespace EvilBot.TwitchBot
             {
                 case "colorme":
                     Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.Message);
-                    _twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, "/color Red");
+                    _twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, $"/color {e.Command.ArgumentsAsString}");
                     break;
 
                 case "rank":

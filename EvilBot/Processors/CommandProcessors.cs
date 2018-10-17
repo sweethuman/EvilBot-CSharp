@@ -34,7 +34,7 @@ namespace EvilBot.Processors
                 {
                     return $"/me {e.Command.ChatMessage.DisplayName} esti {_dataProcessor.GetRankFormatted(results[2], results[0])} cu {Math.Round(double.Parse(results[1], System.Globalization.CultureInfo.InvariantCulture) / 60, 1)} ore!\n\r";
                 }
-                return $"/me {e.Command.ChatMessage.DisplayName} You aren't yet in the database. You'll be added at the next minute check!";
+                return $"/me {e.Command.ChatMessage.DisplayName} Nu esti in baza de date! Vei fi adaugat la urmatorul check!";
             }
             else
             {
@@ -43,7 +43,7 @@ namespace EvilBot.Processors
                 {
                     return $"/me {e.Command.ArgumentsAsString.TrimStart('@')} este {_dataProcessor.GetRankFormatted(results[2], results[0])} cu {Math.Round(double.Parse(results[1], System.Globalization.CultureInfo.InvariantCulture) / 60, 1)} ore!";
                 }
-                return $"/me {e.Command.ArgumentsAsString.TrimStart('@')} isn't yet in the database!";
+                return $"/me {e.Command.ArgumentsAsString.TrimStart('@')} nu este inca in baza de date!";
             }
         }
 
@@ -96,7 +96,7 @@ namespace EvilBot.Processors
                 }
             }
             await _dataAccess.ModifierUserIdAsync(userid, pointModifier, minuteModifier).ConfigureAwait(false);
-            return $"/me Modified {e.Command.ArgumentsAsList[0]} with {pointModifier} points and {minuteModifier} minutes";
+            return $"/me Modificat {e.Command.ArgumentsAsList[0]} cu {pointModifier} puncte si {minuteModifier} minute";
         }
 
         #region PollCommands

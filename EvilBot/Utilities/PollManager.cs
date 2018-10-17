@@ -34,7 +34,7 @@ namespace EvilBot.Utilities
             {
                 PollVotes.Add(0);
             }
-            builder.Append("Poll Created! Poll Options ");
+            builder.Append("Poll Creat! Optiuni: ");
             for (var i = 0; i < PollItems.Count; i++)
             {
                 builder.AppendFormat(" //{0}:{1}", i + 1, PollItems[i]);
@@ -65,7 +65,7 @@ namespace EvilBot.Utilities
         public string PollStats()
         {
             var builder = new StringBuilder();
-            builder.Append("Poll Stats:");
+            builder.Append("Statistici :");
             for (var i = 0; i < PollItems.Count; i++)
             {
                 builder.AppendFormat(" //{0}:{1}", PollItems[i], PollVotes[i]);
