@@ -33,7 +33,7 @@ namespace EvilBot.Utilities.Interfaces
         Task ModifyUserIdRankAsync(string userId, int rank);
 
         /// <summary>
-        /// Retrieves all the users in a certain table.
+        /// Retrieves a user from a table.
         /// </summary>
         /// <param name="table">The tables you can retrieve users from.</param>
         /// <param name="userId">If no userId is given it will retrieve all users.</param>
@@ -53,5 +53,13 @@ namespace EvilBot.Utilities.Interfaces
         /// Closes the database connections.
         /// </summary>
         void Close();
+
+        /// <summary>
+        /// Retrieves all the users in a certain table.
+        /// </summary>
+        /// <param name="table">The table to retrieve users from.</param>
+        /// <remarks>In case of FilteredUsers only Id and UserId is populated.</remarks>
+        /// <returns>Returns a container with all the resources it could get. Not guaranteed it will populate all.</returns>
+        Task<List<IDatabaseUser>> RetrieveAllUsersFromTable(Enums.DatabaseTables table);
     }
 }

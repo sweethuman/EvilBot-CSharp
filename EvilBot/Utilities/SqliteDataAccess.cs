@@ -92,6 +92,20 @@ namespace EvilBot.Utilities
                     return false;
             }
         }
+
+        public async Task<List<IDatabaseUser>> RetrieveAllUsersFromTable(Enums.DatabaseTables table)
+        {
+            if(RetrieveConnection.State != ConnectionState.Open) RetrieveConnection.Open();
+            var retrievingTable = table.ToString();
+            Log.Debug("Retrieving all users from table {table}", retrievingTable);
+            var output =
+                (await RetrieveConnection.QueryAsync<DatabaseUser>($"SELECT * FROM {retrievingTable}",
+                    new DynamicParameters())).ToList();
+            var results = output.ToList<IDatabaseUser>();
+            if (output.Any()) return results;
+            Log.Warning("{table} table is empty!", retrievingTable);
+            return null;
+        }
         
         public async Task<List<IDatabaseUser>> RetrieveUserFromTable(Enums.DatabaseTables table, string userId = null)
         {

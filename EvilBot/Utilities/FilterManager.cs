@@ -26,7 +26,7 @@ namespace EvilBot.Utilities
         public async void InitializeFilter()
         {
             Log.Debug("Initializing filter!");
-            var users = await _dataAccess.RetrieveUserFromTable(Enums.DatabaseTables.FilteredUsers);
+            var users = await _dataAccess.RetrieveAllUsersFromTable(Enums.DatabaseTables.FilteredUsers);
             if (users == null) return;
             users.RemoveAll(x => x == null);
             var userListTasks = new List<Task<User>>();
