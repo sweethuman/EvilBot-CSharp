@@ -9,7 +9,7 @@ namespace EvilBot.Utilities.Interfaces
         List<string> PollItems { get; set; }
         List<double> PollVotes { get; }
 
-        Task PollAddVote(string userId, int optionNumber);
+        Task<bool> PollAddVote(string userId, int votedNumber);
 
         string PollCreate(List<string> optionsList);
 

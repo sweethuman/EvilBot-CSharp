@@ -74,23 +74,23 @@ namespace EvilBot.Utilities
             return builder.ToString();
         }
 
-        public async Task PollAddVote(string userId, int optionNumber)
+        public async Task<bool> PollAddVote(string userId, int votedNumber)
         {
-            if (userId != null && !_usersWhoVoted.Contains(userId) && optionNumber <= PollItems.Count && optionNumber >= 1)
+            if (userId == null || _usersWhoVoted.Contains(userId) || votedNumber > PollItems.Count ||
+                votedNumber < 1) return false;
+            
+            var user = await _dataAccess.RetrieveUserFromTable(Enums.DatabaseTables.UserPoints, userId) ?? new DatabaseUser{UserID = userId, Rank = "0"};
+            if (int.TryParse(user.Rank, out var rank) && rank < InfluencePoints.Count)
             {
-                var user = await _dataAccess.RetrieveUserFromTable(Enums.DatabaseTables.UserPoints, userId) ?? new DatabaseUser{UserID = userId, Rank = "0"};
-
-                if (int.TryParse(user.Rank, out var rank) && rank < InfluencePoints.Count)
-                {
-                    PollVotes[optionNumber - 1] += InfluencePoints[rank];
-                    _usersWhoVoted.Add(userId);
-                    Log.Debug("{UserID} voted", userId);
-                }
-                else
-                {
-                    Log.Warning("Rank was not a parsable: {Rank} {Class}", user.Rank, this);
-                }
+                PollVotes[votedNumber - 1] += InfluencePoints[rank];
+                _usersWhoVoted.Add(userId);
+                Log.Debug("{UserID} voted", userId);
+                return true;
             }
+
+            Log.Warning("Rank was not a parsable: {Rank} {Class}", user.Rank, this);
+
+            return false;
         }
     }
 }

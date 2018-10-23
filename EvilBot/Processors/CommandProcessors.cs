@@ -123,8 +123,12 @@ namespace EvilBot.Processors
         public async Task<string> PollVoteCommandAsync(OnChatCommandReceivedArgs e)
         {
             if (!_pollManager.PollActive) return StandardMessages.PollNotActiveText;
-            if (!int.TryParse(e.Command.ArgumentsAsString, out int votedNumber)) return StandardMessages.PollVoteText;
-            await _pollManager.PollAddVote(e.Command.ChatMessage.UserId, votedNumber).ConfigureAwait(false);
+            if (!int.TryParse(e.Command.ArgumentsAsString, out var votedNumber)) return StandardMessages.PollVoteText;
+            if (await _pollManager.PollAddVote(e.Command.ChatMessage.UserId, votedNumber).ConfigureAwait(false))
+            {
+                return $"/me {e.Command.ChatMessage.DisplayName} a votat pentru {_pollManager.PollItems[votedNumber - 1]}";
+            }
+
             return null;
         }
 
