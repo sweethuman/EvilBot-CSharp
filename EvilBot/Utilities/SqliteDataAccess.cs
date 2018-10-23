@@ -107,20 +107,17 @@ namespace EvilBot.Utilities
             return null;
         }
         
-        public async Task<List<IDatabaseUser>> RetrieveUserFromTable(Enums.DatabaseTables table, string userId = null)
+        public async Task<IDatabaseUser> RetrieveUserFromTable(Enums.DatabaseTables table, string userId)
         {
+            if (userId == null) return null;
             if (RetrieveConnection.State != ConnectionState.Open) RetrieveConnection.Open();
-            Log.Debug("Retrieving all users from table {table}", table.ToString());
             var retrievingTable = table.ToString();
-            List<DatabaseUser> output;
-            if(userId == null)
-                output = (await RetrieveConnection.QueryAsync<DatabaseUser>($"SELECT * FROM {retrievingTable}", new DynamicParameters())).ToList();
-            else
-                output = (await RetrieveConnection.QueryAsync<DatabaseUser>($"SELECT * FROM {retrievingTable} WHERE UserID = '{userId}'", new DynamicParameters())).ToList();
-            
-            var results = output.ToList<IDatabaseUser>();
-            if (output.Any()) return results;
-            Log.Warning("{table} table is empty! for {userId}", table.ToString(), userId);
+            Log.Debug("Retrieving {userId} from table {table}",userId ,retrievingTable );
+            //TODO: add QueryFirstOrDefault after you know what default returns
+            var output = (await RetrieveConnection.QueryAsync<DatabaseUser>(
+                $"SELECT * FROM {retrievingTable} WHERE UserID = '{userId}'", new DynamicParameters())).ToList();
+            if (output.Any()) return output.First();
+            Log.Warning("{userId} not in table {table}",userId, retrievingTable);
             return null;
         }
 

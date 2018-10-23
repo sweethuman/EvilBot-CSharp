@@ -324,7 +324,7 @@ namespace EvilBot.Processors
             
             var properties = await _dataAccess.RetrieveUserFromTable(Enums.DatabaseTables.UserPoints, userId);
             if (properties == null) return null;
-            var results = new List<string> {properties[0].Points, properties[0].Minutes, properties[0].Rank};
+            var results = new List<string> {properties.Points, properties.Minutes, properties.Rank};
             return results[0] == null ? null : results.ToList();
         }
 

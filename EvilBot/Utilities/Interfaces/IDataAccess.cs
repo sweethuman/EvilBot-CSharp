@@ -39,7 +39,7 @@ namespace EvilBot.Utilities.Interfaces
         /// <param name="userId">If no userId is given it will retrieve all users.</param>
         /// <remarks>In case of FilteredUsers only Id and UserId is populated.</remarks>
         /// <returns>Returns a container with all the resources it could get. Not guaranteed it will populate all.</returns>
-        Task<List<IDatabaseUser>> RetrieveUserFromTable(Enums.DatabaseTables table, string userId = null);
+        Task<IDatabaseUser> RetrieveUserFromTable(Enums.DatabaseTables table, string userId = null);
 
         /// <summary>
         /// Modifies the list of FilteredUsers in the database.
