@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using EvilBot.DataStructures.Database;
 using EvilBot.Utilities.Interfaces;
 using Serilog;
 
@@ -73,14 +74,13 @@ namespace EvilBot.Utilities
             return builder.ToString();
         }
 
-        //NOTE make sure it doesn't get negative or 0 numbers at optionNumber
         public async Task PollAddVote(string userId, int optionNumber)
         {
             if (userId != null && !_usersWhoVoted.Contains(userId) && optionNumber <= PollItems.Count && optionNumber >= 1)
             {
-                var userRank = await _dataAccess.RetrieveRowAsync(userId, Enums.DatabaseRow.Rank).ConfigureAwait(false) ?? "0";
+                var user = await _dataAccess.RetrieveUserFromTable(Enums.DatabaseTables.UserPoints, userId) ?? new DatabaseUser{UserID = userId, Rank = "0"};
 
-                if (int.TryParse(userRank, out var rank) && rank < InfluencePoints.Count)
+                if (int.TryParse(user.Rank, out var rank) && rank < InfluencePoints.Count)
                 {
                     PollVotes[optionNumber - 1] += InfluencePoints[rank];
                     _usersWhoVoted.Add(userId);
@@ -88,7 +88,7 @@ namespace EvilBot.Utilities
                 }
                 else
                 {
-                    Log.Warning("Rank was not a parsable: {Rank} {Class}", userRank, this);
+                    Log.Warning("Rank was not a parsable: {Rank} {Class}", user.Rank, this);
                 }
             }
         }

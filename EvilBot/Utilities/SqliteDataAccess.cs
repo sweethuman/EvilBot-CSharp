@@ -20,21 +20,7 @@ namespace EvilBot.Utilities
         public SqliteDataAccess()
         {
             RetrieveConnection = new SQLiteConnection(LoadConnectionString("read_only"));
-            WriteConnection = new SQLiteConnection(LoadConnectionString());
-            
-        }
-        
-        //TODO: destroy all uses of this and see the ways the other functions are used to implement in a safe way
-        public async Task<string> RetrieveRowAsync(string userId, Enums.DatabaseRow databaseRow = Enums.DatabaseRow.Points)
-        {
-            if (RetrieveConnection.State != ConnectionState.Open) RetrieveConnection.Open();
-            if (userId == null) return null;
-            var column = databaseRow.ToString();
-
-            var output = (await RetrieveConnection.QueryAsync<string>($"SELECT {column} FROM UserPoints WHERE UserID = '{userId}'", new DynamicParameters()).ConfigureAwait(false)).ToList();
-            if (output.Any()) return output.ToList()[0];
-            Log.Warning("Asked for inexistent userID in database: {userID}", userId);
-            return null;
+            WriteConnection = new SQLiteConnection(LoadConnectionString());   
         }
 
         public async Task ModifierUserIdAsync(string userId, int points = 1, int minutes = 0, int rank = 0)
