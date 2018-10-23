@@ -23,7 +23,8 @@ namespace EvilBot.Utilities
             WriteConnection = new SQLiteConnection(LoadConnectionString());
             
         }
-
+        
+        //TODO: destroy all uses of this and see the ways the other functions are used to implement in a safe way
         public async Task<string> RetrieveRowAsync(string userId, Enums.DatabaseRow databaseRow = Enums.DatabaseRow.Points)
         {
             if (RetrieveConnection.State != ConnectionState.Open) RetrieveConnection.Open();

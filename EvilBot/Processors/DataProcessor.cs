@@ -313,17 +313,7 @@ namespace EvilBot.Processors
             return null;
         }
 
-        public async Task<string> GetUsernameAsync(string userId)
-        {
-            Log.Debug("AskedForUsername for {Username}", userId);
-            var user = await _twitchChatBot.Api.V5.Users.GetUserByIDAsync(userId).ConfigureAwait(false);
-            if (userId == null || user == null)
-            {
-                return null;
-            }
-            return user.DisplayName;
-        }
-
+        //TODO: advance to a better system, maybe with tuples and maybe make it get all the attributes, or return them all for easy identification and read
         public async Task<List<string>> GetUserAttributesAsync(string userId)
         {
             Log.Debug("Asking for attributes of {userId}", userId);

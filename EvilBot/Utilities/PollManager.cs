@@ -80,7 +80,7 @@ namespace EvilBot.Utilities
             {
                 var userRank = await _dataAccess.RetrieveRowAsync(userId, Enums.DatabaseRow.Rank).ConfigureAwait(false) ?? "0";
 
-                if (int.TryParse(userRank, out int rank) && rank < InfluencePoints.Count)
+                if (int.TryParse(userRank, out var rank) && rank < InfluencePoints.Count)
                 {
                     PollVotes[optionNumber - 1] += InfluencePoints[rank];
                     _usersWhoVoted.Add(userId);
