@@ -17,7 +17,7 @@ namespace EvilBot
 
         private static void SetConsoleMode()
         {
-            Console.Title = @"EvilBot v0.3.2beta for Twitch by M0rtuary";
+            Console.Title = @"EvilBot v0.3.3beta for Twitch by M0rtuary";
             Console.TreatControlCAsInput = true;
         }
 
@@ -31,7 +31,7 @@ namespace EvilBot
             do
             {
                 var keyPress = Console.ReadKey();
-                if (keyPress.Modifiers == (ConsoleModifiers.Control | ConsoleModifiers.Shift | ConsoleModifiers.Alt) && keyPress.Key == ConsoleKey.F6)
+                if (keyPress.Modifiers == (ConsoleModifiers.Control | ConsoleModifiers.Shift) && keyPress.Key == ConsoleKey.Oem3)
                 {
                     stop = true;
                 }
