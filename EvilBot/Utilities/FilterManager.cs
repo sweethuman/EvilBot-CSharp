@@ -4,8 +4,8 @@ using System.Text;
 using System.Threading.Tasks;
 using EvilBot.DataStructures;
 using EvilBot.DataStructures.Interfaces;
-using EvilBot.Processors.Interfaces;
 using EvilBot.Utilities.Interfaces;
+using EvilBot.Utilities.Resources.Interfaces;
 using Serilog;
 using TwitchLib.Api.V5.Models.Users;
 
@@ -14,15 +14,15 @@ namespace EvilBot.Utilities
     public class FilterManager : IFilterManager
     {
         //TODO add somewhere code that if FilteredUsers table does not exist to be created
-        private static List<IUserBase> FilteredUsers { get; } = new List<IUserBase>();
+        private List<IUserBase> FilteredUsers { get; } = new List<IUserBase>();
         private readonly IDataAccess _dataAccess;
-        private readonly IDataProcessor _dataProcessor;
-        public FilterManager(IDataAccess dataAccess, IDataProcessor dataProcessor)
+        private readonly IApiRetriever _apiRetriever;
+        public FilterManager(IDataAccess dataAccess, IApiRetriever apiRetriever)
         {
             _dataAccess = dataAccess;
-            _dataProcessor = dataProcessor;
+            _apiRetriever = apiRetriever;
         }
-        
+
         public async void InitializeFilter()
         {
             Log.Debug("Initializing filter!");
@@ -32,7 +32,7 @@ namespace EvilBot.Utilities
             var userListTasks = new List<Task<User>>();
             for (var i = 0; i < users.Count; i++)
             {
-                userListTasks.Add(_dataProcessor.GetUserAsyncById(users[i].UserID));
+                userListTasks.Add(_apiRetriever.GetUserAsyncById(users[i].UserID));
             }
 
             var userList = (await Task.WhenAll(userListTasks)).ToList();
@@ -61,7 +61,7 @@ namespace EvilBot.Utilities
             FilteredUsers.RemoveAll(x => x.UserId == user.UserId);
             return await _dataAccess.ModifyFilteredUsers(Enums.FilteredUsersDatabaseAction.Remove, user.UserId);
         }
-        
+
         public string RetrieveFilteredUsers()
         {
             Log.Debug("Retrieving FilteredUsers");
@@ -76,7 +76,7 @@ namespace EvilBot.Utilities
             return builder.ToString();
         }
 
-        public static bool CheckIfUserFiltered(IUserBase user)
+        public bool CheckIfUserFiltered(IUserBase user)
         {
             var stateOfCheck = FilteredUsers.Any(x => x.UserId == user.UserId);
             Log.Debug("FilterCheck requested for {user} {userID} result: {result}", user.DisplayName, user.UserId, stateOfCheck);

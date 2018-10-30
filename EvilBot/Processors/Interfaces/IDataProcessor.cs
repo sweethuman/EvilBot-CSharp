@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using System.Timers;
 using EvilBot.DataStructures.Interfaces;
 using EvilBot.Utilities;
-using TwitchLib.Api.V5.Models.Users;
 
 namespace EvilBot.Processors.Interfaces
 {
@@ -13,8 +12,6 @@ namespace EvilBot.Processors.Interfaces
         event EventHandler<RankUpdateEventArgs> RankUpdated;
 
         Task<List<string>> GetUserAttributesAsync(string userId);
-
-        Task<string> GetUserIdAsync(string username);
 
 #pragma warning disable RCS1047 // Non-asynchronous method name should not end with 'Async'.
 
@@ -27,8 +24,5 @@ namespace EvilBot.Processors.Interfaces
         string GetRankFormatted(string rankString, string pointsString);
 
         Task AddToUserAsync(List<IUserBase> userList, int points = 1, int minutes = 0, bool subCheck = true);
-
-        Task<User> GetUserAsyncByUsername(string username);
-        Task<User> GetUserAsyncById(string userId);
     }
 }

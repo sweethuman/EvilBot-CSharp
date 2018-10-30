@@ -5,6 +5,8 @@ using EvilBot.TwitchBot;
 using EvilBot.TwitchBot.Interfaces;
 using EvilBot.Utilities;
 using EvilBot.Utilities.Interfaces;
+using EvilBot.Utilities.Resources;
+using EvilBot.Utilities.Resources.Interfaces;
 
 namespace EvilBot
 {
@@ -22,6 +24,8 @@ namespace EvilBot
             builder.RegisterType<TwitchConnections>().As<ITwitchConnections>().SingleInstance();
             builder.RegisterType<PollManager>().As<IPollManager>().SingleInstance();
             builder.RegisterType<FilterManager>().As<IFilterManager>().SingleInstance();
+            builder.RegisterType<Configuration>().As<IConfiguration>().SingleInstance();
+            builder.RegisterType<ApiRetriever>().As<IApiRetriever>().SingleInstance();
 
             return builder.Build();
         }

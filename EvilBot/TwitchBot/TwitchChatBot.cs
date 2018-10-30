@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Timers;
 using EvilBot.DataStructures;
 using EvilBot.DataStructures.Interfaces;
@@ -8,6 +7,7 @@ using EvilBot.Processors.Interfaces;
 using EvilBot.TwitchBot.Interfaces;
 using EvilBot.Utilities;
 using EvilBot.Utilities.Interfaces;
+using EvilBot.Utilities.Resources.Interfaces;
 using Serilog;
 using TwitchLib.Client.Enums;
 using TwitchLib.Client.Events;
@@ -28,16 +28,19 @@ namespace EvilBot.TwitchBot
         private readonly ICommandProcessor _commandProcessor;
         private readonly IFilterManager _filterManager;
         private readonly IDataAccess _dataAccess;
+        private readonly IConfiguration _configuration;
 
         private readonly List<string> _timedMessages = new List<string>();
 
-        public TwitchChatBot(ITwitchConnections twitchConnection, IDataAccess dataAccess, IDataProcessor dataProcessor, ICommandProcessor commandProcessor, IFilterManager filterManager)
+        //TODO decrease the number of dependencies
+        public TwitchChatBot(ITwitchConnections twitchConnection, IDataAccess dataAccess, IDataProcessor dataProcessor, ICommandProcessor commandProcessor, IFilterManager filterManager, IConfiguration configuration)
         {
             _twitchConnection = twitchConnection;
             _dataProcessor = dataProcessor;
             _commandProcessor = commandProcessor;
             _filterManager = filterManager;
             _dataAccess = dataAccess;
+            _configuration = configuration;
         }
 
         ~TwitchChatBot()
@@ -53,12 +56,9 @@ namespace EvilBot.TwitchBot
         public void Connect()
         {
             Log.Debug("Starting EvilBot");
-            _messageRepeaterMinutes = float.Parse(ConfigurationManager.AppSettings.Get("messageRepeaterMinutes"));
-            if (!int.TryParse(ConfigurationManager.AppSettings.Get("bitsToPointsMultipliers"), out _bitsToPointsMultiplier))
-            {
-                Log.Error("UNABLE TO PARSE {number} TO BITSPOINTSMULTIPLIER, NOT INT", ConfigurationManager.AppSettings.Get("bitsToPointsMultipliers"));
-            }
-            
+            _messageRepeaterMinutes = _configuration.MessageRepeaterMinutes;
+            _bitsToPointsMultiplier = _configuration.BitsPointsMultiplier;
+
             EventIntializer();
             TimedMessageInitializer();
             TimerInitializer();
@@ -190,7 +190,7 @@ namespace EvilBot.TwitchBot
                     Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.Message);
                     _twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.ComenziText);
                     break;
-                
+
                 case "filter":
                     Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.Message);
                     if (e.Command.ChatMessage.UserType >= UserType.Moderator)

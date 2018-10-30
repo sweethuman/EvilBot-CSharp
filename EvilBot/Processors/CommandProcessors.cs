@@ -6,6 +6,7 @@ using EvilBot.DataStructures;
 using EvilBot.Processors.Interfaces;
 using EvilBot.Utilities;
 using EvilBot.Utilities.Interfaces;
+using EvilBot.Utilities.Resources.Interfaces;
 using TwitchLib.Client.Events;
 
 namespace EvilBot.Processors
@@ -16,13 +17,15 @@ namespace EvilBot.Processors
         private readonly IDataAccess _dataAccess;
         private readonly IPollManager _pollManager;
         private readonly IFilterManager _filterManager;
+        private readonly IApiRetriever _apiRetriever;
 
-        public CommandProcessor(IDataProcessor dataProcessor, IDataAccess dataAccess, IPollManager pollManager, IFilterManager filterManager)
+        public CommandProcessor(IDataProcessor dataProcessor, IDataAccess dataAccess, IPollManager pollManager, IFilterManager filterManager, IApiRetriever apiRetriever)
         {
             _dataProcessor = dataProcessor;
             _dataAccess = dataAccess;
             _pollManager = pollManager;
             _filterManager = filterManager;
+            _apiRetriever = apiRetriever;
         }
 
         public async Task<string> RankCommandAsync(OnChatCommandReceivedArgs e)
@@ -38,7 +41,7 @@ namespace EvilBot.Processors
             }
             else
             {
-                var results = await _dataProcessor.GetUserAttributesAsync(await _dataProcessor.GetUserIdAsync(e.Command.ArgumentsAsString.TrimStart('@').ToLower()).ConfigureAwait(false)).ConfigureAwait(false);
+                var results = await _dataProcessor.GetUserAttributesAsync(await _apiRetriever.GetUserIdAsync(e.Command.ArgumentsAsString.TrimStart('@').ToLower()).ConfigureAwait(false)).ConfigureAwait(false);
                 if (results != null)
                 {
                     return $"/me {e.Command.ArgumentsAsString.TrimStart('@')} este {_dataProcessor.GetRankFormatted(results[2], results[0])} cu {Math.Round(double.Parse(results[1], System.Globalization.CultureInfo.InvariantCulture) / 60, 1)} ore!";
@@ -51,7 +54,7 @@ namespace EvilBot.Processors
         {
             string userid;
             if (string.IsNullOrEmpty(e.Command.ArgumentsAsString)) return StandardMessages.ManageCommandText;
-            if (e.Command.ArgumentsAsList.Count < 2 || (userid = await _dataProcessor.GetUserIdAsync(e.Command.ArgumentsAsList[0].TrimStart('@')).ConfigureAwait(false)) == null) 
+            if (e.Command.ArgumentsAsList.Count < 2 || (userid = await _apiRetriever.GetUserIdAsync(e.Command.ArgumentsAsList[0].TrimStart('@')).ConfigureAwait(false)) == null)
                 return StandardMessages.ManageCommandText;
             var pointModifier = 0;
             var minuteModifier = 0;
@@ -155,7 +158,7 @@ namespace EvilBot.Processors
             {
                 case "add":
                 {
-                    var user = await _dataProcessor.GetUserAsyncByUsername(e.Command.ArgumentsAsList[1]);
+                    var user = await _apiRetriever.GetUserAsyncByUsername(e.Command.ArgumentsAsList[1]);
                     if (user == null) return StandardMessages.UserMissingText;
                     if (await _filterManager.AddToFiler(new UserBase(user.DisplayName, user.Id.Trim())))
                     {
@@ -165,7 +168,7 @@ namespace EvilBot.Processors
                 }
                 case "remove":
                 {
-                    var user = await _dataProcessor.GetUserAsyncByUsername(e.Command.ArgumentsAsList[1]);
+                    var user = await _apiRetriever.GetUserAsyncByUsername(e.Command.ArgumentsAsList[1]);
                     if (user == null) return StandardMessages.UserMissingText;
                     if (await _filterManager.RemoveFromFilter(new UserBase(user.DisplayName, user.Id)))
                     {

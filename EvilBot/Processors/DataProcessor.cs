@@ -2,7 +2,6 @@
 using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
@@ -11,30 +10,35 @@ using EvilBot.Processors.Interfaces;
 using EvilBot.TwitchBot.Interfaces;
 using EvilBot.Utilities;
 using EvilBot.Utilities.Interfaces;
-using TwitchLib.Api.V5.Models.Subscriptions;
+using EvilBot.Utilities.Resources.Interfaces;
 using TwitchLib.Api.V5.Models.Users;
 
 namespace EvilBot.Processors
 {
-    internal class DataProcessor : IDataProcessor
+    public class DataProcessor : IDataProcessor
     {
         private readonly IDataAccess _dataAccess;
-        private readonly ITwitchConnections _twitchChatBot;
+        private readonly ITwitchConnections _twitchConnections;
+        private readonly IConfiguration _configuration;
+        private readonly IFilterManager _filterManager;
+        private readonly IApiRetriever _apiRetriever;
         private readonly List<Tuple<string, int>> _ranks = new List<Tuple<string, int>>();
 
         public event EventHandler<RankUpdateEventArgs> RankUpdated;
 
-        private static int RankNumber { get; set; } = 8;
 
         protected virtual void OnRankUpdated(string name, string rank)
         {
             RankUpdated?.Invoke(this, new RankUpdateEventArgs { Name = name, Rank = rank });
         }
 
-        public DataProcessor(IDataAccess dataAccess, ITwitchConnections twitchChatBot)
+        public DataProcessor(IDataAccess dataAccess, ITwitchConnections twitchConnections, IConfiguration configuration, IFilterManager filterManager, IApiRetriever apiRetriever)
         {
             _dataAccess = dataAccess;
-            _twitchChatBot = twitchChatBot;
+            _twitchConnections = twitchConnections;
+            _configuration = configuration;
+            _apiRetriever = apiRetriever;
+            _filterManager = filterManager;
             InitializeRanks();
         }
 
@@ -49,23 +53,21 @@ namespace EvilBot.Processors
             _ranks.Add(new Tuple<string, int>("Initiate", 15000));
             _ranks.Add(new Tuple<string, int>("Veteran", 22000));
             _ranks.Add(new Tuple<string, int>("Emperor", 30000));
-
-            RankNumber = _ranks.Count;
         }
 
         public string GetRankFormatted(string rankString, string pointsString)
         {
-            if (int.TryParse(rankString, out int place) && int.TryParse(pointsString, out int points))
+            if (int.TryParse(rankString, out var rank) && int.TryParse(pointsString, out var points))
             {
-                if (place == 0)
+                if (rank == 0)
                 {
-                    return $"{_ranks[place].Item1} XP: {points}/{_ranks[place + 1].Item2}";
+                    return $"{_ranks[rank].Item1} XP: {points}/{_ranks[rank + 1].Item2}";
                 }
-                if (place == _ranks.Count - 1)
+                if (rank == _ranks.Count - 1)
                 {
-                    return $"{_ranks[place].Item1} (Lvl.{place}) XP: {points}";
+                    return $"{_ranks[rank].Item1} (Lvl.{rank}) XP: {points}";
                 }
-                return $"{_ranks[place].Item1} (Lvl.{place}) XP: {points}/{_ranks[place + 1].Item2}";
+                return $"{_ranks[rank].Item1} (Lvl.{rank}) XP: {points}/{_ranks[rank + 1].Item2}";
             }
             Log.Error("{rankString} {pointsString} is not a parseable value to int {method}", rankString, pointsString, $"{ToString()} GetRankFormatted");
             return null;
@@ -94,11 +96,11 @@ namespace EvilBot.Processors
             try
             {
                 var userList = new List<IUserBase>();
-                var chatusers = await _twitchChatBot.Api.Undocumented.GetChattersAsync(TwitchInfo.ChannelName).ConfigureAwait(false);
+                var chatusers = await _twitchConnections.Api.Undocumented.GetChattersAsync(TwitchInfo.ChannelName).ConfigureAwait(false);
                 var userIdTasks = new List<Task<User>>();
                 for (var i = 0; i < chatusers.Count; i++)
                 {
-                    userIdTasks.Add(GetUserAsyncByUsername(chatusers[i].Username));
+                    userIdTasks.Add(_apiRetriever.GetUserAsyncByUsername(chatusers[i].Username));
                 }
                 var userIdList = (await Task.WhenAll(userIdTasks).ConfigureAwait(false)).ToList();
                 userIdList.RemoveAll(x => x == null);
@@ -145,31 +147,29 @@ namespace EvilBot.Processors
             {
                 for (var i = 0; i < userList.Count; i++)
                 {
-                    if (!FilterManager.CheckIfUserFiltered(userList[i])) continue;
+                    if (!_filterManager.CheckIfUserFiltered(userList[i])) continue;
                     userList.RemoveAll(x => x.UserId == userList[i].UserId);
                     i--;
                 }
-                var pointsMultiplier = float.Parse(ConfigurationManager.AppSettings.Get("pointsMultiplier"));
+
+                var pointsMultiplier = _configuration.PointsMultiplier;
                 //t: make sub checking more efficient
-                List<Subscription> channelSubscribers;
+                List<IUserBase> channelSubscribers;
                 try
                 {
                     if (subCheck)
                     {
-                        var channelId = await GetUserIdAsync(TwitchInfo.ChannelName).ConfigureAwait(false);
-                        channelSubscribers =
-                            (await _twitchChatBot.Api.V5.Channels.GetChannelSubscribersAsync(channelId)
-                                .ConfigureAwait(false)).Subscriptions.ToList();
+                        var channelId = await _apiRetriever.GetUserIdAsync(TwitchInfo.ChannelName).ConfigureAwait(false);
+                        channelSubscribers = await _apiRetriever.GetChannelSubscribers(channelId).ConfigureAwait(false);
                     }
                     else
                     {
-                        channelSubscribers = new List<Subscription>();
+                        channelSubscribers = new List<IUserBase>();
                     }
                 }
                 catch (Exception ex)
                 {
-                    channelSubscribers = new List<Subscription>();
-                    Log.Error(ex, "Some api call failed in AddToUserAsync");
+                    Log.Error(ex, "Failed to GetSubscribers or ChannelId");
                     throw;
                 }
                 int pointAdderValue;
@@ -177,7 +177,7 @@ namespace EvilBot.Processors
                 for (var i = 0; i < userList.Count; i++)
                 {
                     pointAdderValue = points;
-                    if (channelSubscribers.Any(x => x.User.Id == userList[i].UserId))
+                    if (channelSubscribers.Any(x => x.UserId == userList[i].UserId))
                     {
                         pointAdderValue = (int)(pointAdderValue * pointsMultiplier);
                     }
@@ -187,9 +187,9 @@ namespace EvilBot.Processors
                 await UpdateRankAsync(userList).ConfigureAwait(false);
             }
         }
-
+        //BUG THIS HAS BEEN DECOUPLED
         private async Task UpdateRankAsync(IReadOnlyList<IUserBase> userList)
-        {   
+        {
             Log.Debug("Checking Ranks for {userCount}", userList.Count);
             //!WARNING GetUserAttributesAsync() also gets minutes, wich I don't currently need and it might cause performance issues if volume is large
             var userAttributesTasks = new List<Task<List<string>>>();
@@ -209,6 +209,7 @@ namespace EvilBot.Processors
                     {
                         Log.Error("Tried to parse string to int: {string} in {ClassSource}", userAttributes[i][1],
                             $"{ToString()}UpdateRankAsync");
+                        continue;
                     }
 
                     if (!int.TryParse(userAttributes[i][2], out var rank))
@@ -221,7 +222,7 @@ namespace EvilBot.Processors
                     if (currentRank != rank)
                     {
                         databaseRankUpdateTasks.Add(_dataAccess.ModifyUserIdRankAsync(userList[i].UserId, currentRank));
-                        //make it so that it goes all into a single class
+                        //TODO make it so that it goes all into a single class
                         userNameRanks.Add(currentRank);
                         usersUpdated.Add(userList[i]);
                     }
@@ -247,72 +248,6 @@ namespace EvilBot.Processors
 
         #region DataProcessor GeneralProcessors
 
-        public async Task<TimeSpan?> GetUptimeAsync()
-        {
-            var userId = await GetUserIdAsync(TwitchInfo.ChannelName).ConfigureAwait(false);
-            if (userId == null)
-            {
-                return null;
-            }
-            return _twitchChatBot.Api.V5.Streams.GetUptimeAsync(userId).Result;
-        }
-        public async Task<User> GetUserAsyncByUsername(string username)
-        {
-            username = username.Trim('@');
-            Log.Debug("AskedForID for {Username}", username);
-            User[] userList;
-            try
-            {
-                userList = (await _twitchChatBot.Api.V5.Users.GetUserByNameAsync(username).ConfigureAwait(false)).Matches;
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "GetUserAsyncByUsername blew up with {username}", username);
-                return null;
-            }
-
-            if (userList.Length != 0) return userList[0];
-            Log.Warning("User does not exit {username}", username);
-            return null;
-        }        
-        public async Task<User> GetUserAsyncById(string userId)
-        {
-            Log.Debug("AskedForID for {Username}", userId);
-            User user;
-            try
-            {
-                user = await _twitchChatBot.Api.V5.Users.GetUserByIDAsync(userId).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "GetUserAsyncByUsername blew up with {username}", userId);
-                return null;
-            }
-            
-            if (user != null) return user;
-            Log.Warning("User does not exit {username}", userId);
-            return null;
-        }
-        public async Task<string> GetUserIdAsync(string username)
-        {
-            Log.Debug("AskedForID for {Username}", username);
-            User[] userList;
-            try
-            {
-                userList = (await _twitchChatBot.Api.V5.Users.GetUserByNameAsync(username).ConfigureAwait(false))
-                    .Matches;
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "GetUserIdAsync blew up with {username}", username);
-                return null;
-            }
-
-            if (userList.Length != 0) return userList[0].Id;
-            Log.Warning("User does not exit {username}", username);
-            return null;
-        }
-
         //TODO: advance to a better system, maybe with tuples and maybe make it get all the attributes, or return them all for easy identification and read
         public async Task<List<string>> GetUserAttributesAsync(string userId)
         {
@@ -321,11 +256,11 @@ namespace EvilBot.Processors
             {
                 return null;
             }
-            
+
             var properties = await _dataAccess.RetrieveUserFromTable(Enums.DatabaseTables.UserPoints, userId);
             if (properties == null) return null;
             var results = new List<string> {properties.Points, properties.Minutes, properties.Rank};
-            return results[0] == null ? null : results.ToList();
+            return results[0] == null ? null : results;
         }
 
         #endregion DataProcessor GeneralProcessors

@@ -311,6 +311,10 @@
     <Compile Include="Utilities\PointCounter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utilities\Resources\ApiRetriever.cs" />
+    <Compile Include="Utilities\Resources\Configuration.cs" />
+    <Compile Include="Utilities\Resources\Interfaces\IApiRetriever.cs" />
+    <Compile Include="Utilities\Resources\Interfaces\IConfiguration.cs" />
     <Compile Include="Utilities\SqliteDataAccess.cs" />
     <Compile Include="Utilities\StandardMessages.cs" />
     <Compile Include="TwitchBot\TwitchChatBot.cs" />

@@ -9,5 +9,6 @@ namespace EvilBot.Utilities.Interfaces
         Task<bool> AddToFiler(IUserBase user);
         Task<bool> RemoveFromFilter(IUserBase user);
         string RetrieveFilteredUsers();
+        bool CheckIfUserFiltered(IUserBase user);
     }
 }
