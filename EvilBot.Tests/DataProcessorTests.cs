@@ -123,19 +123,13 @@ namespace EvilBot.Tests
             }
         }
 
-        public static IEnumerable<object[]> GetUserAtrributesParams
+        public static IEnumerable<object[]> GetUserAtrributesParams => new[]
         {
-            get
-            {
-                return new[]
-                {
-                    new object[] {null, null, null},
-                    new object[] {"00000000", new DatabaseUser{ Id = 1, UserID = "00000000", Minutes = "400", Points = "643", Rank = "1"}, new List<string> {"643","400","1"}},
-                    new object[] {"00000000", null, null },
-                    new object[] {"00000000", new DatabaseUser(), null}
-                };
-            }
-        }
+            new object[] {null, null, null},
+            new object[] {"00000000", new DatabaseUser{ Id = 1, UserID = "00000000", Minutes = "400", Points = "643", Rank = "1"}, new List<string> {"643","400","1"}},
+            new object[] {"00000000", null, null },
+            new object[] {"00000000", new DatabaseUser(), null}
+        };
 
         [Theory]
         [MemberData(nameof(GetUserAtrributesParams))]

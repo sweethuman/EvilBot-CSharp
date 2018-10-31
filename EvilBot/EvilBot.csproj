@@ -305,7 +305,6 @@
     <Compile Include="Processors\Interfaces\IDataProcessor.cs" />
     <Compile Include="TwitchBot\Interfaces\ITwitchChatBot.cs" />
     <Compile Include="TwitchBot\Interfaces\ITwitchConnections.cs" />
-    <Compile Include="Utilities\Interfaces\IDataAccess.cs" />
     <Compile Include="Utilities\Interfaces\ILoggerManager.cs" />
     <Compile Include="Utilities\LoggerManager.cs" />
     <Compile Include="Utilities\PointCounter.cs" />
@@ -315,7 +314,8 @@
     <Compile Include="Utilities\Resources\Configuration.cs" />
     <Compile Include="Utilities\Resources\Interfaces\IApiRetriever.cs" />
     <Compile Include="Utilities\Resources\Interfaces\IConfiguration.cs" />
-    <Compile Include="Utilities\SqliteDataAccess.cs" />
+    <Compile Include="Utilities\Resources\Interfaces\IDataAccess.cs" />
+    <Compile Include="Utilities\Resources\SqliteDataAccess.cs" />
     <Compile Include="Utilities\StandardMessages.cs" />
     <Compile Include="TwitchBot\TwitchChatBot.cs" />
     <Compile Include="TwitchInfo.Designer.cs">

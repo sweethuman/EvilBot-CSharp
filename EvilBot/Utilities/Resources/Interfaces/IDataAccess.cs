@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using EvilBot.DataStructures.Database.Interfaces;
 
-namespace EvilBot.Utilities.Interfaces
+namespace EvilBot.Utilities.Resources.Interfaces
 {
     public interface IDataAccess
     {

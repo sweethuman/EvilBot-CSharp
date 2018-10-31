@@ -5,12 +5,13 @@ using System.Data.SQLite;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using EvilBot.Utilities.Interfaces;
 using EvilBot.DataStructures.Database;
 using EvilBot.DataStructures.Database.Interfaces;
+using EvilBot.Utilities.Interfaces;
+using EvilBot.Utilities.Resources.Interfaces;
 using Serilog;
 
-namespace EvilBot.Utilities
+namespace EvilBot.Utilities.Resources
 {
     public class SqliteDataAccess : IDataAccess
     {
@@ -20,7 +21,7 @@ namespace EvilBot.Utilities
         public SqliteDataAccess()
         {
             RetrieveConnection = new SQLiteConnection(LoadConnectionString("read_only"));
-            WriteConnection = new SQLiteConnection(LoadConnectionString());   
+            WriteConnection = new SQLiteConnection(LoadConnectionString());
         }
 
         public async Task ModifierUserIdAsync(string userId, int points = 1, int minutes = 0, int rank = 0)
@@ -92,7 +93,7 @@ namespace EvilBot.Utilities
             Log.Warning("{table} table is empty!", retrievingTable);
             return null;
         }
-        
+
         public async Task<IDatabaseUser> RetrieveUserFromTable(Enums.DatabaseTables table, string userId)
         {
             if (userId == null) return null;

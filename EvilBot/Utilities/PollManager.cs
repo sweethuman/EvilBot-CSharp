@@ -3,6 +3,7 @@ using System.Text;
 using System.Threading.Tasks;
 using EvilBot.DataStructures.Database;
 using EvilBot.Utilities.Interfaces;
+using EvilBot.Utilities.Resources.Interfaces;
 using Serilog;
 
 namespace EvilBot.Utilities
@@ -78,7 +79,7 @@ namespace EvilBot.Utilities
         {
             if (userId == null || _usersWhoVoted.Contains(userId) || votedNumber > PollItems.Count ||
                 votedNumber < 1) return false;
-            
+
             var user = await _dataAccess.RetrieveUserFromTable(Enums.DatabaseTables.UserPoints, userId) ?? new DatabaseUser{UserID = userId, Rank = "0"};
             if (int.TryParse(user.Rank, out var rank) && rank < InfluencePoints.Count)
             {
