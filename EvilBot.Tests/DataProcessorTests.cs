@@ -93,7 +93,7 @@ namespace EvilBot.Tests
         }
 
         [Fact]
-        public async void AddToUserAsync_ShouldThrowAndHandleExcteption()
+        public async void AddToUserAsync_ShouldThrowAndHandleException()
         {
             using (var mock = AutoMock.GetLoose())
             {

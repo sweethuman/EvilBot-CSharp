@@ -187,7 +187,7 @@ namespace EvilBot.Processors
                 await UpdateRankAsync(userList).ConfigureAwait(false);
             }
         }
-        //BUG THIS HAS BEEN DECOUPLED
+
         private async Task UpdateRankAsync(IReadOnlyList<IUserBase> userList)
         {
             Log.Debug("Checking Ranks for {userCount}", userList.Count);
