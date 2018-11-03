@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using EvilBot.Utilities.Resources;
 
 namespace EvilBot.Utilities.Interfaces
 {
@@ -9,7 +10,7 @@ namespace EvilBot.Utilities.Interfaces
         List<string> PollItems { get; set; }
         List<double> PollVotes { get; }
 
-        Task<bool> PollAddVote(string userId, int votedNumber);
+        Task<Enums.PollAddVoteFinishState> PollAddVote(string userId, int votedNumber);
 
         string PollCreate(List<string> optionsList);
 

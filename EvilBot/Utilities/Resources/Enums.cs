@@ -15,5 +15,10 @@
         {
             Remove, Insert
         }
+
+        public enum PollAddVoteFinishState
+        {
+            PollNotActive,VoteAdded,VoteFailed
+        }
     }
 }

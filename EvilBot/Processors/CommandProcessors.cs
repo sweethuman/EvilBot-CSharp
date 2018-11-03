@@ -126,24 +126,28 @@ namespace EvilBot.Processors
 
         public async Task<string> PollVoteCommandAsync(OnChatCommandReceivedArgs e)
         {
-            if (!_pollManager.PollActive) return StandardMessages.PollNotActiveText;
             if (!int.TryParse(e.Command.ArgumentsAsString, out var votedNumber)) return StandardMessages.PollVoteText;
-            if (await _pollManager.PollAddVote(e.Command.ChatMessage.UserId, votedNumber).ConfigureAwait(false))
+            var voteState = await _pollManager.PollAddVote(e.Command.ChatMessage.UserId, votedNumber)
+                .ConfigureAwait(false);
+            switch (voteState)
             {
-                return $"/me {e.Command.ChatMessage.DisplayName} a votat pentru {_pollManager.PollItems[votedNumber - 1]}";
+                case Enums.PollAddVoteFinishState.PollNotActive:
+                    return StandardMessages.PollNotActiveText;
+                case Enums.PollAddVoteFinishState.VoteAdded:
+                    return $"/me {e.Command.ChatMessage.DisplayName} a votat pentru {_pollManager.PollItems[votedNumber - 1]}";
+                default:
+                    return null;
             }
-
-            return null;
         }
 
         public string PollStatsCommand(OnChatCommandReceivedArgs e)
         {
-            return _pollManager.PollActive ? $"/me {_pollManager.PollStats()}" : StandardMessages.PollNotActiveText;
+            return $"/me {_pollManager.PollStats()}";
         }
 
         public string PollEndCommand(OnChatCommandReceivedArgs e)
         {
-            return _pollManager.PollActive ? $"/me {_pollManager.PollEnd()}" : StandardMessages.PollNotActiveText;
+            return $"/me {_pollManager.PollEnd()}";
         }
 
         #endregion PollCommands

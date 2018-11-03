@@ -23,7 +23,8 @@ namespace EvilBot.Utilities
         {
             _dataAccess = dataAccess;
         }
-
+        /*NOTE this is probably bad design because it directly returns strings and can have multpiple points of failure
+         and the return type and data is not consistent for this or the way data is processed, it just seems awful*/
         public string PollCreate(List<string> optionsList)
         {
             //t: in case given string is empty or null to not add it to the options
@@ -48,6 +49,7 @@ namespace EvilBot.Utilities
 
         public string PollEnd()
         {
+            if (!PollActive) return StandardMessages.PollNotActiveText;
             PollActive = false;
             var winner = 0;
             for (var i = 1; i < PollItems.Count; i++)
@@ -67,6 +69,7 @@ namespace EvilBot.Utilities
 
         public string PollStats()
         {
+            if (!PollActive) return StandardMessages.PollNotActiveText;
             var builder = new StringBuilder();
             builder.Append("Statistici :");
             for (var i = 0; i < PollItems.Count; i++)
@@ -76,10 +79,11 @@ namespace EvilBot.Utilities
             return builder.ToString();
         }
 
-        public async Task<bool> PollAddVote(string userId, int votedNumber)
+        public async Task<Enums.PollAddVoteFinishState> PollAddVote(string userId, int votedNumber)
         {
+            if (!PollActive) return Enums.PollAddVoteFinishState.PollNotActive;
             if (userId == null || _usersWhoVoted.Contains(userId) || votedNumber > PollItems.Count ||
-                votedNumber < 1) return false;
+                votedNumber < 1) return Enums.PollAddVoteFinishState.VoteFailed;
 
             var user = await _dataAccess.RetrieveUserFromTable(Enums.DatabaseTables.UserPoints, userId) ?? new DatabaseUser{UserID = userId, Rank = "0"};
             if (int.TryParse(user.Rank, out var rank) && rank < InfluencePoints.Count)
@@ -87,12 +91,12 @@ namespace EvilBot.Utilities
                 PollVotes[votedNumber - 1] += InfluencePoints[rank];
                 _usersWhoVoted.Add(userId);
                 Log.Debug("{UserID} voted", userId);
-                return true;
+                return Enums.PollAddVoteFinishState.VoteAdded;
             }
 
             Log.Warning("Rank was not a parsable: {Rank} {Class}", user.Rank, this);
 
-            return false;
+            return Enums.PollAddVoteFinishState.VoteAdded;
         }
     }
 }
