@@ -6,6 +6,7 @@ using EvilBot.DataStructures;
 using EvilBot.Processors.Interfaces;
 using EvilBot.Utilities;
 using EvilBot.Utilities.Interfaces;
+using EvilBot.Utilities.Resources;
 using EvilBot.Utilities.Resources.Interfaces;
 using TwitchLib.Client.Events;
 

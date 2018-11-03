@@ -3,6 +3,7 @@ using System.Text;
 using System.Threading.Tasks;
 using EvilBot.DataStructures.Database;
 using EvilBot.Utilities.Interfaces;
+using EvilBot.Utilities.Resources;
 using EvilBot.Utilities.Resources.Interfaces;
 using Serilog;
 

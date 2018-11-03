@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace EvilBot
+namespace EvilBot.Utilities
 {
     public static class CommandHelpers
     {

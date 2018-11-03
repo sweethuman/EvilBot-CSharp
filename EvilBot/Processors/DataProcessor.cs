@@ -10,6 +10,7 @@ using EvilBot.Processors.Interfaces;
 using EvilBot.TwitchBot.Interfaces;
 using EvilBot.Utilities;
 using EvilBot.Utilities.Interfaces;
+using EvilBot.Utilities.Resources;
 using EvilBot.Utilities.Resources.Interfaces;
 using TwitchLib.Api.V5.Models.Users;
 

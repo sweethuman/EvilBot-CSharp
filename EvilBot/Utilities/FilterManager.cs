@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using EvilBot.DataStructures;
 using EvilBot.DataStructures.Interfaces;
 using EvilBot.Utilities.Interfaces;
+using EvilBot.Utilities.Resources;
 using EvilBot.Utilities.Resources.Interfaces;
 using Serilog;
 using TwitchLib.Api.V5.Models.Users;

@@ -1,4 +1,4 @@
-﻿namespace EvilBot.Utilities
+﻿namespace EvilBot.Utilities.Resources
 {
     public static class Enums
     {
@@ -10,7 +10,7 @@
         {
             UserPoints, FilteredUsers
         }
-        
+
         public enum FilteredUsersDatabaseAction
         {
             Remove, Insert

@@ -10,6 +10,7 @@ using EvilBot.Processors;
 using EvilBot.TwitchBot.Interfaces;
 using EvilBot.Utilities;
 using EvilBot.Utilities.Interfaces;
+using EvilBot.Utilities.Resources;
 using EvilBot.Utilities.Resources.Interfaces;
 using Moq;
 using Xunit;
