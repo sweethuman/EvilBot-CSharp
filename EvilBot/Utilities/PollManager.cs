@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 using System.Threading.Tasks;
+using EvilBot.DataStructures;
 using EvilBot.DataStructures.Database;
+using EvilBot.DataStructures.Interfaces;
 using EvilBot.Utilities.Interfaces;
 using EvilBot.Utilities.Resources;
 using EvilBot.Utilities.Resources.Interfaces;
@@ -20,52 +22,49 @@ namespace EvilBot.Utilities
 		}
 
 		private List<double> InfluencePoints { get; } = new List<double> {1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8};
-		public List<string> PollItems { get; set; }
+		public List<string> PollItems { get; private set; }
 		public List<double> PollVotes { get; private set; }
 
 		public bool PollActive { get; private set; }
 
 		/*NOTE this is probably bad design because it directly returns strings and can have multpiple points of failure
 		 and the return type and data is not consistent for this or the way data is processed, it just seems awful*/
-		public string PollCreate(List<string> optionsList)
+		public List<string> PollCreate(List<string> optionsList)
 		{
-			//t: in case given string is empty or null to not add it to the options
+			//TODO in case given string is empty or null to not add it to the options
 			Log.Debug("PollStarting");
-			var builder = new StringBuilder();
 			PollItems = optionsList;
 			_usersWhoVoted = new List<string>();
 			PollVotes = new List<double>();
 			PollActive = true;
 			for (var i = 0; i < PollItems.Count; i++) PollVotes.Add(0);
-			builder.Append("Poll Creat! Optiuni: ");
-			for (var i = 0; i < PollItems.Count; i++) builder.AppendFormat(" //{0}:{1}", i + 1, PollItems[i]);
 			Log.Debug("PollStarted");
-			return builder.ToString();
+			return PollItems;
 		}
 
-		public string PollEnd()
+		public IPollItem PollEnd()
 		{
-			if (!PollActive) return StandardMessages.PollNotActiveText;
+			//TODO checks or return null for different failures
+			if (!PollActive) return null;
 			PollActive = false;
 			var winner = 0;
 			for (var i = 1; i < PollItems.Count; i++)
 				if (PollVotes[winner] < PollVotes[i])
 					winner = i;
-			var message = $"A Castigat || {PollItems[winner]} || cu {PollVotes[winner]} puncte";
+			var pollItem = new PollItem(PollVotes[winner], PollItems[winner]);
+
 			PollItems = null;
 			PollVotes = null;
 			_usersWhoVoted = null;
 			Log.Debug("Poll Ended");
-			return message;
+			return pollItem;
 		}
 
-		public string PollStats()
+		public List<IPollItem> PollStats()
 		{
-			if (!PollActive) return StandardMessages.PollNotActiveText;
-			var builder = new StringBuilder();
-			builder.Append("Statistici :");
-			for (var i = 0; i < PollItems.Count; i++) builder.AppendFormat(" //{0}:{1}", PollItems[i], PollVotes[i]);
-			return builder.ToString();
+			//TODO checks or return null for different failures
+			if (!PollActive) return null;
+			return PollItems.Select((t, i) => new PollItem(PollVotes[i], t)).ToList<IPollItem>();
 		}
 
 		public async Task<Enums.PollAddVoteFinishState> PollAddVote(string userId, int votedNumber)

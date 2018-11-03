@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using EvilBot.DataStructures;
 using EvilBot.Processors.Interfaces;
@@ -9,6 +9,7 @@ using EvilBot.Utilities;
 using EvilBot.Utilities.Interfaces;
 using EvilBot.Utilities.Resources;
 using EvilBot.Utilities.Resources.Interfaces;
+using Serilog;
 using TwitchLib.Client.Events;
 
 namespace EvilBot.Processors
@@ -137,13 +138,21 @@ namespace EvilBot.Processors
 		{
 			if (string.IsNullOrEmpty(e.Command.ArgumentsAsString) || e.Command.ArgumentsAsString.Contains("||"))
 				return StandardMessages.PollCreateText;
-			var arguments = e.Command.ArgumentsAsString.Trim();
-			arguments = arguments.Trim('|');
-			arguments = arguments.Trim();
-			var options = arguments.Split('|').ToList();
-			for (var i = 0; i < options.Count; i++) options[i] = options[i].Trim();
-			if (options.Count >= 2) return $"/me {_pollManager.PollCreate(options)}";
-			return StandardMessages.PollCreateText;
+
+			var options = CommandHelpers.FilterAndPreparePollOptions(e.Command.ArgumentsAsString);
+			if (options.Count < 2) return StandardMessages.PollCreateText;
+
+			var resultItems = _pollManager.PollCreate(options);
+			if (resultItems == null)
+			{
+				Log.Error("Something major failed when creating the poll {paramString}", e.Command.ArgumentsAsString);
+				return StandardMessages.BigError;
+			}
+
+			var builder = new StringBuilder();
+			builder.Append("Poll Creat! Optiuni: ");
+			for (var i = 0; i < resultItems.Count; i++) builder.AppendFormat(" //{0}:{1}", i + 1, resultItems[i]);
+			return $"/me {builder}";
 		}
 
 		public async Task<string> PollVoteCommandAsync(OnChatCommandReceivedArgs e)
@@ -151,6 +160,7 @@ namespace EvilBot.Processors
 			if (!int.TryParse(e.Command.ArgumentsAsString, out var votedNumber)) return StandardMessages.PollVoteText;
 			var voteState = await _pollManager.PollAddVote(e.Command.ChatMessage.UserId, votedNumber)
 				.ConfigureAwait(false);
+
 			switch (voteState)
 			{
 				case Enums.PollAddVoteFinishState.PollNotActive:
@@ -165,12 +175,30 @@ namespace EvilBot.Processors
 
 		public string PollStatsCommand(OnChatCommandReceivedArgs e)
 		{
-			return $"/me {_pollManager.PollStats()}";
+			var resultItems = _pollManager.PollStats();
+			if (resultItems == null)
+			{
+				Log.Error("Something major failed when getting Poll stats {paramString}", e.Command.ArgumentsAsString);
+				return StandardMessages.BigError;
+			}
+
+			var builder = new StringBuilder();
+			builder.Append("Statistici :");
+			for (var i = 0; i < resultItems.Count; i++) builder.AppendFormat(" //{0}:{1}", resultItems[i].Item, resultItems[i].ItemPoints);
+			return $"/me {builder}";
 		}
 
 		public string PollEndCommand(OnChatCommandReceivedArgs e)
 		{
-			return $"/me {_pollManager.PollEnd()}";
+			var resultItem = _pollManager.PollEnd();
+			if (resultItem == null)
+			{
+				Log.Error("Something major failed when ending the Poll {paramString}", e.Command.ArgumentsAsString);
+				return StandardMessages.BigError;
+			}
+
+			var message = $"A Castigat || {resultItem.Item} || cu {resultItem.ItemPoints} puncte";
+			return $"/me {message}";
 		}
 
 		#endregion PollCommands

@@ -16,5 +16,6 @@
 
 		public static string FilterText { get; } = "/me !filter get/add/remove <username>";
 		public static string UserMissingText { get; } = "/me Acest User nu exista!";
+		public static string BigError { get; } = "/me Ok. UMM, SOMETHING HUGE FAILED, PLEASE REPORT ERORR";
 	}
 }

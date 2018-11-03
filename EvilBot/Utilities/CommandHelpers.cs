@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace EvilBot.Utilities
 {
@@ -19,6 +20,17 @@ namespace EvilBot.Utilities
 			stringOrder.Add(stringOne);
 			stringOrder.Add(stringTwo);
 			return stringOrder;
+		}
+
+		public static List<string> FilterAndPreparePollOptions(string arguments)
+		{
+			arguments = arguments.Trim();
+			arguments = arguments.Trim('|');
+			arguments = arguments.Trim();
+			var options = arguments.Split('|').ToList();
+			for (var i = 0; i < options.Count; i++) options[i] = options[i].Trim();
+			options.RemoveAll(string.IsNullOrEmpty);
+			return options;
 		}
 	}
 }
