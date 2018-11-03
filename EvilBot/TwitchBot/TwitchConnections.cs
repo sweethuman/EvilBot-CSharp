@@ -11,53 +11,55 @@ using TwitchLib.Communication.Models;
 
 namespace EvilBot.TwitchBot
 {
-    internal class TwitchConnections : ITwitchConnections
-    {
-        private readonly ConnectionCredentials _credentials = new ConnectionCredentials(TwitchInfo.BotUsername, TwitchInfo.BotToken);
-        private readonly ILoggerManager _loggerManager;
+	internal class TwitchConnections : ITwitchConnections
+	{
+		private readonly ConnectionCredentials _credentials =
+			new ConnectionCredentials(TwitchInfo.BotUsername, TwitchInfo.BotToken);
 
-        public TwitchClient Client { get; private set; }
+		private readonly ILoggerManager _loggerManager;
 
-        public TwitchAPI Api { get; private set; }
+		public TwitchConnections(ILoggerManager loggerManager)
+		{
+			_loggerManager = loggerManager;
+		}
 
-        public TwitchConnections(ILoggerManager loggerManager)
-        {
-            _loggerManager = loggerManager;
-        }
+		public TwitchClient Client { get; private set; }
 
-        public void Connect()
-        {
-            Log.Debug("Connecting");
-            ClientInitialize();
-            ApiInitialize();
-        }
+		public TwitchAPI Api { get; private set; }
 
-        public void Disconnect()
-        {
-            Log.Debug("Disconnecting");
-        }
+		public void Connect()
+		{
+			Log.Debug("Connecting");
+			ClientInitialize();
+			ApiInitialize();
+		}
 
-        private void ClientInitialize()
-        {
-            var clientOptions = new ClientOptions
-            {
-                ClientType = ClientType.Chat,
-                ReconnectionPolicy = new ReconnectionPolicy(5, 5),
-                UseSsl = true,
-                MessagesAllowedInPeriod = 90,
-                ThrottlingPeriod = TimeSpan.FromSeconds(30)
-            };
-            var customClient = new WebSocketClient(clientOptions);
-            Client = new TwitchClient(customClient, logger: _loggerManager.ClientLogger);
-            Client.Initialize(_credentials, TwitchInfo.ChannelName);
-            Client.Connect();
-        }
+		public void Disconnect()
+		{
+			Log.Debug("Disconnecting");
+		}
 
-        private void ApiInitialize()
-        {
-            Api = new TwitchAPI(_loggerManager.ApiLoggerFactory);
-            Api.Settings.ClientId = TwitchInfo.ClientID;
-            Api.Settings.AccessToken = TwitchInfo.BotToken;
-        }
-    }
+		private void ClientInitialize()
+		{
+			var clientOptions = new ClientOptions
+			{
+				ClientType = ClientType.Chat,
+				ReconnectionPolicy = new ReconnectionPolicy(5, 5),
+				UseSsl = true,
+				MessagesAllowedInPeriod = 90,
+				ThrottlingPeriod = TimeSpan.FromSeconds(30)
+			};
+			var customClient = new WebSocketClient(clientOptions);
+			Client = new TwitchClient(customClient, logger: _loggerManager.ClientLogger);
+			Client.Initialize(_credentials, TwitchInfo.ChannelName);
+			Client.Connect();
+		}
+
+		private void ApiInitialize()
+		{
+			Api = new TwitchAPI(_loggerManager.ApiLoggerFactory);
+			Api.Settings.ClientId = TwitchInfo.ClientID;
+			Api.Settings.AccessToken = TwitchInfo.BotToken;
+		}
+	}
 }

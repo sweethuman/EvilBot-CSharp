@@ -6,12 +6,12 @@ using TwitchLib.Api.V5.Models.Users;
 
 namespace EvilBot.Utilities.Resources.Interfaces
 {
-    public interface IApiRetriever
-    {
-        Task<TimeSpan?> GetUptimeAsync();
-        Task<User> GetUserAsyncByUsername(string username);
-        Task<User> GetUserAsyncById(string userId);
-        Task<string> GetUserIdAsync(string username);
-        Task<List<IUserBase>> GetChannelSubscribers(string channelId);
-    }
+	public interface IApiRetriever
+	{
+		Task<TimeSpan?> GetUptimeAsync();
+		Task<User> GetUserAsyncByUsername(string username);
+		Task<User> GetUserAsyncById(string userId);
+		Task<string> GetUserIdAsync(string username);
+		Task<List<IUserBase>> GetChannelSubscribers(string channelId);
+	}
 }

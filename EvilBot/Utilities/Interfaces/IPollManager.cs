@@ -4,18 +4,18 @@ using EvilBot.Utilities.Resources;
 
 namespace EvilBot.Utilities.Interfaces
 {
-    public interface IPollManager
-    {
-        bool PollActive { get; }
-        List<string> PollItems { get; set; }
-        List<double> PollVotes { get; }
+	public interface IPollManager
+	{
+		bool PollActive { get; }
+		List<string> PollItems { get; set; }
+		List<double> PollVotes { get; }
 
-        Task<Enums.PollAddVoteFinishState> PollAddVote(string userId, int votedNumber);
+		Task<Enums.PollAddVoteFinishState> PollAddVote(string userId, int votedNumber);
 
-        string PollCreate(List<string> optionsList);
+		string PollCreate(List<string> optionsList);
 
-        string PollEnd();
+		string PollEnd();
 
-        string PollStats();
-    }
+		string PollStats();
+	}
 }

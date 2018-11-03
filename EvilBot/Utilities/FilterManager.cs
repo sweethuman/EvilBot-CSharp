@@ -12,76 +12,78 @@ using TwitchLib.Api.V5.Models.Users;
 
 namespace EvilBot.Utilities
 {
-    public class FilterManager : IFilterManager
-    {
-        //TODO add somewhere code that if FilteredUsers table does not exist to be created
-        private List<IUserBase> FilteredUsers { get; } = new List<IUserBase>();
-        private readonly IDataAccess _dataAccess;
-        private readonly IApiRetriever _apiRetriever;
-        public FilterManager(IDataAccess dataAccess, IApiRetriever apiRetriever)
-        {
-            _dataAccess = dataAccess;
-            _apiRetriever = apiRetriever;
-        }
+	public class FilterManager : IFilterManager
+	{
+		private readonly IApiRetriever _apiRetriever;
+		private readonly IDataAccess _dataAccess;
 
-        public async void InitializeFilter()
-        {
-            Log.Debug("Initializing filter!");
-            var users = await _dataAccess.RetrieveAllUsersFromTable(Enums.DatabaseTables.FilteredUsers);
-            if (users == null) return;
-            users.RemoveAll(x => x == null);
-            var userListTasks = new List<Task<User>>();
-            for (var i = 0; i < users.Count; i++)
-            {
-                userListTasks.Add(_apiRetriever.GetUserAsyncById(users[i].UserID));
-            }
+		public FilterManager(IDataAccess dataAccess, IApiRetriever apiRetriever)
+		{
+			_dataAccess = dataAccess;
+			_apiRetriever = apiRetriever;
+		}
 
-            var userList = (await Task.WhenAll(userListTasks)).ToList();
-            userList.RemoveAll(x => x == null);
-            for (var i = 0; i < userList.Count; i++)
-            {
-                Log.Debug("{user} {userId} adding to the filter", userList[i].DisplayName, userList[i].Id);
-                FilteredUsers.Add(new UserBase(userList[i].DisplayName, userList[i].Id.Trim()));
-            }
-        }
+		//TODO add somewhere code that if FilteredUsers table does not exist to be created
+		private List<IUserBase> FilteredUsers { get; } = new List<IUserBase>();
 
-        public async Task<bool> AddToFiler(IUserBase user)
-        {
-            if (FilteredUsers.All(x => x.UserId != user.UserId))
-            {
-                Log.Debug("{user} {userId} adding to the filter", user.DisplayName, user.UserId);
-                FilteredUsers.Add(user);
-            }
-            else FilteredUsers.First(x => x.UserId == user.UserId).DisplayName = user.DisplayName; //NOTE not sure how well this works, but it should.
-            return await _dataAccess.ModifyFilteredUsers(Enums.FilteredUsersDatabaseAction.Insert, user.UserId);
-        }
+		public async void InitializeFilter()
+		{
+			Log.Debug("Initializing filter!");
+			var users = await _dataAccess.RetrieveAllUsersFromTable(Enums.DatabaseTables.FilteredUsers);
+			if (users == null) return;
+			users.RemoveAll(x => x == null);
+			var userListTasks = new List<Task<User>>();
+			for (var i = 0; i < users.Count; i++) userListTasks.Add(_apiRetriever.GetUserAsyncById(users[i].UserId));
 
-        public async Task<bool> RemoveFromFilter(IUserBase user)
-        {
-            Log.Debug("{user} {userId} removing from the filter", user.DisplayName, user.UserId);
-            FilteredUsers.RemoveAll(x => x.UserId == user.UserId);
-            return await _dataAccess.ModifyFilteredUsers(Enums.FilteredUsersDatabaseAction.Remove, user.UserId);
-        }
+			var userList = (await Task.WhenAll(userListTasks)).ToList();
+			userList.RemoveAll(x => x == null);
+			for (var i = 0; i < userList.Count; i++)
+			{
+				Log.Debug("{user} {userId} adding to the filter", userList[i].DisplayName, userList[i].Id);
+				FilteredUsers.Add(new UserBase(userList[i].DisplayName, userList[i].Id.Trim()));
+			}
+		}
 
-        public string RetrieveFilteredUsers()
-        {
-            Log.Debug("Retrieving FilteredUsers");
-            if (FilteredUsers.Count <= 0) return "/me Nici un User filtrat!";
-            var builder = new StringBuilder();
-            builder.Append("/me Useri filtrati:");
-            for (var i = 0; i < FilteredUsers.Count; i++)
-            {
-                builder.Append($" {FilteredUsers[i].DisplayName},");
-            }
+		public async Task<bool> AddToFiler(IUserBase user)
+		{
+			if (FilteredUsers.All(x => x.UserId != user.UserId))
+			{
+				Log.Debug("{user} {userId} adding to the filter", user.DisplayName, user.UserId);
+				FilteredUsers.Add(user);
+			}
+			else
+			{
+				FilteredUsers.First(x => x.UserId == user.UserId).DisplayName =
+					user.DisplayName; //NOTE not sure how well this works, but it should.
+			}
 
-            return builder.ToString();
-        }
+			return await _dataAccess.ModifyFilteredUsers(Enums.FilteredUsersDatabaseAction.Insert, user.UserId);
+		}
 
-        public bool CheckIfUserFiltered(IUserBase user)
-        {
-            var stateOfCheck = FilteredUsers.Any(x => x.UserId == user.UserId);
-            Log.Debug("FilterCheck requested for {user} {userID} result: {result}", user.DisplayName, user.UserId, stateOfCheck);
-            return stateOfCheck;
-        }
-    }
+		public async Task<bool> RemoveFromFilter(IUserBase user)
+		{
+			Log.Debug("{user} {userId} removing from the filter", user.DisplayName, user.UserId);
+			FilteredUsers.RemoveAll(x => x.UserId == user.UserId);
+			return await _dataAccess.ModifyFilteredUsers(Enums.FilteredUsersDatabaseAction.Remove, user.UserId);
+		}
+
+		public string RetrieveFilteredUsers()
+		{
+			Log.Debug("Retrieving FilteredUsers");
+			if (FilteredUsers.Count <= 0) return "/me Nici un User filtrat!";
+			var builder = new StringBuilder();
+			builder.Append("/me Useri filtrati:");
+			for (var i = 0; i < FilteredUsers.Count; i++) builder.Append($" {FilteredUsers[i].DisplayName},");
+
+			return builder.ToString();
+		}
+
+		public bool CheckIfUserFiltered(IUserBase user)
+		{
+			var stateOfCheck = FilteredUsers.Any(x => x.UserId == user.UserId);
+			Log.Debug("FilterCheck requested for {user} {userID} result: {result}", user.DisplayName, user.UserId,
+				stateOfCheck);
+			return stateOfCheck;
+		}
+	}
 }
