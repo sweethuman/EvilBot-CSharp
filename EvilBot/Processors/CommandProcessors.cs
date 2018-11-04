@@ -177,10 +177,7 @@ namespace EvilBot.Processors
 		{
 			var resultItems = _pollManager.PollStats();
 			if (resultItems == null)
-			{
-				Log.Error("Something major failed when getting Poll stats {paramString}", e.Command.ArgumentsAsString);
-				return StandardMessages.BigError;
-			}
+				return StandardMessages.PollNotActiveText;
 
 			var builder = new StringBuilder();
 			builder.Append("Statistici :");
@@ -192,10 +189,7 @@ namespace EvilBot.Processors
 		{
 			var resultItem = _pollManager.PollEnd();
 			if (resultItem == null)
-			{
-				Log.Error("Something major failed when ending the Poll {paramString}", e.Command.ArgumentsAsString);
-				return StandardMessages.BigError;
-			}
+				return StandardMessages.PollNotActiveText;
 
 			var message = $"A Castigat || {resultItem.Item} || cu {resultItem.ItemPoints} puncte";
 			return $"/me {message}";

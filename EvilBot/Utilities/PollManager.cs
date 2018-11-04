@@ -32,6 +32,7 @@ namespace EvilBot.Utilities
 		public List<string> PollCreate(List<string> optionsList)
 		{
 			//TODO in case given string is empty or null to not add it to the options
+			if (optionsList.Exists(string.IsNullOrEmpty)) return null;
 			Log.Debug("PollStarting");
 			PollItems = optionsList;
 			_usersWhoVoted = new List<string>();
@@ -44,7 +45,6 @@ namespace EvilBot.Utilities
 
 		public IPollItem PollEnd()
 		{
-			//TODO checks or return null for different failures
 			if (!PollActive) return null;
 			PollActive = false;
 			var winner = 0;
@@ -62,7 +62,6 @@ namespace EvilBot.Utilities
 
 		public List<IPollItem> PollStats()
 		{
-			//TODO checks or return null for different failures
 			if (!PollActive) return null;
 			return PollItems.Select((t, i) => new PollItem(PollVotes[i], t)).ToList<IPollItem>();
 		}
