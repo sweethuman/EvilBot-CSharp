@@ -30,7 +30,8 @@ namespace EvilBot.Utilities.Resources
 			if (userId == null) return;
 			await WriteConnection
 				.ExecuteAsync(
-					$"INSERT INTO UserPoints (UserID, Points, Minutes, Rank) VALUES ('{userId}', '{points}', '{minutes}', '{rank}') ON CONFLICT(UserID) DO UPDATE SET Points = Points + {points}, Minutes = Minutes + {minutes}")
+					"INSERT INTO UserPoints (UserID, Points, Minutes, Rank) VALUES (@UserId, @Points, @Minutes, @Rank) ON CONFLICT(UserID) DO UPDATE SET Points = Points + @Points, Minutes = Minutes + @Minutes",
+					new {UserId = userId, Points = points, Minutes = minutes, Rank = rank})
 				.ConfigureAwait(false);
 			Log.Information("{userID} modified/added {minutes}m and {points}", userId, minutes, points);
 		}
@@ -43,7 +44,7 @@ namespace EvilBot.Utilities.Resources
 			Log.Information("Advancing a User with {UserID} with [{Rank}]", userId, rank);
 			try
 			{
-				await WriteConnection.ExecuteAsync($"UPDATE UserPoints SET Rank = {rank} WHERE UserID = '{userId}'")
+				await WriteConnection.ExecuteAsync("UPDATE UserPoints SET Rank = @Rank WHERE UserID = @UserId", new {Rank = rank, UserID = userId})
 					.ConfigureAwait(false);
 			}
 			catch (Exception ex)
@@ -65,14 +66,14 @@ namespace EvilBot.Utilities.Resources
 				case Enums.FilteredUsersDatabaseAction.Remove:
 				{
 					var rowsAffected =
-						await WriteConnection.ExecuteAsync($"DELETE FROM FilteredUsers WHERE UserID = '{userId}'");
+						await WriteConnection.ExecuteAsync("DELETE FROM FilteredUsers WHERE UserID = @UserId ", new {UserId = userId});
 					return rowsAffected > 0;
 				}
 				case Enums.FilteredUsersDatabaseAction.Insert:
 				{
 					var rowsAffected =
 						await WriteConnection.ExecuteAsync(
-							$"INSERT INTO FilteredUsers (UserID) VALUES ('{userId}') ON CONFLICT DO NOTHING");
+							"INSERT INTO FilteredUsers (UserID) VALUES (@UserId) ON CONFLICT DO NOTHING", new {UserId = userId});
 					return rowsAffected > 0;
 				}
 				default:
@@ -104,7 +105,7 @@ namespace EvilBot.Utilities.Resources
 			Log.Debug("Retrieving {userId} from table {table}", userId, retrievingTable);
 			//TODO: add QueryFirstOrDefault after you know what default returns
 			var output = (await RetrieveConnection.QueryAsync<DatabaseUser>(
-				$"SELECT * FROM {retrievingTable} WHERE UserID = '{userId}'", new DynamicParameters())).ToList();
+				$"SELECT * FROM {retrievingTable} WHERE UserID = @UserId ", new {RetrievingTable = retrievingTable ,UserId = userId})).ToList();
 			if (output.Any()) return output.First();
 			Log.Warning("{userId} not in table {table}", userId, retrievingTable);
 			return null;
