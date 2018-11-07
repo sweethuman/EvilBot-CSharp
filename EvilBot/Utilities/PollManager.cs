@@ -31,8 +31,7 @@ namespace EvilBot.Utilities
 		 and the return type and data is not consistent for this or the way data is processed, it just seems awful*/
 		public List<string> PollCreate(List<string> optionsList)
 		{
-			//TODO in case given string is empty or null to not add it to the options
-			if (optionsList.Exists(string.IsNullOrEmpty)) return null;
+			if (optionsList == null || optionsList.Count < 2 || optionsList.Exists(string.IsNullOrEmpty)) return null;
 			Log.Debug("PollStarting");
 			PollItems = optionsList;
 			_usersWhoVoted = new List<string>();
