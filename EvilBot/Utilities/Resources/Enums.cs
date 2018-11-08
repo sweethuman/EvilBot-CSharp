@@ -25,6 +25,7 @@
 		{
 			PollNotActive,
 			VoteAdded,
+			OptionOutOfRange,
 			VoteFailed
 		}
 	}

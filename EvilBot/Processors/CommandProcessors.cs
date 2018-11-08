@@ -157,7 +157,7 @@ namespace EvilBot.Processors
 
 		public async Task<string> PollVoteCommandAsync(OnChatCommandReceivedArgs e)
 		{
-			if (!int.TryParse(e.Command.ArgumentsAsString, out var votedNumber)) return StandardMessages.PollVoteText;
+			if (!int.TryParse(e.Command.ArgumentsAsString, out var votedNumber)) return StandardMessages.PollVoteNotNumber;
 			var voteState = await _pollManager.PollAddVote(e.Command.ChatMessage.UserId, votedNumber)
 				.ConfigureAwait(false);
 
@@ -168,6 +168,8 @@ namespace EvilBot.Processors
 				case Enums.PollAddVoteFinishState.VoteAdded:
 					return
 						$"/me {e.Command.ChatMessage.DisplayName} a votat pentru {_pollManager.PollItems[votedNumber - 1]}";
+				case Enums.PollAddVoteFinishState.OptionOutOfRange:
+					return StandardMessages.PollVoteText;
 				default:
 					return null;
 			}
