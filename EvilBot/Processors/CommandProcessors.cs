@@ -21,6 +21,8 @@ namespace EvilBot.Processors
 		private readonly IDataProcessor _dataProcessor;
 		private readonly IFilterManager _filterManager;
 		private readonly IPollManager _pollManager;
+		
+		private string PollOptionsString { get; set; }
 
 		public CommandProcessor(IDataProcessor dataProcessor, IDataAccess dataAccess, IPollManager pollManager,
 			IFilterManager filterManager, IApiRetriever apiRetriever)
@@ -152,6 +154,8 @@ namespace EvilBot.Processors
 			var builder = new StringBuilder();
 			builder.Append("Poll Creat! Optiuni: ");
 			for (var i = 0; i < resultItems.Count; i++) builder.AppendFormat(" //{0}:{1}", i + 1, resultItems[i]);
+			//NOTE FUCC, THIS IS MAY NOT BE STABLE IN FUTURE
+			PollOptionsString = CommandHelpers.PollOptionsStringBuilder(_pollManager.PollStats());
 			return $"/me {builder}";
 		}
 
@@ -169,7 +173,12 @@ namespace EvilBot.Processors
 					return
 						$"/me {e.Command.ChatMessage.DisplayName} a votat pentru {_pollManager.PollItems[votedNumber - 1]}";
 				case Enums.PollAddVoteFinishState.OptionOutOfRange:
-					return StandardMessages.PollVoteText;
+					if (PollOptionsString == null)
+					{
+						Log.Error("PollOptionsString shouldn't be null when vote is out of range... returning null!");
+						return null;
+					}
+					return $"Foloseste !pollvote {PollOptionsString}";
 				default:
 					return null;
 			}
@@ -192,7 +201,7 @@ namespace EvilBot.Processors
 			var resultItem = _pollManager.PollEnd();
 			if (resultItem == null)
 				return StandardMessages.PollNotActiveText;
-
+			PollOptionsString = null;
 			var message = $"A Castigat || {resultItem.Item} || cu {resultItem.ItemPoints} puncte";
 			return $"/me {message}";
 		}

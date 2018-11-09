@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using EvilBot.DataStructures.Interfaces;
 
 namespace EvilBot.Utilities
 {
@@ -31,6 +33,19 @@ namespace EvilBot.Utilities
 			for (var i = 0; i < options.Count; i++) options[i] = options[i].Trim();
 			options.RemoveAll(string.IsNullOrEmpty);
 			return options;
+		}
+
+		public static string PollOptionsStringBuilder(List<IPollItem> pollItems)
+		{
+			var builder = new StringBuilder();
+			builder.Append("<1");
+			for (int i = 2; i <= pollItems.Count; i++)
+			{
+				builder.AppendFormat(",{0}", i);
+			}
+
+			builder.Append(">");
+			return builder.ToString();
 		}
 	}
 }

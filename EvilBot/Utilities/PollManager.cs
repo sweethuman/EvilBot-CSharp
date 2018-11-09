@@ -26,9 +26,7 @@ namespace EvilBot.Utilities
 		public List<double> PollVotes { get; private set; }
 
 		public bool PollActive { get; private set; }
-
-		/*NOTE this is probably bad design because it directly returns strings and can have multpiple points of failure
-		 and the return type and data is not consistent for this or the way data is processed, it just seems awful*/
+		
 		public List<string> PollCreate(List<string> optionsList)
 		{
 			if (optionsList == null || optionsList.Count < 2 || optionsList.Exists(string.IsNullOrEmpty)) return null;
