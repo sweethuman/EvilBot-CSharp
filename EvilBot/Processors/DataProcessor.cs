@@ -87,6 +87,10 @@ namespace EvilBot.Processors
 			_ranks.Add(new Tuple<string, int>("Emperor", 30000));
 		}
 
+		public List<IRankItem> GetRankList()
+		{
+			return _ranks.Select((t, i) => new RankItem(i, t.Item1, t.Item2)).ToList<IRankItem>();
+		}
 		#region DataProcessor TimedPointManagers
 
 		private int GetRank(int points)

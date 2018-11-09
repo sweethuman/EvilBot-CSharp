@@ -23,6 +23,7 @@ namespace EvilBot.Processors
 		private readonly IPollManager _pollManager;
 		
 		private string PollOptionsString { get; set; }
+		private string RankListString { get; set; }
 
 		public CommandProcessor(IDataProcessor dataProcessor, IDataAccess dataAccess, IPollManager pollManager,
 			IFilterManager filterManager, IApiRetriever apiRetriever)
@@ -32,8 +33,18 @@ namespace EvilBot.Processors
 			_pollManager = pollManager;
 			_filterManager = filterManager;
 			_apiRetriever = apiRetriever;
+			BuildRankListString();
 		}
 
+		private void BuildRankListString()
+		{
+			var rankList = _dataProcessor.GetRankList();
+			var builder = new StringBuilder();
+			for (int i = 1; i < rankList.Count; i++)
+				builder.AppendFormat("{0}.{1}:{2} ", rankList[i].Id, rankList[i].Name, rankList[i].RequiredPoints);
+			RankListString = builder.ToString();
+		}
+		
 		public async Task<string> RankCommandAsync(OnChatCommandReceivedArgs e)
 		{
 			if (string.IsNullOrEmpty(e.Command.ArgumentsAsString))
@@ -134,6 +145,10 @@ namespace EvilBot.Processors
 			}
 		}
 
+		public string RanksListCommand(OnChatCommandReceivedArgs e)
+		{
+			return $"/me {RankListString}";
+		}
 		#region PollCommands
 
 		public string PollCreateCommand(OnChatCommandReceivedArgs e)
@@ -178,7 +193,7 @@ namespace EvilBot.Processors
 						Log.Error("PollOptionsString shouldn't be null when vote is out of range... returning null!");
 						return null;
 					}
-					return $"Foloseste !pollvote {PollOptionsString}";
+					return $"/me Foloseste !pollvote {PollOptionsString}";
 				default:
 					return null;
 			}
