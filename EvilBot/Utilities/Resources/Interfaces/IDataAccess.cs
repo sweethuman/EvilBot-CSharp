@@ -53,5 +53,7 @@ namespace EvilBot.Utilities.Resources.Interfaces
 	    /// <remarks>In case of FilteredUsers only Id and UserId is populated.</remarks>
 	    /// <returns>Returns a container with all the resources it could get. Not guaranteed it will populate all.</returns>
 	    Task<List<IDatabaseUser>> RetrieveAllUsersFromTable(Enums.DatabaseTables table);
+
+	    Task<List<IDatabaseUser>> RetrieveNumberOfUsersFromTable(Enums.DatabaseTables table, int limit);
 	}
 }

@@ -111,6 +111,20 @@ namespace EvilBot.Utilities.Resources
 			return null;
 		}
 
+		public async Task<List<IDatabaseUser>> RetrieveNumberOfUsersFromTable(Enums.DatabaseTables table, int limit)
+		{
+			if (RetrieveConnection.State != ConnectionState.Open) RetrieveConnection.Open();
+			var retrievingTable = table.ToString();
+			Log.Debug("Retrieving all users from table {table}", retrievingTable);
+			var output =
+				//BUG this will not work for filtered users because of "ORDER BY Points", filtered users table does not have that column
+				(await RetrieveConnection.QueryAsync<DatabaseUser>($"SELECT * FROM {retrievingTable} ORDER BY Points DESC LIMIT {limit}",
+					new DynamicParameters())).ToList();
+			var results = output.ToList<IDatabaseUser>();
+			if (output.Any()) return results;
+			Log.Warning("{table} table is empty!", retrievingTable);
+			return null;
+		}
 		public void Close()
 		{
 			Log.Debug("Closing database connections!");
