@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using EvilBot.DataStructures;
@@ -149,6 +150,25 @@ namespace EvilBot.Processors
 		{
 			return $"/me {RankListString}";
 		}
+
+		public async Task<string> TopCommand(OnChatCommandReceivedArgs e)
+		{
+			var result = await _dataAccess.RetrieveNumberOfUsersFromTable(Enums.DatabaseTables.UserPoints, 5);
+			var getUserListTasks = result.Select(t => _apiRetriever.GetUserAsyncById(t.UserId)).ToList();
+			var retrievedUserList = await Task.WhenAll(getUserListTasks);
+			/*var topUsers = result.Select((t, i) =>
+				new UserData(retrievedUserList[i].DisplayName, i, t.UserId, t.Points, t.Minutes, t.Rank));*/
+			var builder = new StringBuilder();
+			builder.Append("Top: ");
+			for (var i = 0; i < result.Count; i++)
+			{
+				builder.AppendFormat("{0}.{1}(Lvl. {2}):{3} ", i+1, retrievedUserList[i].DisplayName,
+					result[i].Rank, result[i].Points);
+			}
+
+			return $"/me {builder}";
+		}
+		
 		#region PollCommands
 
 		public string PollCreateCommand(OnChatCommandReceivedArgs e)
