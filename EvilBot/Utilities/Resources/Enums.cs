@@ -2,11 +2,12 @@
 {
 	public static class Enums
 	{
-		public enum DatabaseRow
+		public enum DatabaseUserPointsOrderRow
 		{
 			Points,
 			Minutes,
-			Rank
+			Rank,
+			None
 		}
 
 		public enum DatabaseTables
