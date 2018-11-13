@@ -6,13 +6,11 @@ using System.Timers;
 using EvilBot.DataStructures;
 using EvilBot.DataStructures.Interfaces;
 using EvilBot.Processors.Interfaces;
-using EvilBot.TwitchBot.Interfaces;
 using EvilBot.Utilities;
 using EvilBot.Utilities.Interfaces;
 using EvilBot.Utilities.Resources;
 using EvilBot.Utilities.Resources.Interfaces;
 using Serilog;
-using TwitchLib.Api.V5.Models.Users;
 
 namespace EvilBot.Processors
 {
@@ -23,13 +21,11 @@ namespace EvilBot.Processors
 		private readonly IDataAccess _dataAccess;
 		private readonly IFilterManager _filterManager;
 		private readonly List<Tuple<string, int>> _ranks = new List<Tuple<string, int>>();
-		private readonly ITwitchConnections _twitchConnections;
 
-		public DataProcessor(IDataAccess dataAccess, ITwitchConnections twitchConnections, IConfiguration configuration,
+		public DataProcessor(IDataAccess dataAccess, IConfiguration configuration,
 			IFilterManager filterManager, IApiRetriever apiRetriever)
 		{
 			_dataAccess = dataAccess;
-			_twitchConnections = twitchConnections;
 			_configuration = configuration;
 			_apiRetriever = apiRetriever;
 			_filterManager = filterManager;

@@ -190,6 +190,7 @@ namespace EvilBot.Processors
 				}
 
 				var databaseUsers = (await Task.WhenAll(getDatabaseUsersTasks).ConfigureAwait(false)).ToList();
+				databaseUsers.RemoveAll(x => x == null);
 				var query =
 					from databaseUser in databaseUsers
 					join user in userList on databaseUser.UserId equals user.Id
