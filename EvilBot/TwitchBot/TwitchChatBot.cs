@@ -136,8 +136,9 @@ namespace EvilBot.TwitchBot
 				case "giveaway":
 					Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName,
 						e.Command.ChatMessage.Message);
-					_twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel,
-						await _commandProcessor.GiveawayCommand(e));
+					if (e.Command.ChatMessage.UserType >= UserType.Moderator)
+						_twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel,
+							await _commandProcessor.GiveawayCommand(e));
 					break;
 			}
 		}

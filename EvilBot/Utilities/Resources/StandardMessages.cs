@@ -13,7 +13,7 @@
 		public static string PollNotActiveText { get; } = "/me Nu exista poll activ!";
 
 		public static string ComenziText { get; } =
-			"/me !rank !ranklist !manage(mod) !pollcreate(mod) !pollvote !pollstats !pollend(mod) !filter(mod)";
+			"/me !rank !ranklist !manage(mod) !pollcreate(mod) !pollvote !pollstats !pollend(mod) !filter(mod) !top !giveaway(mod)";
 
 		public static string FilterText { get; } = "/me !filter get/add/remove <username>";
 		public static string UserMissingText { get; } = "/me Acest User nu exista!";

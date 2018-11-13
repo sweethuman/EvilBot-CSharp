@@ -155,8 +155,9 @@ namespace EvilBot.Processors
 		public async Task<string> TopCommand(OnChatCommandReceivedArgs e)
 		{
 			var result = await _dataAccess.RetrieveNumberOfUsersFromTable(Enums.DatabaseTables.UserPoints, 5, Enums.DatabaseUserPointsOrderRow.Points);
+			if (result == null) return "/me Baza de date este goala!";
 			var getUserListTasks = result.Select(t => _apiRetriever.GetUserAsyncById(t.UserId)).ToList();
-			var retrievedUserList = await Task.WhenAll(getUserListTasks);
+			var retrievedUserList = (await Task.WhenAll(getUserListTasks)).ToList();
 			/*var topUsers = result.Select((t, i) =>
 				new UserStructureData(retrievedUserList[i].DisplayName, i, t.UserId, t.Points, t.Minutes, t.Rank));*/
 			var builder = new StringBuilder();
