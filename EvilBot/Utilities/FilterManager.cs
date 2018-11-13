@@ -32,8 +32,7 @@ namespace EvilBot.Utilities
 			var users = await _dataAccess.RetrieveAllUsersFromTable(Enums.DatabaseTables.FilteredUsers);
 			if (users == null) return;
 			users.RemoveAll(x => x == null);
-			var userListTasks = new List<Task<User>>();
-			for (var i = 0; i < users.Count; i++) userListTasks.Add(_apiRetriever.GetUserAsyncById(users[i].UserId));
+			var userListTasks = users.Select(t => _apiRetriever.GetUserAsyncById(t.UserId)).ToList();
 
 			var userList = (await Task.WhenAll(userListTasks)).ToList();
 			userList.RemoveAll(x => x == null);
@@ -77,7 +76,7 @@ namespace EvilBot.Utilities
 
 			return builder.ToString();
 		}
-
+		//NOTE maybe i should only be working with userId's
 		public bool CheckIfUserFiltered(IUserBase user)
 		{
 			var stateOfCheck = FilteredUsers.Any(x => x.UserId == user.UserId);

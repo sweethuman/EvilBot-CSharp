@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using EvilBot.DataStructures;
+using EvilBot.DataStructures.Database.Interfaces;
 using EvilBot.Processors.Interfaces;
 using EvilBot.Utilities;
 using EvilBot.Utilities.Interfaces;
@@ -157,7 +158,7 @@ namespace EvilBot.Processors
 			var getUserListTasks = result.Select(t => _apiRetriever.GetUserAsyncById(t.UserId)).ToList();
 			var retrievedUserList = await Task.WhenAll(getUserListTasks);
 			/*var topUsers = result.Select((t, i) =>
-				new UserData(retrievedUserList[i].DisplayName, i, t.UserId, t.Points, t.Minutes, t.Rank));*/
+				new UserStructureData(retrievedUserList[i].DisplayName, i, t.UserId, t.Points, t.Minutes, t.Rank));*/
 			var builder = new StringBuilder();
 			builder.Append("Top: ");
 			for (var i = 0; i < result.Count; i++)
@@ -167,6 +168,47 @@ namespace EvilBot.Processors
 			}
 
 			return $"/me {builder}";
+		}
+
+		public async Task<string> GiveawayCommand(OnChatCommandReceivedArgs e)
+		{
+			Log.Information("Giveaway started!");
+			try
+			{
+				var userList = await _apiRetriever.GetChatterUsers(TwitchInfo.ChannelName);
+				userList.RemoveAll(x => x.Name == TwitchInfo.ChannelName.ToLower());
+				var getDatabaseUsersTasks = new List<Task<IDatabaseUser>>();
+				for (var i = 0; i < userList.Count; i++)
+				{
+					if (!_filterManager.CheckIfUserFiltered(new UserBase(userList[i].DisplayName, userList[i].Id)))
+					{
+						getDatabaseUsersTasks.Add(_dataAccess.RetrieveUserFromTable(Enums.DatabaseTables.UserPoints, userList[i].Id));
+						continue;
+					}
+					userList.RemoveAll(x => x.Id == userList[i].Id);
+					i--;
+				}
+
+				var databaseUsers = (await Task.WhenAll(getDatabaseUsersTasks).ConfigureAwait(false)).ToList();
+				var query =
+					from databaseUser in databaseUsers
+					join user in userList on databaseUser.UserId equals user.Id
+					where int.Parse(databaseUser.Rank) >= 2
+					select new UserStructureData(user.DisplayName, databaseUser.Id, user.Id, databaseUser.Points,
+						databaseUser.Minutes, databaseUser.Rank);
+				var sourceAccounts = query.ToList();
+				if (sourceAccounts.Count < 1)
+					return "/me Nu exista oameni eligibili pentru giveaway";
+				var randomNumber = new Random()
+					.Next(0, sourceAccounts.Count);
+				Log.Information("Giveaway ran with success!");
+				return $"/me {sourceAccounts[randomNumber].DisplayName} a castigat {e.Command.ArgumentsAsString}!";
+			}
+			catch (Exception exception)
+			{
+				Log.Error(exception, "GiveawayCommand failed!");
+				return "/me SORRY, GIVEAWAY FAILED, PLEASE TRY AGAIN LATER, also send logs, thx";
+			}
 		}
 		
 		#region PollCommands
@@ -208,12 +250,9 @@ namespace EvilBot.Processors
 					return
 						$"/me {e.Command.ChatMessage.DisplayName} a votat pentru {_pollManager.PollItems[votedNumber - 1]}";
 				case Enums.PollAddVoteFinishState.OptionOutOfRange:
-					if (PollOptionsString == null)
-					{
-						Log.Error("PollOptionsString shouldn't be null when vote is out of range... returning null!");
-						return null;
-					}
-					return $"/me Foloseste !pollvote {PollOptionsString}";
+					if (PollOptionsString != null) return $"/me Foloseste !pollvote {PollOptionsString}";
+					Log.Error("PollOptionsString shouldn't be null when vote is out of range... returning null!");
+					return null;
 				default:
 					return null;
 			}

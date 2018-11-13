@@ -133,6 +133,12 @@ namespace EvilBot.TwitchBot
 					_twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel,
 						await _commandProcessor.TopCommand(e));
 					break;
+				case "giveaway":
+					Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName,
+						e.Command.ChatMessage.Message);
+					_twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel,
+						await _commandProcessor.GiveawayCommand(e));
+					break;
 			}
 		}
 

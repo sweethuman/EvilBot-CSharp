@@ -290,12 +290,12 @@
     <Compile Include="DataStructures\Database\Interfaces\IDatabaseUser.cs" />
     <Compile Include="DataStructures\Interfaces\IPollItem.cs" />
     <Compile Include="DataStructures\Interfaces\IRankItem.cs" />
-    <Compile Include="DataStructures\Interfaces\IUser.cs" />
+    <Compile Include="DataStructures\Interfaces\IUserStructure.cs" />
     <Compile Include="DataStructures\Interfaces\IUserBase.cs" />
     <Compile Include="DataStructures\PollItem.cs" />
     <Compile Include="DataStructures\RankItem.cs" />
     <Compile Include="DataStructures\UserBase.cs" />
-    <Compile Include="DataStructures\UserData.cs" />
+    <Compile Include="DataStructures\UserStructureData.cs" />
     <Compile Include="Processors\CommandProcessors.cs" />
     <Compile Include="Processors\Interfaces\ICommandProcessors.cs" />
     <Compile Include="TwitchBot\TwitchConnections.cs" />

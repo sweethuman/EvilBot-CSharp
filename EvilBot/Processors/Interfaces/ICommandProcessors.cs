@@ -20,5 +20,6 @@ namespace EvilBot.Processors.Interfaces
 		Task<string> FilterCommand(OnChatCommandReceivedArgs e);
 		string RanksListCommand(OnChatCommandReceivedArgs e);
 		Task<string> TopCommand(OnChatCommandReceivedArgs e);
+		Task<string> GiveawayCommand(OnChatCommandReceivedArgs e);
 	}
 }
