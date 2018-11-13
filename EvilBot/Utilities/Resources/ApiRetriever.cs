@@ -7,6 +7,7 @@ using EvilBot.DataStructures.Interfaces;
 using EvilBot.TwitchBot.Interfaces;
 using EvilBot.Utilities.Resources.Interfaces;
 using Serilog;
+using TwitchLib.Api.Core.Interfaces;
 using TwitchLib.Api.V5.Models.Users;
 
 namespace EvilBot.Utilities.Resources
@@ -94,6 +95,24 @@ namespace EvilBot.Utilities.Resources
 				.Subscriptions.ToList();
 
 			return subscribers.Select(t => new UserBase(t.User.DisplayName, t.User.Id)).ToList<IUserBase>();
+		}
+
+		public async Task<List<IUser>> GetChatterUsers(string channelName)
+		{
+			try
+			{
+				var chatusers = await _twitchConnections.Api.Undocumented.GetChattersAsync(TwitchInfo.ChannelName)
+					.ConfigureAwait(false);
+				var getUserTasks = chatusers.Select(t => GetUserAsyncByUsername(t.Username)).ToList();
+				var userList = (await Task.WhenAll(getUserTasks).ConfigureAwait(false)).ToList();
+				userList.RemoveAll(x => x == null);
+				return userList.ToList<IUser>();
+			}
+			catch (Exception e)
+			{
+				Log.Error(e,"GetChatterUsers Failed, channel: {channel}", channelName);
+				throw;
+			}
 		}
 	}
 }

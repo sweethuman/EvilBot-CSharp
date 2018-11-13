@@ -111,16 +111,8 @@ namespace EvilBot.Processors
 			//in case twitch says something went wrong, it throws exception, catch that exception
 			try
 			{
-				var userList = new List<IUserBase>();
-				var chatusers = await _twitchConnections.Api.Undocumented.GetChattersAsync(TwitchInfo.ChannelName)
-					.ConfigureAwait(false);
-				var userIdTasks = new List<Task<User>>();
-				for (var i = 0; i < chatusers.Count; i++)
-					userIdTasks.Add(_apiRetriever.GetUserAsyncByUsername(chatusers[i].Username));
-				var userIdList = (await Task.WhenAll(userIdTasks).ConfigureAwait(false)).ToList();
-				userIdList.RemoveAll(x => x == null);
-				for (var i = 0; i < userIdList.Count; i++)
-					userList.Add(new UserBase(userIdList[i].DisplayName, userIdList[i].Id));
+				var userIdList = await _apiRetriever.GetChatterUsers(TwitchInfo.ChannelName);
+				var userList = userIdList.Select(t => new UserBase(t.DisplayName, t.Id)).ToList<IUserBase>();
 				await AddToUserAsync(userList, minutes: 10).ConfigureAwait(false);
 				Log.Debug("Database updated! Lurkers present: {Lurkers}", userList.Count);
 			}
@@ -145,20 +137,13 @@ namespace EvilBot.Processors
 			}
 		}
 
-	    /// <summary>
-	    ///     Adds Points to the Users asynchronously.
-	    /// </summary>
-	    /// <param name="userList">The users to add too the defined values.</param>
-	    /// <param name="points">The points to add.</param>
-	    /// <param name="minutes">The minutes to add.</param>
-	    /// <param name="subCheck">If set to <c>true</c> it will check if users are subscribers.</param>
-	    /// <returns>Just a task.</returns>
-	    //TODO unit test on nulls
-		public async Task AddToUserAsync(List<IUserBase> userList, int points = 1, int minutes = 0,
-			bool subCheck = true)
+	    /// <inheritdoc />
+		public async Task AddToUserAsync
+			(List<IUserBase> userList, int points = 1, int minutes = 0, bool subCheck = true)
 		{
 			if (userList.Count != 0)
 			{
+				//NOTE maybe this should be put in a function and moved upwards because it doesn't really fit the scope of this method
 				for (var i = 0; i < userList.Count; i++)
 				{
 					if (!_filterManager.CheckIfUserFiltered(userList[i])) continue;
