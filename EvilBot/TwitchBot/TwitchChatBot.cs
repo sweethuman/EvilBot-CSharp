@@ -70,6 +70,7 @@ namespace EvilBot.TwitchBot
 					_twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel,
 						await _commandProcessor.RankCommandAsync(e).ConfigureAwait(false));
 					break;
+				case "ranks":
 				case "ranklist":
 					Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName,
 						e.Command.ChatMessage.Message);

@@ -162,7 +162,7 @@ namespace EvilBot.Processors
 			builder.Append("Top: ");
 			for (var i = 0; i < result.Count; i++)
 			{
-				builder.AppendFormat("{0}.{1}(Lvl. {2}):{3} ", i+1, retrievedUserList[i].DisplayName,
+				builder.AppendFormat("{0}.{1}(Lvl. {2}):{3}p ", i+1, retrievedUserList[i].DisplayName,
 					result[i].Rank, result[i].Points);
 			}
 
