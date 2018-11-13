@@ -2,9 +2,9 @@ using EvilBot.DataStructures.Interfaces;
 
 namespace EvilBot.DataStructures
 {
-    public class UserData : IUserBase, IUser
+    public class UserStructureData : IUserBase, IUserStructure
     {
-        public UserData(string displayName, int id, string userId, string points, string minutes, string rank)
+        public UserStructureData(string displayName, int id, string userId, string points, string minutes, string rank)
         {
             DisplayName = displayName;
             Id = id;
