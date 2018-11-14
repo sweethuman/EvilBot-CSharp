@@ -154,15 +154,15 @@ namespace EvilBot.Processors
 
 		public async Task<string> TopCommand(OnChatCommandReceivedArgs e)
 		{
-			var result = await _dataAccess.RetrieveNumberOfUsersFromTable(Enums.DatabaseTables.UserPoints, 5, Enums.DatabaseUserPointsOrderRow.Points);
+			var result = await _dataAccess.RetrieveNumberOfUsersFromTable(Enums.DatabaseTables.UserPoints, 6, Enums.DatabaseUserPointsOrderRow.Points);
 			if (result == null) return "/me Baza de date este goala!";
+			result.RemoveAll(x => x.UserId == _apiRetriever.TwitchChannelId);
+			if (result.Count < 1) return "/me Nu am ce afisa!";
 			var getUserListTasks = result.Select(t => _apiRetriever.GetUserAsyncById(t.UserId)).ToList();
 			var retrievedUserList = (await Task.WhenAll(getUserListTasks)).ToList();
-			/*var topUsers = result.Select((t, i) =>
-				new UserStructureData(retrievedUserList[i].DisplayName, i, t.UserId, t.Points, t.Minutes, t.Rank));*/
 			var builder = new StringBuilder();
 			builder.Append("Top: ");
-			for (var i = 0; i < result.Count; i++)
+			for (var i = 0; i < retrievedUserList.Count && i < 5; i++)
 			{
 				builder.AppendFormat("{0}.{1}(Lvl. {2}):{3}p ", i+1, retrievedUserList[i].DisplayName,
 					result[i].Rank, result[i].Points);
