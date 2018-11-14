@@ -15,10 +15,12 @@ namespace EvilBot.Utilities.Resources
 	public class ApiRetriever : IApiRetriever
 	{
 		private readonly ITwitchConnections _twitchConnections;
+		public string TwitchChannelId { get; }
 
 		public ApiRetriever(ITwitchConnections twitchConnections)
 		{
 			_twitchConnections = twitchConnections;
+			TwitchChannelId = GetUserIdAsync(TwitchInfo.ChannelName).Result;
 		}
 
 		public async Task<TimeSpan?> GetUptimeAsync()

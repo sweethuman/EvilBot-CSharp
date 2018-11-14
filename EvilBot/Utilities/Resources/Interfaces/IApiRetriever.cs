@@ -15,5 +15,6 @@ namespace EvilBot.Utilities.Resources.Interfaces
 		Task<string> GetUserIdAsync(string username);
 		Task<List<IUserBase>> GetChannelSubscribers(string channelId);
 		Task<List<IUser>> GetChatterUsers(string channelName);
+		string TwitchChannelId { get; }
 	}
 }

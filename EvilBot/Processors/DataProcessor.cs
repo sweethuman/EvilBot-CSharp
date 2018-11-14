@@ -154,9 +154,7 @@ namespace EvilBot.Processors
 				{
 					if (subCheck)
 					{
-						var channelId = await _apiRetriever.GetUserIdAsync(TwitchInfo.ChannelName)
-							.ConfigureAwait(false);
-						channelSubscribers = await _apiRetriever.GetChannelSubscribers(channelId).ConfigureAwait(false);
+						channelSubscribers = await _apiRetriever.GetChannelSubscribers(_apiRetriever.TwitchChannelId).ConfigureAwait(false);
 					}
 					else
 					{
