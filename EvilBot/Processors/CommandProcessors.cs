@@ -122,7 +122,14 @@ namespace EvilBot.Processors
 		public async Task<string> FilterCommand(OnChatCommandReceivedArgs e)
 		{
 			if (e.Command.ArgumentsAsList.Count >= 1 && e.Command.ArgumentsAsList[0] == "get")
-				return _filterManager.RetrieveFilteredUsers();
+			{
+				var filteredUsers = _filterManager.RetrieveFilteredUsers();
+				if (filteredUsers.Count <= 0) return "/me Nici un User filtrat!";
+				var builder = new StringBuilder();
+				builder.Append("Useri filtrati:");
+				for (var i = 0; i < filteredUsers.Count; i++) builder.Append($" {filteredUsers[i].DisplayName},");
+				return $"/me {builder}";
+			}
 			if (e.Command.ArgumentsAsList.Count < 2) return StandardMessages.FilterText;
 			switch (e.Command.ArgumentsAsList[0])
 			{

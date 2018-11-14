@@ -66,15 +66,10 @@ namespace EvilBot.Utilities
 			return await _dataAccess.ModifyFilteredUsers(Enums.FilteredUsersDatabaseAction.Remove, user.UserId);
 		}
 
-		public string RetrieveFilteredUsers()
+		public List<IUserBase> RetrieveFilteredUsers()
 		{
 			Log.Debug("Retrieving FilteredUsers");
-			if (FilteredUsers.Count <= 0) return "/me Nici un User filtrat!";
-			var builder = new StringBuilder();
-			builder.Append("/me Useri filtrati:");
-			for (var i = 0; i < FilteredUsers.Count; i++) builder.Append($" {FilteredUsers[i].DisplayName},");
-
-			return builder.ToString();
+			return FilteredUsers;
 		}
 		//NOTE maybe i should only be working with userId's
 		public bool CheckIfUserFiltered(IUserBase user)
