@@ -25,6 +25,7 @@ namespace EvilBot.Utilities
 		//TODO add somewhere code that if FilteredUsers table does not exist to be created
 		private List<IUserBase> FilteredUsers { get; } = new List<IUserBase>();
 
+		//NOTE this is async but returns void
 		public async void InitializeFilter()
 		{
 			Log.Debug("Initializing filter!");

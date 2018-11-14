@@ -21,6 +21,7 @@ namespace EvilBot.TwitchBot
 		public TwitchConnections(ILoggerManager loggerManager)
 		{
 			_loggerManager = loggerManager;
+			Connect();
 		}
 
 		public TwitchClient Client { get; private set; }

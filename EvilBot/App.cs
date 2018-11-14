@@ -19,8 +19,6 @@ namespace EvilBot
 		{
 			AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 			SetConsoleMode();
-			_twitchConnection.Connect();
-			_twitchChatBot.Connect();
 			var stop = false;
 			do
 			{

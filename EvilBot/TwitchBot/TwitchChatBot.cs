@@ -43,6 +43,7 @@ namespace EvilBot.TwitchBot
 			_filterManager = filterManager;
 			_dataAccess = dataAccess;
 			_configuration = configuration;
+			Connect();
 		}
 
 		~TwitchChatBot()
