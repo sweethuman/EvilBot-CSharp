@@ -138,8 +138,13 @@ namespace EvilBot.TwitchBot
 					Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName,
 						e.Command.ChatMessage.Message);
 					if (e.Command.ChatMessage.UserType >= UserType.Moderator)
-						_twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel,
-							await _commandProcessor.GiveawayCommand(e));
+					{
+						var giveaway = await _commandProcessor.GiveawayCommand(e);
+						Log.Debug(giveaway.usersAnnouncement);
+						Log.Debug(giveaway.winnerAnnouncement);
+						_twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel,giveaway.usersAnnouncement);
+						_twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel,giveaway.winnerAnnouncement);
+					}
 					break;
 			}
 		}
@@ -166,6 +171,7 @@ namespace EvilBot.TwitchBot
 
 		private void TimedMessageInitializer()
 		{
+			_timedMessages.Add("Pentru a migra punctele te rog da !myrank si tag la un moderator");
 			_timedMessages.Add("Incearca !rank si vezi cat de activ ai fost");
 			_timedMessages.Add("Fii activ ca sa castigi XP");
 			_timedMessages.Add("Pentru a migra punctele te rog da !myrank si tag la un moderator");

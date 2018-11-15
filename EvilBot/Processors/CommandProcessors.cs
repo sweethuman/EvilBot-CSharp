@@ -178,7 +178,7 @@ namespace EvilBot.Processors
 			return $"/me {builder}";
 		}
 
-		public async Task<string> GiveawayCommand(OnChatCommandReceivedArgs e)
+		public async Task<(string usersAnnouncement, string winnerAnnouncement)> GiveawayCommand(OnChatCommandReceivedArgs e)
 		{
 			Log.Information("Giveaway started!");
 			try
@@ -206,17 +206,27 @@ namespace EvilBot.Processors
 					select new UserStructureData(user.DisplayName, databaseUser.Id, user.Id, databaseUser.Points,
 						databaseUser.Minutes, databaseUser.Rank);
 				var sourceAccounts = query.ToList();
+				
 				if (sourceAccounts.Count < 1)
-					return "/me Nu exista oameni eligibili pentru giveaway";
+					return (null,"/me Nu exista oameni eligibili pentru giveaway");
+				
 				var randomNumber = new Random()
 					.Next(0, sourceAccounts.Count);
+				var winner =  $"/me {sourceAccounts[randomNumber].DisplayName} a castigat {e.Command.ArgumentsAsString}!";
+				var builder = new StringBuilder();
+				builder.Append("/me Inscrisi: ");
+				for (var i = 0; i < sourceAccounts.Count; i++)
+				{
+					builder.AppendFormat("{0}, ", sourceAccounts[i].DisplayName);
+				}
+				
 				Log.Information("Giveaway ran with success!");
-				return $"/me {sourceAccounts[randomNumber].DisplayName} a castigat {e.Command.ArgumentsAsString}!";
+				return (builder.ToString(), winner);
 			}
 			catch (Exception exception)
 			{
 				Log.Error(exception, "GiveawayCommand failed!");
-				return "/me SORRY, GIVEAWAY FAILED, PLEASE TRY AGAIN LATER, also send logs, thx";
+				return (null,"/me SORRY, GIVEAWAY FAILED, PLEASE TRY AGAIN LATER, also send logs, thx");
 			}
 		}
 		
