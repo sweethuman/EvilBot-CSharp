@@ -64,9 +64,8 @@ namespace EvilBot.Tests
 					.Returns(Task.FromResult(default(object)));
 				mock.Mock<ITwitchConnections>();
 				mock.Mock<IApiRetriever>()
-					//NOTE This does not change when the name changes
-					.Setup(x => x.GetUserIdAsync("EvilStarCommunity"))
-					.ReturnsAsync("11122233");
+					.SetupGet(x => x.TwitchChannelId)
+					.Returns("11122233");
 				mock.Mock<IApiRetriever>()
 					.Setup(x => x.GetChannelSubscribers("11122233"))
 					.ReturnsAsync(GetSampleUserSubscribers());
