@@ -99,7 +99,7 @@ namespace EvilBot.Utilities.Resources
 			return subscribers.Select(t => new UserBase(t.User.DisplayName, t.User.Id)).ToList<IUserBase>();
 		}
 
-		public async Task<List<IUser>> GetChatterUsers(string channelName)
+		public async Task<List<IUser>> GetChattersUsers(string channelName)
 		{
 			try
 			{
@@ -112,7 +112,7 @@ namespace EvilBot.Utilities.Resources
 			}
 			catch (Exception e)
 			{
-				Log.Error(e,"GetChatterUsers Failed, channel: {channel}", channelName);
+				Log.Error(e,"GetChattersUsers Failed, channel: {channel}", channelName);
 				throw;
 			}
 		}

@@ -21,6 +21,6 @@ namespace EvilBot.Utilities.Resources.Interfaces
 		
 		Task<List<IUserBase>> GetChannelSubscribers(string channelId);
 		
-		Task<List<IUser>> GetChatterUsers(string channelName);
+		Task<List<IUser>> GetChattersUsers(string channelName);
 	}
 }

@@ -184,8 +184,8 @@ namespace EvilBot.Processors
 			Log.Information("Giveaway started!");
 			try
 			{
-				var userList = await _apiRetriever.GetChatterUsers(TwitchInfo.ChannelName);
-				userList.RemoveAll(x => x.Name == TwitchInfo.ChannelName.ToLower());
+				var userList = await _apiRetriever.GetChattersUsers(TwitchInfo.ChannelName);
+				userList.RemoveAll(x => string.Equals(x.Name, TwitchInfo.ChannelName, StringComparison.CurrentCultureIgnoreCase));
 				var getDatabaseUsersTasks = new List<Task<IDatabaseUser>>();
 				for (var i = 0; i < userList.Count; i++)
 				{

@@ -107,7 +107,7 @@ namespace EvilBot.Processors
 			//in case twitch says something went wrong, it throws exception, catch that exception
 			try
 			{
-				var userIdList = await _apiRetriever.GetChatterUsers(TwitchInfo.ChannelName);
+				var userIdList = await _apiRetriever.GetChattersUsers(TwitchInfo.ChannelName);
 				var userList = userIdList.Select(t => new UserBase(t.DisplayName, t.Id)).ToList<IUserBase>();
 				await AddToUserAsync(userList, minutes: 10).ConfigureAwait(false);
 				Log.Debug("Database updated! Lurkers present: {Lurkers}", userList.Count);
