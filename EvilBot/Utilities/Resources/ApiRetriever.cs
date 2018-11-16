@@ -20,14 +20,11 @@ namespace EvilBot.Utilities.Resources
 		public ApiRetriever(ITwitchConnections twitchConnections)
 		{
 			_twitchConnections = twitchConnections;
-			TwitchChannelId = GetUserIdAsync(TwitchInfo.ChannelName).Result;
-		}
-
-		public async Task<TimeSpan?> GetUptimeAsync()
-		{
-			var userId = await GetUserIdAsync(TwitchInfo.ChannelName).ConfigureAwait(false);
-			if (userId == null) return null;
-			return _twitchConnections.Api.V5.Streams.GetUptimeAsync(userId).Result;
+			var twitchChannelId = GetUserIdAsync(TwitchInfo.ChannelName).Result;
+			if (twitchChannelId == null)
+				throw new Exception(
+					"TwitchChannelId is null. Check if channel name is correct or connexions are made correctly");
+			TwitchChannelId = twitchChannelId;
 		}
 
 		public async Task<User> GetUserAsyncByUsername(string username)

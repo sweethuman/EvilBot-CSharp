@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using EvilBot.DataStructures.Interfaces;
@@ -10,9 +9,7 @@ namespace EvilBot.Utilities.Resources.Interfaces
 	public interface IApiRetriever
 	{
 		string TwitchChannelId { get; }
-		
-		Task<TimeSpan?> GetUptimeAsync();
-		
+
 		Task<User> GetUserAsyncByUsername(string username);
 		
 		Task<User> GetUserAsyncById(string userId);
