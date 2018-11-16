@@ -54,7 +54,6 @@ namespace EvilBot.Utilities.Resources
 		}
 
 		//TODO add table selector if it is the case
-
 		public async Task<bool> ModifyFilteredUsers(Enums.FilteredUsersDatabaseAction databaseAction, string userId)
 		{
 			if (WriteConnection.State != ConnectionState.Open) WriteConnection.Open();
@@ -120,6 +119,8 @@ namespace EvilBot.Utilities.Resources
 			var orderString = "";
 			if (orderRow != Enums.DatabaseUserPointsOrderRow.None)
 				orderString = $"ORDER BY {orderRow.ToString()}";
+			if(table != Enums.DatabaseTables.UserPoints && orderRow != Enums.DatabaseUserPointsOrderRow.None)
+				throw new Exception("Bad parameter. When using other than UserPoints table orderRow needs to be None.");
 			var output =
 				(await RetrieveConnection.QueryAsync<DatabaseUser>($"SELECT * FROM {retrievingTable} {orderString} DESC LIMIT {limit}",
 					new DynamicParameters())).ToList();
