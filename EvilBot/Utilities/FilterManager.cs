@@ -31,10 +31,11 @@ namespace EvilBot.Utilities
 			var users = await _dataAccess.RetrieveAllUsersFromTable(Enums.DatabaseTables.FilteredUsers);
 			if (users == null) return;
 			users.RemoveAll(x => x == null);
+			
 			var userListTasks = users.Select(t => _apiRetriever.GetUserAsyncById(t.UserId)).ToList();
-
 			var userList = (await Task.WhenAll(userListTasks)).ToList();
 			userList.RemoveAll(x => x == null);
+			
 			for (var i = 0; i < userList.Count; i++)
 			{
 				Log.Debug("{user} {userId} adding to the filter", userList[i].DisplayName, userList[i].Id);

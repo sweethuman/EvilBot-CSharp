@@ -74,10 +74,9 @@ namespace EvilBot.Processors
 
 		public async Task<string> ManageCommandAsync(OnChatCommandReceivedArgs e)
 		{
-			string userid;
 			if (string.IsNullOrEmpty(e.Command.ArgumentsAsString)) return StandardMessages.ManageCommandText;
-			if (e.Command.ArgumentsAsList.Count < 2 || (userid = await _apiRetriever
-				    .GetUserIdAsync(e.Command.ArgumentsAsList[0].TrimStart('@')).ConfigureAwait(false)) == null)
+			var userid = await _apiRetriever.GetUserIdAsync(e.Command.ArgumentsAsList[0].TrimStart('@')).ConfigureAwait(false);
+			if (e.Command.ArgumentsAsList.Count < 2 || userid == null)
 				return StandardMessages.ManageCommandText;
 			var pointModifier = 0;
 			var minuteModifier = 0;
@@ -165,9 +164,11 @@ namespace EvilBot.Processors
 			if (result == null) return "/me Baza de date este goala!";
 			result.RemoveAll(x => x.UserId == _apiRetriever.TwitchChannelId);
 			if (result.Count < 1) return "/me Nu am ce afisa!";
+			
 			var getUserListTasks = result.Select(t => _apiRetriever.GetUserAsyncById(t.UserId)).ToList();
 			var retrievedUserList = (await Task.WhenAll(getUserListTasks)).ToList();
 			retrievedUserList.RemoveAll(x => x == null);
+			
 			var builder = new StringBuilder();
 			builder.Append("Top: ");
 			for (var i = 0; i < retrievedUserList.Count && i < 5; i++)
