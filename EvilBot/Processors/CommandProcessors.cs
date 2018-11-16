@@ -167,6 +167,7 @@ namespace EvilBot.Processors
 			if (result.Count < 1) return "/me Nu am ce afisa!";
 			var getUserListTasks = result.Select(t => _apiRetriever.GetUserAsyncById(t.UserId)).ToList();
 			var retrievedUserList = (await Task.WhenAll(getUserListTasks)).ToList();
+			retrievedUserList.RemoveAll(x => x == null);
 			var builder = new StringBuilder();
 			builder.Append("Top: ");
 			for (var i = 0; i < retrievedUserList.Count && i < 5; i++)
