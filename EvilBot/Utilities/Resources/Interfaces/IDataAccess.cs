@@ -54,6 +54,14 @@ namespace EvilBot.Utilities.Resources.Interfaces
 	    /// <returns>Returns a container with all the resources it could get. Not guaranteed it will populate all.</returns>
 	    Task<List<IDatabaseUser>> RetrieveAllUsersFromTable(Enums.DatabaseTables table);
 
+
+	    /// <summary>
+	    /// 	Retrieve a limited amout of users from the database.
+	    /// </summary>
+	    /// <param name="table">Specify the table where to get from.</param>
+	    /// <param name="limit">Number of users to get.</param>
+	    /// <param name="orderRow">Only use this if you are pulling users from UserPoints.</param>
+	    /// <returns>A List of users filled with data. In case of Filtered Users only Id and UserId.</returns>
 	    Task<List<IDatabaseUser>> RetrieveNumberOfUsersFromTable
 		    (Enums.DatabaseTables table, int limit, Enums.DatabaseUserPointsOrderRow orderRow = Enums.DatabaseUserPointsOrderRow.None);
 	}

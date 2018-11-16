@@ -32,6 +32,7 @@ namespace EvilBot.Processors.Interfaces
 		void AddPointsTimer_ElapsedAsync(object sender, ElapsedEventArgs e);
 
 #pragma warning restore RCS1047 // Non-asynchronous method name should not end with 'Async'.
+		
 		List<IRankItem> GetRankList();
 	}
 }
