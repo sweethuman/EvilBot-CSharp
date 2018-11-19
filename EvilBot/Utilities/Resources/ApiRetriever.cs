@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using EvilBot.DataStructures;
 using EvilBot.DataStructures.Interfaces;
@@ -48,6 +49,33 @@ namespace EvilBot.Utilities.Resources
 			return null;
 		}
 
+		public async Task<List<User>> GetUsersAsyncByUsername(List<string> usernames)
+		{
+			if (usernames == null || usernames.Count == 0)
+				return null;
+			usernames = usernames.Select(x => { return x.Trim('@'); }).ToList();
+			
+			var builder = new StringBuilder();
+			for (var i = 0; i < usernames.Count; i++)
+				builder.AppendFormat("{0}, ",usernames[i]);
+			Log.Debug("AskedForUser for {usernames}", builder);
+			
+			List<User> userList;
+			try
+			{
+				userList = (await _twitchConnections.Api.V5.Users.GetUsersByNameAsync(usernames).ConfigureAwait(false))
+					.Matches.ToList();
+				if (userList.Count != 0) return userList;
+				Log.Warning("None of the users existed {usernames}", builder);
+				return null;
+			}
+			catch (Exception e)
+			{
+				Log.Warning(e,"BLEW UP WITH {usernames}", builder);
+				return null;
+			}
+		}
+		
 		public async Task<User> GetUserAsyncById(string userId)
 		{
 			Log.Debug("AskedForID for {Username}", userId);
@@ -87,6 +115,32 @@ namespace EvilBot.Utilities.Resources
 			return null;
 		}
 
+		public async Task<List<TwitchLib.Api.Helix.Models.Users.User>> GetUsersHelixAsync
+		(List<string> ids = null, List<string> logins = null)
+		{
+			if ((ids == null || ids.Count == 0) && (logins == null || logins.Count ==0))
+				return null;
+			var builder = new StringBuilder();
+			if(ids != null)
+				for (var i = 0; i < ids.Count; i++)
+					builder.AppendFormat("{0}, ",ids[i]);
+			if(logins != null)
+				for (var i = 0; i < logins.Count; i++)
+					builder.AppendFormat("{0}, ",logins[i]);
+			Log.Debug("Asked for Users of {identifiers}", builder);
+			try
+			{
+				var usersResponse = await _twitchConnections.Api.Helix.Users.GetUsersAsync(ids, logins);
+				var userList = usersResponse.Users.ToList();
+				return userList.Count == 0 ? null : userList;
+			}
+			catch (Exception e)
+			{
+				Log.Error(e, "GetUsersHelixAsync blew up with {usernames}", builder);
+				return null;
+			}
+		}
+		
 		public async Task<List<IUserBase>> GetChannelSubscribers(string channelId)
 		{
 			var subscribers =
@@ -100,10 +154,11 @@ namespace EvilBot.Utilities.Resources
 		{
 			try
 			{
-				var chatusers = await _twitchConnections.Api.Undocumented.GetChattersAsync(TwitchInfo.ChannelName)
+				var chatusers = await _twitchConnections.Api.Undocumented.GetChattersAsync(channelName)
 					.ConfigureAwait(false);
-				var getUserTasks = chatusers.Select(t => GetUserAsyncByUsername(t.Username)).ToList();
-				var userList = (await Task.WhenAll(getUserTasks).ConfigureAwait(false)).ToList();
+				var usernamesList = chatusers.Select(t => t.Username).ToList();
+				var userList = await GetUsersAsyncByUsername(usernamesList).ConfigureAwait(false);
+				if (userList == null) return null;
 				userList.RemoveAll(x => x == null);
 				return userList.ToList<IUser>();
 			}
