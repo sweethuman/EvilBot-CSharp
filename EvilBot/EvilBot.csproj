@@ -319,6 +319,7 @@
     <Compile Include="Utilities\PointCounter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utilities\PresenceCounter.cs" />
     <Compile Include="Utilities\Resources\ApiRetriever.cs" />
     <Compile Include="Utilities\Resources\Configuration.cs" />
     <Compile Include="Utilities\Resources\Enums.cs" />
