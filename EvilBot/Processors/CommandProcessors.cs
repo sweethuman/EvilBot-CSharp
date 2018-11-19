@@ -160,23 +160,36 @@ namespace EvilBot.Processors
 
 		public async Task<string> TopCommand(OnChatCommandReceivedArgs e)
 		{
-			var result = await _dataAccess.RetrieveNumberOfUsersFromTable(Enums.DatabaseTables.UserPoints, 6, Enums.DatabaseUserPointsOrderRow.Points);
-			if (result == null) return "/me Baza de date este goala!";
-			result.RemoveAll(x => x.UserId == _apiRetriever.TwitchChannelId);
-			if (result.Count < 1) return "/me Nu am ce afisa!";
-			
-			var getUserListTasks = result.Select(t => _apiRetriever.GetUserAsyncById(t.UserId)).ToList();
-			var retrievedUserList = (await Task.WhenAll(getUserListTasks)).ToList();
-			retrievedUserList.RemoveAll(x => x == null);
-			
+			Log.Debug("Top Command Started!");
+			var databaseUsers = await _dataAccess.RetrieveNumberOfUsersFromTable(Enums.DatabaseTables.UserPoints, 6, Enums.DatabaseUserPointsOrderRow.Points);
+			if (databaseUsers == null) return "/me Baza de date este goala!";
+			databaseUsers.RemoveAll(x => x.UserId == _apiRetriever.TwitchChannelId);
+			if (databaseUsers.Count < 1) return "/me Nu am ce afisa!";
+			var userIdList = databaseUsers.Select(t => t.UserId).ToList();
+			var twitchUsers = await _apiRetriever.GetUsersHelixAsync(userIdList);
+			if (twitchUsers == null || twitchUsers.Count == 0)
+			{
+				var builder1 = new StringBuilder();
+				for (var i = 0; i < databaseUsers.Count; i++)
+					builder1.AppendFormat("{0}, ", databaseUsers[i].UserId);
+				Log.Error("No data could be obtained from twitch servers wih {ids}", builder1);
+				return "/me ERROR. NU SE POT OBTINE NICI O DATA A NICI UNUI USER. SEND LOGS.";
+			}
+			var query =
+				from databaseUser in databaseUsers
+				join twitchUser in twitchUsers on databaseUser.UserId equals twitchUser.Id
+				orderby databaseUser.Points
+				select new UserStructureData(twitchUser.DisplayName, databaseUser.Id, twitchUser.Id,
+					databaseUser.Points, databaseUser.Minutes, databaseUser.Rank);
+			var userList = query.ToList();
 			var builder = new StringBuilder();
 			builder.Append("Top: ");
-			for (var i = 0; i < retrievedUserList.Count && i < 5; i++)
+			for (var i = 0; i < userList.Count && i < 5; i++)
 			{
-				builder.AppendFormat("{0}.{1}(Lvl. {2}):{3}p ", i+1, retrievedUserList[i].DisplayName,
-					result[i].Rank, result[i].Points);
+				builder.AppendFormat("{0}.{1}(Lvl. {2}):{3}xp ", i+1, userList[i].DisplayName,
+					userList[i].Rank, userList[i].Points);
 			}
-
+			Log.Debug("Top Command finished successfully!");
 			return $"/me {builder}";
 		}
 

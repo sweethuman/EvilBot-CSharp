@@ -201,6 +201,12 @@ namespace EvilBot.TwitchBot
 			_twitchConnection.Client.OnChatCommandReceived += Client_OnChatCommandReceivedAsync;
 			_twitchConnection.Client.OnMessageReceived += Client_OnMessageReceived;
 			_dataProcessor.RankUpdated += _dataProcessor_RankUpdated;
+			_twitchConnection.Client.OnMessageSent += Client_OnMessageSent;
+		}
+
+		private void Client_OnMessageSent(object sender, OnMessageSentArgs e)
+		{
+			Log.Information("Message sent: {message}", e.SentMessage.Message);
 		}
 
 		#endregion TwitchChatBot Initializers
@@ -229,14 +235,12 @@ namespace EvilBot.TwitchBot
 			if (!e.ChatMessage.Message.StartsWith("!"))
 				PointCounter.AddMessagePoint(new UserBase(e.ChatMessage.DisplayName, e.ChatMessage.UserId));
 
-			if (e.ChatMessage.Bits != 0)
-			{
-				_dataProcessor.AddToUserAsync(
-					new List<IUserBase> {new UserBase(e.ChatMessage.DisplayName, e.ChatMessage.UserId)},
-					e.ChatMessage.Bits * _bitsToPointsMultiplier + 11, subCheck: false);
-				_twitchConnection.Client.SendMessage(e.ChatMessage.Channel,
-					$"/me {e.ChatMessage.DisplayName} a fost recompensat {e.ChatMessage.Bits * _bitsToPointsMultiplier + 11} puncte! Bravo!");
-			}
+			if (e.ChatMessage.Bits == 0) return;
+			_dataProcessor.AddToUserAsync(
+				new List<IUserBase> {new UserBase(e.ChatMessage.DisplayName, e.ChatMessage.UserId)},
+				e.ChatMessage.Bits * _bitsToPointsMultiplier + 11, subCheck: false);
+			_twitchConnection.Client.SendMessage(e.ChatMessage.Channel,
+				$"/me {e.ChatMessage.DisplayName} a fost recompensat {e.ChatMessage.Bits * _bitsToPointsMultiplier + 11} puncte! Bravo!");
 		}
 
 		#endregion TwitchChatBot EventTriggers
