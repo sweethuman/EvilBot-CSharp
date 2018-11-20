@@ -12,6 +12,7 @@ using EvilBot.Utilities.Interfaces;
 using EvilBot.Utilities.Resources;
 using EvilBot.Utilities.Resources.Interfaces;
 using Serilog;
+using TwitchLib.Api.Helix.Models.Users;
 using TwitchLib.Client.Events;
 
 namespace EvilBot.Processors
@@ -166,7 +167,16 @@ namespace EvilBot.Processors
 			databaseUsers.RemoveAll(x => x.UserId == _apiRetriever.TwitchChannelId);
 			if (databaseUsers.Count < 1) return "/me Nu am ce afisa!";
 			var userIdList = databaseUsers.Select(t => t.UserId).ToList();
-			var twitchUsers = await _apiRetriever.GetUsersHelixAsync(userIdList);
+			List<User> twitchUsers;
+			try
+			{
+				twitchUsers = await _apiRetriever.GetUsersHelixAsync(userIdList);
+			}
+			catch (Exception exception)
+			{
+				Log.Error(exception,"TopCommand Failed");
+				return "/me TopCommand a esuat sa obtina userii. Te rog trimite LOGurile.";
+			}
 			if (twitchUsers == null || twitchUsers.Count == 0)
 			{
 				var builder1 = new StringBuilder();
@@ -193,6 +203,7 @@ namespace EvilBot.Processors
 			return $"/me {builder}";
 		}
 
+		//TODO there should be instead more smaller try catches with different outputs
 		public async Task<(string usersAnnouncement, string winnerAnnouncement)> GiveawayCommand(OnChatCommandReceivedArgs e)
 		{
 			Log.Information("Giveaway started!");

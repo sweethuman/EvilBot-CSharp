@@ -5,11 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using EvilBot.DataStructures;
 using EvilBot.DataStructures.Interfaces;
+using EvilBot.Processors;
 using EvilBot.TwitchBot.Interfaces;
 using EvilBot.Utilities.Resources.Interfaces;
 using Serilog;
 using TwitchLib.Api.Core.Interfaces;
-using TwitchLib.Api.V5.Models.Users;
+using TwitchLib.Api.Helix.Models.Users;
+using User = TwitchLib.Api.V5.Models.Users.User;
 
 namespace EvilBot.Utilities.Resources
 {
@@ -60,11 +62,16 @@ namespace EvilBot.Utilities.Resources
 				builder.AppendFormat("{0}, ",usernames[i]);
 			Log.Debug("AskedForUser for {usernames}", builder);
 			
-			List<User> userList;
+			var userList = new List<User>();
 			try
 			{
-				userList = (await _twitchConnections.Api.V5.Users.GetUsersByNameAsync(usernames).ConfigureAwait(false))
-					.Matches.ToList();
+				var getUsersTasks = DataProcessor.SplitList(usernames).Select(split => _twitchConnections.Api.V5.Users.GetUsersByNameAsync(split));
+				var splitUsersList =
+					(await Task.WhenAll(getUsersTasks).ConfigureAwait(false)).Select(t => t.Matches);
+				foreach (var splitUser in splitUsersList)
+				{
+					userList.AddRange(splitUser);
+				}
 				if (userList.Count != 0) return userList;
 				Log.Warning("None of the users existed {usernames}", builder);
 				return null;
@@ -72,7 +79,7 @@ namespace EvilBot.Utilities.Resources
 			catch (Exception e)
 			{
 				Log.Warning(e,"BLEW UP WITH {usernames}", builder);
-				return null;
+				throw;
 			}
 		}
 		
@@ -120,24 +127,41 @@ namespace EvilBot.Utilities.Resources
 		{
 			if ((ids == null || ids.Count == 0) && (logins == null || logins.Count ==0))
 				return null;
+			if(ids == null) ids = new List<string>();
+			if(logins == null) logins = new List<string>();
 			var builder = new StringBuilder();
-			if(ids != null)
-				for (var i = 0; i < ids.Count; i++)
-					builder.AppendFormat("{0}, ",ids[i]);
-			if(logins != null)
-				for (var i = 0; i < logins.Count; i++)
-					builder.AppendFormat("{0}, ",logins[i]);
+			for (var i = 0; i < ids.Count; i++)
+				builder.AppendFormat("{0}, ",ids[i]);
+			for (var i = 0; i < logins.Count; i++)
+				builder.AppendFormat("{0}, ",logins[i]);
 			Log.Debug("Asked for Users of {identifiers}", builder);
+			
 			try
 			{
-				var usersResponse = await _twitchConnections.Api.Helix.Users.GetUsersAsync(ids, logins);
-				var userList = usersResponse.Users.ToList();
+				var splitIds = DataProcessor.SplitList(ids).ToList();
+				var splitLogins = DataProcessor.SplitList(logins).ToList();
+				var minDistance = Math.Min(splitIds.Count, splitLogins.Count);
+				int i;
+				var getUsersTasks = new List<Task<GetUsersResponse>>();
+				for (i = 0; i < minDistance; i++)
+					getUsersTasks.Add(_twitchConnections.Api.Helix.Users.GetUsersAsync(splitIds[i], splitLogins[i]));
+				for (var j = i; j < splitIds.Count; j++)
+					getUsersTasks.Add(_twitchConnections.Api.Helix.Users.GetUsersAsync(splitIds[i]));
+				for (var j = i; j < splitLogins.Count; j++)
+					getUsersTasks.Add(_twitchConnections.Api.Helix.Users.GetUsersAsync(logins: splitLogins[i]));
+				
+				var splitUsers = (await Task.WhenAll(getUsersTasks).ConfigureAwait(false)).Select(t => t.Users);
+				var userList = new List<TwitchLib.Api.Helix.Models.Users.User>();
+				foreach (var splitUser in splitUsers)
+				{
+					userList.AddRange(splitUser);
+				}
 				return userList.Count == 0 ? null : userList;
 			}
 			catch (Exception e)
 			{
 				Log.Error(e, "GetUsersHelixAsync blew up with {usernames}", builder);
-				return null;
+				throw;
 			}
 		}
 		

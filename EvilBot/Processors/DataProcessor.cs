@@ -238,6 +238,14 @@ namespace EvilBot.Processors
 			return results[0] == null ? null : results;
 		}
 
+		public static IEnumerable<List<T>> SplitList<T>(List<T> list, int sizeOfSplit = 100)
+		{
+			for (var i = 0; i < list.Count; i+=sizeOfSplit)
+			{
+				yield return list.GetRange(i, Math.Min(sizeOfSplit, list.Count - i));	
+			}
+		}
+		
 		#endregion GeneralProcessors
 	}
 }
