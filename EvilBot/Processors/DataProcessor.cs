@@ -22,8 +22,8 @@ namespace EvilBot.Processors
 		private readonly IFilterManager _filterManager;
 		private readonly List<Tuple<string, int>> _ranks = new List<Tuple<string, int>>();
 
-		public DataProcessor(IDataAccess dataAccess, IConfiguration configuration,
-			IFilterManager filterManager, IApiRetriever apiRetriever)
+		public DataProcessor
+			(IDataAccess dataAccess, IConfiguration configuration, IFilterManager filterManager, IApiRetriever apiRetriever)
 		{
 			_dataAccess = dataAccess;
 			_configuration = configuration;
@@ -33,37 +33,6 @@ namespace EvilBot.Processors
 		}
 
 		public event EventHandler<RankUpdateEventArgs> RankUpdated;
-
-		public string GetRankFormatted(string rankString, string pointsString)
-		{
-			if (int.TryParse(rankString, out var rank) && int.TryParse(pointsString, out var points))
-			{
-				if (rank == 0) return $"{_ranks[rank].Item1} XP: {points}/{_ranks[rank + 1].Item2}";
-				if (rank == _ranks.Count - 1) return $"{_ranks[rank].Item1} (Lvl.{rank}) XP: {points}";
-				return $"{_ranks[rank].Item1} (Lvl.{rank}) XP: {points}/{_ranks[rank + 1].Item2}";
-			}
-
-			Log.Error("{rankString} {pointsString} is not a parseable value to int {method}", rankString, pointsString,
-				$"{ToString()} GetRankFormatted");
-			return null;
-		}
-
-		#region DataProcessor GeneralProcessors
-
-		//TODO: advance to a better system, maybe with tuples and maybe make it get all the attributes, or return them all for easy identification and read
-		public async Task<List<string>> GetUserAttributesAsync(string userId)
-		{
-			Log.Debug("Asking for attributes of {userId}", userId);
-			if (userId == null) return null;
-
-			var properties = await _dataAccess.RetrieveUserFromTable(Enums.DatabaseTables.UserPoints, userId);
-			if (properties == null) return null;
-			var results = new List<string> {properties.Points, properties.Minutes, properties.Rank};
-			return results[0] == null ? null : results;
-		}
-
-		#endregion DataProcessor GeneralProcessors
-
 
 		protected virtual void OnRankUpdated(string name, string rank)
 		{
@@ -87,19 +56,7 @@ namespace EvilBot.Processors
 		{
 			return _ranks.Select((t, i) => new RankItem(i, t.Item1, t.Item2)).ToList<IRankItem>();
 		}
-		#region DataProcessor TimedPointManagers
-
-		private int GetRank(int points)
-		{
-			var place = 0;
-			for (var i = 0; i < _ranks.Count - 1; i++)
-			{
-				if (points < _ranks[i + 1].Item2) break;
-				place = i + 1;
-			}
-
-			return place;
-		}
+		#region TimedPointManagers
 
 		public async void AddLurkerPointsTimer_ElapsedAsync(object sender, ElapsedEventArgs e)
 		{
@@ -133,6 +90,36 @@ namespace EvilBot.Processors
 			}
 		}
 
+		#endregion TimedPointManagers
+
+		#region Ranking and Points
+
+		public string GetRankFormatted(string rankString, string pointsString)
+		{
+			if (int.TryParse(rankString, out var rank) && int.TryParse(pointsString, out var points))
+			{
+				if (rank == 0) return $"{_ranks[rank].Item1} XP: {points}/{_ranks[rank + 1].Item2}";
+				if (rank == _ranks.Count - 1) return $"{_ranks[rank].Item1} (Lvl.{rank}) XP: {points}";
+				return $"{_ranks[rank].Item1} (Lvl.{rank}) XP: {points}/{_ranks[rank + 1].Item2}";
+			}
+
+			Log.Error("{rankString} {pointsString} is not a parseable value to int {method}", rankString, pointsString,
+				$"{ToString()} GetRankFormatted");
+			return null;
+		}
+		
+		private int GetRank(int points)
+		{
+			var place = 0;
+			for (var i = 0; i < _ranks.Count - 1; i++)
+			{
+				if (points < _ranks[i + 1].Item2) break;
+				place = i + 1;
+			}
+
+			return place;
+		}
+		
 	    /// <inheritdoc />
 		public async Task AddToUserAsync
 			(List<IUserBase> userList, int points = 1, int minutes = 0, bool subCheck = true)
@@ -235,6 +222,22 @@ namespace EvilBot.Processors
 					$"{_ranks[userNameRanks[i]].Item1} (Lvl. {userNameRanks[i]})");
 		}
 
-		#endregion DataProcessor TimedPointManagers
+		#endregion Ranking and Points
+		
+		#region GeneralProcessors
+
+		//TODO: advance to a better system, maybe with tuples and maybe make it get all the attributes, or return them all for easy identification and read
+		public async Task<List<string>> GetUserAttributesAsync(string userId)
+		{
+			Log.Debug("Asking for attributes of {userId}", userId);
+			if (userId == null) return null;
+
+			var properties = await _dataAccess.RetrieveUserFromTable(Enums.DatabaseTables.UserPoints, userId);
+			if (properties == null) return null;
+			var results = new List<string> {properties.Points, properties.Minutes, properties.Rank};
+			return results[0] == null ? null : results;
+		}
+
+		#endregion GeneralProcessors
 	}
 }
