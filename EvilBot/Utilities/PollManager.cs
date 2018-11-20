@@ -48,7 +48,7 @@ namespace EvilBot.Utilities
 			for (var i = 1; i < PollItems.Count; i++)
 				if (PollVotes[winner] < PollVotes[i])
 					winner = i;
-			var pollItem = new PollItem(PollVotes[winner], PollItems[winner]);
+			var pollItem = new PollItem(0,PollVotes[winner], PollItems[winner]);
 
 			PollItems = null;
 			PollVotes = null;
@@ -60,7 +60,7 @@ namespace EvilBot.Utilities
 		public List<IPollItem> PollStats()
 		{
 			if (!PollActive) return null;
-			return PollItems.Select((t, i) => new PollItem(PollVotes[i], t)).ToList<IPollItem>();
+			return PollItems.Select((t, i) => new PollItem(i,PollVotes[i], t)).ToList<IPollItem>();
 		}
 
 		public async Task<Enums.PollAddVoteFinishState> PollAddVote(string userId, int votedNumber)

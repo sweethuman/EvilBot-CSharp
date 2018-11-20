@@ -4,8 +4,9 @@ namespace EvilBot.DataStructures
 {
 	public class PollItem : IPollItem
 	{
-		public PollItem(double itemPoints, string item)
+		public PollItem(int itemId, double itemPoints, string item)
 		{
+			ItemId = itemId;
 			ItemPoints = itemPoints;
 			Item = item;
 		}
