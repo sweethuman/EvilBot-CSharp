@@ -190,7 +190,7 @@ namespace EvilBot.Processors
             var query =
                 from databaseUser in databaseUsers
                 join twitchUser in twitchUsers on databaseUser.UserId equals twitchUser.Id
-                orderby databaseUser.Points
+                orderby int.Parse(databaseUser.Points) descending
                 select new UserStructureData(twitchUser.DisplayName, databaseUser.Id, twitchUser.Id,
                     databaseUser.Points, databaseUser.Minutes, databaseUser.Rank);
             var userList = query.ToList();
