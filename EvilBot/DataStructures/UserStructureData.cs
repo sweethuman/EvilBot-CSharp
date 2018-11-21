@@ -2,7 +2,7 @@ using EvilBot.DataStructures.Interfaces;
 
 namespace EvilBot.DataStructures
 {
-    public class UserStructureData : IUserBase, IUserStructure
+    public class UserStructureData : IUserStructure
     {
         public UserStructureData(string displayName, int id, string userId, string points, string minutes, string rank)
         {

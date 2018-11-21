@@ -48,27 +48,29 @@ namespace EvilBot.Processors
 			RankListString = builder.ToString();
 		}
 		
+		
+		//TODO this could be cleaned up better
 		public async Task<string> RankCommandAsync(OnChatCommandReceivedArgs e)
 		{
 			if (string.IsNullOrEmpty(e.Command.ArgumentsAsString))
 			{
-				var results = await _dataProcessor.GetUserAttributesAsync(e.Command.ChatMessage.UserId)
+				var results = await _dataAccess.RetrieveUserFromTable(Enums.DatabaseTables.UserPoints, e.Command.ChatMessage.UserId)
 					.ConfigureAwait(false);
 				if (results != null)
 					return
-						$"/me {e.Command.ChatMessage.DisplayName} esti {_dataProcessor.GetRankFormatted(results[2], results[0])} cu {Math.Round(double.Parse(results[1], CultureInfo.InvariantCulture) / 60, 1)} ore!\n\r";
+						$"/me {e.Command.ChatMessage.DisplayName} esti {_dataProcessor.GetRankFormatted(results.Rank, results.Points)} cu {Math.Round(double.Parse(results.Minutes, CultureInfo.InvariantCulture) / 60, 1)} ore!\n\r";
 				return
 					$"/me {e.Command.ChatMessage.DisplayName} Nu esti in baza de date! Vei fi adaugat la urmatorul check!";
 			}
 			else
 			{
-				var results = await _dataProcessor
-					.GetUserAttributesAsync(await _apiRetriever
-						.GetUserIdAsync(e.Command.ArgumentsAsString.TrimStart('@').ToLower()).ConfigureAwait(false))
+				var userId = await _apiRetriever
+					.GetUserIdAsync(e.Command.ArgumentsAsString.TrimStart('@').ToLower()).ConfigureAwait(false);
+				var results = await _dataAccess.RetrieveUserFromTable(Enums.DatabaseTables.UserPoints,userId)
 					.ConfigureAwait(false);
 				if (results != null)
 					return
-						$"/me {e.Command.ArgumentsAsString.TrimStart('@')} este {_dataProcessor.GetRankFormatted(results[2], results[0])} cu {Math.Round(double.Parse(results[1], CultureInfo.InvariantCulture) / 60, 1)} ore!";
+						$"/me {e.Command.ArgumentsAsString.TrimStart('@')} este {_dataProcessor.GetRankFormatted(results.Rank, results.Points)} cu {Math.Round(double.Parse(results.Minutes, CultureInfo.InvariantCulture) / 60, 1)} ore!";
 				return $"/me {e.Command.ArgumentsAsString.TrimStart('@')} nu este inca in baza de date!";
 			}
 		}

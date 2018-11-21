@@ -11,8 +11,6 @@ namespace EvilBot.Processors.Interfaces
 	{
 		event EventHandler<RankUpdateEventArgs> RankUpdated;
 
-		Task<List<string>> GetUserAttributesAsync(string userId);
-
 		string GetRankFormatted(string rankString, string pointsString);
 
 		/// <summary>

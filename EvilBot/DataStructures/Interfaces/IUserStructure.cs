@@ -1,6 +1,6 @@
 namespace EvilBot.DataStructures.Interfaces
 {
-    public interface IUserStructure
+    public interface IUserStructure : IUserBase
     {
         string DisplayName { get; set; }
         int Id { get; set; }

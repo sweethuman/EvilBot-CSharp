@@ -145,7 +145,8 @@ namespace EvilBot.Processors
 				{
 					if (subCheck)
 					{
-						channelSubscribers = await _apiRetriever.GetChannelSubscribers(_apiRetriever.TwitchChannelId).ConfigureAwait(false);
+						channelSubscribers = await _apiRetriever.GetChannelSubscribers(_apiRetriever.TwitchChannelId)
+							.ConfigureAwait(false);
 					}
 					else
 					{
@@ -176,40 +177,48 @@ namespace EvilBot.Processors
 		private async Task UpdateRankAsync(IReadOnlyList<IUserBase> userList)
 		{
 			Log.Debug("Checking Ranks for {userCount}", userList.Count);
-			//!WARNING GetUserAttributesAsync() also gets minutes, wich I don't currently need and it might cause performance issues if volume is large
-			var userAttributesTasks = new List<Task<List<string>>>();
-			var userNameRanks = new List<int>();
-			var usersUpdated = new List<IUserBase>();
+			var usersUpdated = new List<IUserStructure>();
 			var databaseRankUpdateTasks = new List<Task>();
-			for (var i = 0; i < userList.Count; i++)
-				userAttributesTasks.Add(GetUserAttributesAsync(userList[i].UserId));
-			var userAttributes = (await Task.WhenAll(userAttributesTasks).ConfigureAwait(false)).ToList();
-			for (var i = 0; i < userAttributes.Count; i++)
+			var getUserAttributesTasks = userList.Select(t => _dataAccess.RetrieveUserFromTable(Enums.DatabaseTables.UserPoints, t.UserId)).ToList();
+			var userAttributes = (await Task.WhenAll(getUserAttributesTasks).ConfigureAwait(false)).ToList();
+			if(userAttributes.Contains(null))
+				Log.Error("There shouldn't have been sent a null user or every user should have been in the database. INVESTIGATE!");
+			userAttributes.RemoveAll(x => x == null);	
+			var query =
+				from userAttribute in userAttributes
+				join user in userList on userAttribute.UserId equals user.UserId
+				select new UserStructureData(user.DisplayName, userAttribute.Id, userAttribute.UserId,
+					userAttribute.Points, userAttribute.Minutes, userAttribute.Rank);
+			var users = query.ToList<IUserStructure>();
+			for (var i = 0; i < users.Count; i++)
 				try
 				{
-					if (!int.TryParse(userAttributes[i][0], out var points))
+					if (!int.TryParse(users[i].Points, out var points))
 					{
-						Log.Error("Tried to parse string to int: {string} in {ClassSource}", userAttributes[i][1],
+						Log.Error("Tried to parse string to int: {string} in {ClassSource}", users[i].Points,
 							$"{ToString()}UpdateRankAsync");
 						continue;
 					}
 
-					if (!int.TryParse(userAttributes[i][2], out var rank))
-						Log.Error("Tried to parse string to int: {string} in {ClassSource}", userAttributes[i][1],
+					if (!int.TryParse(users[i].Rank, out var rank))
+					{
+						Log.Error("Tried to parse string to int: {string} in {ClassSource}", users[i].Rank,
 							$"{ToString()}UpdateRankAsync");
+						continue;
+					}
 
 					var currentRank = GetRank(points);
 					if (currentRank == rank) continue;
 					databaseRankUpdateTasks.Add(_dataAccess.ModifyUserIdRankAsync(userList[i].UserId, currentRank));
-					//TODO make it so that it goes all into a single class
-					userNameRanks.Add(currentRank);
-					usersUpdated.Add(userList[i]);
+					users[i].Rank = currentRank.ToString();
+					usersUpdated.Add(users[i]);
 				}
 				catch (NullReferenceException e)
 				{
 					Log.Error(e,
 						"Some null happened, probably userAttributes, prevent from sending the null onward, or check why it was sent {problemSource}",
 						e.Source);
+					await Task.WhenAll(databaseRankUpdateTasks).ConfigureAwait(false);
 					throw;
 				}
 				catch (Exception e)
@@ -217,30 +226,19 @@ namespace EvilBot.Processors
 					Log.Error(e,
 						"Ok, this is pretty bad, it's not null so somebody didn't know how to handle stuff {source}",
 						e.Source);
+					await Task.WhenAll(databaseRankUpdateTasks).ConfigureAwait(false);
 					throw;
 				}
 
 			await Task.WhenAll(databaseRankUpdateTasks).ConfigureAwait(false);
 			for (var i = 0; i < usersUpdated.Count; i++)
 				OnRankUpdated(usersUpdated[i].DisplayName,
-					$"{_ranks[userNameRanks[i]].Item1} (Lvl. {userNameRanks[i]})");
+					$"{_ranks[int.Parse(usersUpdated[i].Rank)].Item1} (Lvl. {usersUpdated[i].Rank})");
 		}
 
 		#endregion Ranking and Points
 		
 		#region GeneralProcessors
-
-		//TODO: advance to a better system, maybe with tuples and maybe make it get all the attributes, or return them all for easy identification and read
-		public async Task<List<string>> GetUserAttributesAsync(string userId)
-		{
-			Log.Debug("Asking for attributes of {userId}", userId);
-			if (userId == null) return null;
-
-			var properties = await _dataAccess.RetrieveUserFromTable(Enums.DatabaseTables.UserPoints, userId);
-			if (properties == null) return null;
-			var results = new List<string> {properties.Points, properties.Minutes, properties.Rank};
-			return results[0] == null ? null : results;
-		}
 
 		public static IEnumerable<List<T>> SplitList<T>(List<T> list, int sizeOfSplit = 100)
 		{
