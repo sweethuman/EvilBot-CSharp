@@ -23,9 +23,7 @@ namespace EvilBot.Utilities
 
 		//TODO add somewhere code that if FilteredUsers table does not exist to be created
 		private List<IUserBase> FilteredUsers { get; } = new List<IUserBase>();
-
-		//NOTE this is async but returns void
-		public async void InitializeFilter()
+		public async Task InitializeFilter()
 		{
 			Log.Debug("Initializing filter!");
 			var users = await _dataAccess.RetrieveAllUsersFromTable(Enums.DatabaseTables.FilteredUsers);
@@ -53,7 +51,7 @@ namespace EvilBot.Utilities
 			else
 			{
 				FilteredUsers.First(x => x.UserId == user.UserId).DisplayName =
-					user.DisplayName; //NOTE not sure how well this works, but it should.
+					user.DisplayName;
 			}
 
 			return await _dataAccess.ModifyFilteredUsers(Enums.FilteredUsersDatabaseAction.Insert, user.UserId);

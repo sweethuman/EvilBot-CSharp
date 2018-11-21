@@ -160,7 +160,7 @@ namespace EvilBot.TwitchBot
 			EventIntializer();
 			TimedMessageInitializer();
 			TimerInitializer();
-			_filterManager.InitializeFilter();
+			_filterManager.InitializeFilter().Wait();
 		}
 
 		public void Disconnect()
@@ -240,11 +240,21 @@ namespace EvilBot.TwitchBot
 			}
 
 			if (e.ChatMessage.Bits == 0) return;
-			_dataProcessor.AddToUserAsync(
-				new List<IUserBase> {new UserBase(e.ChatMessage.DisplayName, e.ChatMessage.UserId)},
-				e.ChatMessage.Bits * _bitsToPointsMultiplier + 11, subCheck: false);
-			_twitchConnection.Client.SendMessage(e.ChatMessage.Channel,
-				$"/me {e.ChatMessage.DisplayName} a fost recompensat {e.ChatMessage.Bits * _bitsToPointsMultiplier + 11} puncte! Bravo!");
+			string message;
+			try
+			{
+				_dataProcessor.AddToUserAsync(
+					new List<IUserBase> {new UserBase(e.ChatMessage.DisplayName, e.ChatMessage.UserId)},
+					e.ChatMessage.Bits * _bitsToPointsMultiplier + 11, subCheck: false);
+				message =
+					"/me {e.ChatMessage.DisplayName} a fost recompensat {e.ChatMessage.Bits * _bitsToPointsMultiplier + 11} puncte! Bravo!";
+			}
+			catch (Exception exception)
+			{
+				Log.Error(exception, "Rewarding user for bits FAILED!");
+				message = "/me A ESUAT SA RECOMPENSEZE USERul. SEND LOGS.";
+			}
+			_twitchConnection.Client.SendMessage(e.ChatMessage.Channel,message);
 		}
 
 		#endregion TwitchChatBot EventTriggers

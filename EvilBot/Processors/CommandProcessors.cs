@@ -276,7 +276,7 @@ namespace EvilBot.Processors
 			var builder = new StringBuilder();
 			builder.Append("Poll Creat! Optiuni: ");
 			for (var i = 0; i < resultItems.Count; i++) builder.AppendFormat(" //{0}:{1}", i + 1, resultItems[i]);
-			//NOTE FUCC, THIS IS MAY NOT BE STABLE IN FUTURE
+			//NOTE FUCC, THIS IS MAY NOT BE STABLE IN THE FUTURE because we're not even in poll class and maybe I shouldn't have this if things change dinamically
 			PollOptionsString = CommandHelpers.PollOptionsStringBuilder(_pollManager.PollStats());
 			return $"/me {builder}";
 		}
@@ -297,7 +297,7 @@ namespace EvilBot.Processors
 				case Enums.PollAddVoteFinishState.OptionOutOfRange:
 					if (PollOptionsString != null) return $"/me Foloseste !pollvote {PollOptionsString}";
 					Log.Error("PollOptionsString shouldn't be null when vote is out of range... returning null!");
-					return null;
+					return "/me Foloseste !pollvote ERROR: LIPSESC OPTIUNILE. SEND LOGS.";
 				default:
 					return null;
 			}

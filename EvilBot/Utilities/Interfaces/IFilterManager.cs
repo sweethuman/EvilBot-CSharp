@@ -6,7 +6,7 @@ namespace EvilBot.Utilities.Interfaces
 {
 	public interface IFilterManager
 	{
-		void InitializeFilter();
+		Task InitializeFilter();
 		
 		Task<bool> AddToFiler(IUserBase user);
 		

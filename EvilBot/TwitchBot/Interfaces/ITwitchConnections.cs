@@ -14,5 +14,6 @@ namespace EvilBot.TwitchBot.Interfaces
 		void Connect();
 		
 		void Disconnect();
+		void SendErrorMessage(string message);
 	}
 }

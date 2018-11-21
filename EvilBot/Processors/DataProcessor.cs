@@ -6,6 +6,7 @@ using System.Timers;
 using EvilBot.DataStructures;
 using EvilBot.DataStructures.Interfaces;
 using EvilBot.Processors.Interfaces;
+using EvilBot.TwitchBot.Interfaces;
 using EvilBot.Utilities;
 using EvilBot.Utilities.Interfaces;
 using EvilBot.Utilities.Resources;
@@ -20,15 +21,17 @@ namespace EvilBot.Processors
 		private readonly IConfiguration _configuration;
 		private readonly IDataAccess _dataAccess;
 		private readonly IFilterManager _filterManager;
+		private readonly ITwitchConnections _twitchConnections;
 		private readonly List<Tuple<string, int>> _ranks = new List<Tuple<string, int>>();
 
 		public DataProcessor
-			(IDataAccess dataAccess, IConfiguration configuration, IFilterManager filterManager, IApiRetriever apiRetriever)
+			(IDataAccess dataAccess, IConfiguration configuration, IFilterManager filterManager, IApiRetriever apiRetriever, ITwitchConnections twitchConnections)
 		{
 			_dataAccess = dataAccess;
 			_configuration = configuration;
 			_apiRetriever = apiRetriever;
 			_filterManager = filterManager;
+			_twitchConnections = twitchConnections;
 			InitializeRanks();
 		}
 
@@ -72,6 +75,7 @@ namespace EvilBot.Processors
 			catch (Exception exception)
 			{
 				Log.Error(exception, "AddLurkerTimer failed");
+				_twitchConnections.SendErrorMessage("A esuat sa updateze lurkerii. SEND LOGS.");
 			}
 		}
 
@@ -87,6 +91,7 @@ namespace EvilBot.Processors
 			catch (Exception exception)
 			{
 				Log.Error(exception, "AddPointsTimer failed");
+				_twitchConnections.SendErrorMessage("A esuat sa updateze chatterii. SEND LOGS.");
 			}
 		}
 
@@ -135,7 +140,6 @@ namespace EvilBot.Processors
 				}
 
 				var pointsMultiplier = _configuration.PointsMultiplier;
-				//t: make sub checking more efficient
 				List<IUserBase> channelSubscribers;
 				try
 				{
@@ -195,25 +199,25 @@ namespace EvilBot.Processors
 							$"{ToString()}UpdateRankAsync");
 
 					var currentRank = GetRank(points);
-					if (currentRank != rank)
-					{
-						databaseRankUpdateTasks.Add(_dataAccess.ModifyUserIdRankAsync(userList[i].UserId, currentRank));
-						//TODO make it so that it goes all into a single class
-						userNameRanks.Add(currentRank);
-						usersUpdated.Add(userList[i]);
-					}
+					if (currentRank == rank) continue;
+					databaseRankUpdateTasks.Add(_dataAccess.ModifyUserIdRankAsync(userList[i].UserId, currentRank));
+					//TODO make it so that it goes all into a single class
+					userNameRanks.Add(currentRank);
+					usersUpdated.Add(userList[i]);
 				}
 				catch (NullReferenceException e)
 				{
 					Log.Error(e,
 						"Some null happened, probably userAttributes, prevent from sending the null onward, or check why it was sent {problemSource}",
 						e.Source);
+					throw;
 				}
 				catch (Exception e)
 				{
 					Log.Error(e,
 						"Ok, this is pretty bad, it's not null so somebody didn't know how to handle stuff {source}",
 						e.Source);
+					throw;
 				}
 
 			await Task.WhenAll(databaseRankUpdateTasks).ConfigureAwait(false);

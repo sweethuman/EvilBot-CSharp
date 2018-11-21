@@ -38,7 +38,7 @@ namespace EvilBot.Utilities.Resources.Interfaces
 	    /// </summary>
 	    /// <param name="userId">The user identifier.</param>
 	    /// <param name="databaseAction">Represents the action to do in the database</param>
-	    /// <returns>If the specified user was removed or added. False means database was not changed</returns>
+	    /// <returns>True if the user was removed or added. False means database was not changed.</returns>
 	    Task<bool> ModifyFilteredUsers(Enums.FilteredUsersDatabaseAction databaseAction, string userId);
 
 	    /// <summary>

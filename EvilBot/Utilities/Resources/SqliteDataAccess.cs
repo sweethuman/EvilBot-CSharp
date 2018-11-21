@@ -52,16 +52,13 @@ namespace EvilBot.Utilities.Resources
 				Log.Error(ex, "ModifyUserIDRankAsync blew up with: {UserID} {Rank}", userId, rank);
 			}
 		}
-
-		//TODO add table selector if it is the case
+		
 		public async Task<bool> ModifyFilteredUsers(Enums.FilteredUsersDatabaseAction databaseAction, string userId)
 		{
 			if (WriteConnection.State != ConnectionState.Open) WriteConnection.Open();
 			Log.Debug("Modifying filtered {userId}", userId);
 			switch (databaseAction)
 			{
-				//TODO later add a way to make sure it is correct userid
-				//TODO ADD MORE DOCUMENTATION
 				case Enums.FilteredUsersDatabaseAction.Remove:
 				{
 					var rowsAffected =
