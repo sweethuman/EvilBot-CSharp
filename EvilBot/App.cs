@@ -33,7 +33,7 @@ namespace EvilBot
 
 		private static void SetConsoleMode()
 		{
-			Console.Title = @"EvilBot v0.4.10beta for Twitch by M0rtuary";
+			Console.Title = @"EvilBot v0.4.16beta for Twitch by M0rtuary";
 			Console.TreatControlCAsInput = true;
 		}
 
