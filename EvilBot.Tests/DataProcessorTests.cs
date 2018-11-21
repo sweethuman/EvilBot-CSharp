@@ -60,6 +60,17 @@ namespace EvilBot.Tests
 					})
 					.Verifiable();
 				mock.Mock<IDataAccess>()
+					.Setup(x => x.RetrieveUserFromTable(Enums.DatabaseTables.UserPoints, "00000003"))
+					.ReturnsAsync(new DatabaseUser
+					{
+						Id = 1,
+						Minutes = "10",
+						Points = "5",
+						Rank = "0",
+						UserId = "00000003"
+					})
+					.Verifiable();
+				mock.Mock<IDataAccess>()
 					.Setup(x => x.ModifyUserIdRankAsync(It.IsAny<string>(), It.IsAny<int>()))
 					.Returns(Task.FromResult(default(object)));
 				mock.Mock<ITwitchConnections>();
@@ -89,45 +100,20 @@ namespace EvilBot.Tests
 							It.Is<int>(i => i == 2 && subCheck || i == 1 && subCheck == false), 0, 0),
 						Times.Exactly(1));
 				mock.Mock<IDataAccess>()
+					.Verify(
+						x => x.ModifierUserIdAsync("00000003",
+							It.Is<int>(i => i == 1 && subCheck || i == 1 && subCheck == false), 0, 0),
+						Times.Exactly(1));
+				mock.Mock<IDataAccess>()
 					.Verify(x => x.ModifyUserIdRankAsync("00000000", It.IsAny<int>()), Times.Exactly(1));
 				mock.Mock<IDataAccess>()
 					.Verify(x => x.RetrieveUserFromTable(Enums.DatabaseTables.UserPoints,
-						It.Is<string>(z => z == "00000000" || z == "00000002")));
+						It.Is<string>(z => z == "00000000" || z == "00000002" || z == "00000003")));
 				mock.Mock<IDataAccess>()
 					.VerifyNoOtherCalls();
 			}
 		}
 
-		public static IEnumerable<object[]> GetUserAtrributesParams => new[]
-		{
-			new object[] {null, null, null},
-			new object[]
-			{
-				"00000000", new DatabaseUser {Id = 1, UserId = "00000000", Minutes = "400", Points = "643", Rank = "1"},
-				new List<string> {"643", "400", "1"}
-			},
-			new object[] {"00000000", null, null},
-			new object[] {"00000000", new DatabaseUser(), null}
-		};
-
-		[Theory]
-		[MemberData(nameof(GetUserAtrributesParams))]
-		public async void GetUserAttributesAsync_ShouldReturnNullOrActualValue(string userId,
-			IDatabaseUser valueFromDatabase, List<string> expected)
-		{
-			using (var mock = AutoMock.GetLoose())
-			{
-				mock.Mock<IDataAccess>()
-					.Setup(x => x.RetrieveUserFromTable(Enums.DatabaseTables.UserPoints, userId))
-					.ReturnsAsync(valueFromDatabase);
-				mock.Mock<ITwitchConnections>();
-				mock.Mock<IApiRetriever>();
-				mock.Mock<IConfiguration>();
-				mock.Mock<IFilterManager>();
-				var cls = mock.Create<DataProcessor>();
-				//TODO different check, old version of GetUserAtrributes was removed!
-			}
-		}
 
 		private List<IUserBase> GetSampleUserSubscribers()
 		{
@@ -144,7 +130,8 @@ namespace EvilBot.Tests
 			{
 				new UserBase("dingo", "00000000"),
 				new UserBase("Mantoly", "00000001"),
-				new UserBase("Pantalony", "00000002")
+				new UserBase("Pantalony", "00000002"),
+				new UserBase("Gouliver","00000003")
 			};
 			return output;
 		}

@@ -203,7 +203,6 @@ namespace EvilBot.Processors
             return $"/me {builder}";
         }
 
-        //TODO there should be instead more smaller try catches with different outputs
         public async Task<(string usersAnnouncement, string winnerAnnouncement)> GiveawayCommand(
             OnChatCommandReceivedArgs e)
         {
@@ -226,9 +225,9 @@ namespace EvilBot.Processors
                     userList.RemoveAll(x => x.Id == userList[i].Id);
                     i--;
                 }
-
                 var databaseUsers = (await Task.WhenAll(getDatabaseUsersTasks).ConfigureAwait(false)).ToList();
                 databaseUsers.RemoveAll(x => x == null);
+                
                 var query =
                     from databaseUser in databaseUsers
                     join user in userList on databaseUser.UserId equals user.Id
@@ -236,7 +235,6 @@ namespace EvilBot.Processors
                     select new UserStructureData(user.DisplayName, databaseUser.Id, user.Id, databaseUser.Points,
                         databaseUser.Minutes, databaseUser.Rank);
                 var sourceAccounts = query.ToList();
-
                 if (sourceAccounts.Count < 1)
                     return (null, "/me Nu exista oameni eligibili pentru giveaway");
 
