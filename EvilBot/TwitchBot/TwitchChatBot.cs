@@ -20,12 +20,11 @@ namespace EvilBot.TwitchBot
 		private readonly ICommandProcessor _commandProcessor;
 		private readonly IConfiguration _configuration;
 		private readonly IDataAccess _dataAccess;
-
 		private readonly IDataProcessor _dataProcessor;
 		private readonly IFilterManager _filterManager;
+		private readonly ITwitchConnections _twitchConnection;
 
 		private readonly List<string> _timedMessages = new List<string>();
-		private readonly ITwitchConnections _twitchConnection;
 		private Timer _addLurkerPointsTimer;
 		private Timer _addPointsTimer;
 
@@ -247,7 +246,7 @@ namespace EvilBot.TwitchBot
 					new List<IUserBase> {new UserBase(e.ChatMessage.DisplayName, e.ChatMessage.UserId)},
 					e.ChatMessage.Bits * _bitsToPointsMultiplier + 11, subCheck: false);
 				message =
-					"/me {e.ChatMessage.DisplayName} a fost recompensat {e.ChatMessage.Bits * _bitsToPointsMultiplier + 11} puncte! Bravo!";
+					$"/me {e.ChatMessage.DisplayName} a fost recompensat {e.ChatMessage.Bits * _bitsToPointsMultiplier + 11} puncte! Bravo!";
 			}
 			catch (Exception exception)
 			{
