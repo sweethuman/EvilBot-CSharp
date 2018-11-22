@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Autofac.Extras.Moq;
 using EvilBot.DataStructures;
 using EvilBot.DataStructures.Database;
-using EvilBot.DataStructures.Database.Interfaces;
 using EvilBot.DataStructures.Interfaces;
 using EvilBot.Processors;
 using EvilBot.TwitchBot.Interfaces;
