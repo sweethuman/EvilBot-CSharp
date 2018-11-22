@@ -170,13 +170,13 @@ namespace EvilBot.TwitchBot
 
 		private void TimedMessageInitializer()
 		{
-			_timedMessages.Add("Pentru a migra punctele te rog da !myrank si tag la un moderator");
+			_timedMessages.Add("Pentru a migra punctele te rog da !myrank si tag unui moderator");
 			_timedMessages.Add("Incearca !rank si vezi cat de activ ai fost");
 			_timedMessages.Add("Fii activ ca sa castigi XP");
-			_timedMessages.Add("Pentru a migra punctele te rog da !myrank si tag la un moderator");
+			_timedMessages.Add("Pentru a migra punctele te rog da !myrank si tag unui moderator");
 			_timedMessages.Add("Subscriberii primesc x2 puncte!");
 			_timedMessages.Add("Daca iti place, apasa butonul de FOLLOW! Multumesc pentru sustinere!");
-			_timedMessages.Add("Pentru a migra punctele te rog da !myrank si tag la un moderator");
+			_timedMessages.Add("Pentru a migra punctele te rog da !myrank si tag unui moderator");
 		}
 
 		private void TimerInitializer()
