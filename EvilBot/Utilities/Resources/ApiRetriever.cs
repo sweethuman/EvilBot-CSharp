@@ -31,6 +31,7 @@ namespace EvilBot.Utilities.Resources
 
         public string TwitchChannelId { get; }
 
+
         public async Task<User> GetUserAsyncByUsername(string username)
         {
             username = username.Trim('@');
