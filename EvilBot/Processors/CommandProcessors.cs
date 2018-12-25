@@ -56,8 +56,19 @@ namespace EvilBot.Processors
             }
             else
             {
-                var userId = await _apiRetriever
-                    .GetUserIdAsync(e.Command.ArgumentsAsString.TrimStart('@').ToLower()).ConfigureAwait(false);
+                string userId;
+                try
+                {
+                    userId = await _apiRetriever
+                        .GetUserIdAsync(e.Command.ArgumentsAsString.TrimStart('@').ToLower()).ConfigureAwait(false);
+                }
+                //TODO find accurate exception to differentiate between bad parameters and any other exception
+                catch (Exception exception)
+                {
+                    Log.Error(exception, "Invalid username {username}", e.Command.ArgumentsAsString);
+                    return "/me Numele dat este invalid.";
+                }
+
                 var results = await _dataAccess.RetrieveUserFromTable(Enums.DatabaseTables.UserPoints, userId)
                     .ConfigureAwait(false);
                 var displayName = e.Command.ArgumentsAsString.TrimStart('@');
@@ -73,8 +84,18 @@ namespace EvilBot.Processors
         public async Task<string> ManageCommandAsync(OnChatCommandReceivedArgs e)
         {
             if (string.IsNullOrEmpty(e.Command.ArgumentsAsString)) return StandardMessages.ManageCommandText;
-            var userid = await _apiRetriever.GetUserIdAsync(e.Command.ArgumentsAsList[0].TrimStart('@'))
-                .ConfigureAwait(false);
+            string userid;
+            try
+            {
+                userid = await _apiRetriever.GetUserIdAsync(e.Command.ArgumentsAsList[0].TrimStart('@'))
+                    .ConfigureAwait(false);
+            }
+            catch (Exception exception)
+            {
+                Log.Error(exception, "Invalid username {username}", e.Command.ArgumentsAsList[0].TrimStart('@'));
+                return "/me Numele dat este invalid.";
+            }
+
             if (e.Command.ArgumentsAsList.Count < 2 || userid == null)
                 return StandardMessages.ManageCommandText;
             var pointModifier = 0;
@@ -225,9 +246,10 @@ namespace EvilBot.Processors
                     userList.RemoveAll(x => x.Id == userList[i].Id);
                     i--;
                 }
+
                 var databaseUsers = (await Task.WhenAll(getDatabaseUsersTasks).ConfigureAwait(false)).ToList();
                 databaseUsers.RemoveAll(x => x == null);
-                
+
                 var query =
                     from databaseUser in databaseUsers
                     join user in userList on databaseUser.UserId equals user.Id
