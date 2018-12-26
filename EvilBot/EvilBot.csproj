@@ -314,6 +314,7 @@
     <Compile Include="DataStructures\RankItem.cs" />
     <Compile Include="DataStructures\UserBase.cs" />
     <Compile Include="DataStructures\UserStructureData.cs" />
+    <Compile Include="EventArguments\RankUpdateEventArgs.cs" />
     <Compile Include="Processors\CommandProcessors.cs" />
     <Compile Include="Processors\Interfaces\ICommandProcessors.cs" />
     <Compile Include="TwitchBot\TwitchConnections.cs" />
@@ -322,7 +323,6 @@
     <Compile Include="Utilities\Interfaces\IFilterManager.cs" />
     <Compile Include="Utilities\Interfaces\IPollManager.cs" />
     <Compile Include="Utilities\PollManager.cs" />
-    <Compile Include="Utilities\EventArguments.cs" />
     <Compile Include="Processors\DataProcessor.cs" />
     <Compile Include="IApplication.cs" />
     <Compile Include="Processors\Interfaces\IDataProcessor.cs" />

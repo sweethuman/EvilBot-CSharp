@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace EvilBot.Utilities
+namespace EvilBot.EventArguments
 {
 	public class RankUpdateEventArgs : EventArgs
 	{

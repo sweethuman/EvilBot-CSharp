@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Timers;
 using EvilBot.DataStructures;
 using EvilBot.DataStructures.Interfaces;
+using EvilBot.EventArguments;
 using EvilBot.Processors.Interfaces;
 using EvilBot.TwitchBot.Interfaces;
 using EvilBot.Utilities;

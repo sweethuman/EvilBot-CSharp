@@ -30,6 +30,7 @@ namespace EvilBot.Utilities
 			if (users == null) return;
 			users.RemoveAll(x => x == null);
 			
+			//TODO move from GetUserById to GetUsersHelix for performance improvements
 			var userListTasks = users.Select(t => _apiRetriever.GetUserByIdAsync(t.UserId)).ToList();
 			var userList = (await Task.WhenAll(userListTasks).ConfigureAwait(false)).ToList();
 			userList.RemoveAll(x => x == null);

@@ -26,6 +26,9 @@ namespace EvilBot.Processors
         private readonly IFilterManager _filterManager;
         private readonly IPollManager _pollManager;
 
+        private string PollOptionsString { get; set; }
+        private string RankListString { get; set; }
+
         public CommandProcessor(IDataProcessor dataProcessor, IDataAccess dataAccess, IPollManager pollManager,
             IFilterManager filterManager, IApiRetriever apiRetriever)
         {
@@ -37,8 +40,6 @@ namespace EvilBot.Processors
             BuildRankListString();
         }
 
-        private string PollOptionsString { get; set; }
-        private string RankListString { get; set; }
 
         public async Task<string> RankCommandAsync(OnChatCommandReceivedArgs e)
         {
@@ -61,18 +62,17 @@ namespace EvilBot.Processors
                 try
                 {
                     userId = await _apiRetriever
-                        .GetUserIdAsync(e.Command.ArgumentsAsString.TrimStart('@').ToLower()).ConfigureAwait(false);
+                        .GetUserIdAsync(e.Command.ArgumentsAsList[0].TrimStart('@').ToLower()).ConfigureAwait(false);
                 }
-                //TODO find accurate exception to differentiate between bad parameters and any other exception
                 catch (BadParameterException exception)
                 {
                     Log.Error(exception, "Bad parameter {parameter}", e.Command.ArgumentsAsString);
-                    return $"/me Numele \"{e.Command.ArgumentsAsString}\" este invalid.";
+                    return $"/me Numele \"{e.Command.ArgumentsAsList[0]}\" este invalid.";
                 }
                 catch (BadRequestException exception)
                 {
-                    Log.Error(exception, "Bad parameter {parameter}", e.Command.ArgumentsAsString);
-                    return $"/me Numele \"{e.Command.ArgumentsAsString}\" este invalid.";
+                    Log.Error(exception, "Bad request {parameter}", e.Command.ArgumentsAsString);
+                    return $"/me Numele \"{e.Command.ArgumentsAsList[0]}\" este invalid.";
                 }
                 catch (Exception exception)
                 {
@@ -82,7 +82,7 @@ namespace EvilBot.Processors
 
                 var results = await _dataAccess.RetrieveUserFromTableAsync(Enums.DatabaseTables.UserPoints, userId)
                     .ConfigureAwait(false);
-                var displayName = e.Command.ArgumentsAsString.TrimStart('@');
+                var displayName = e.Command.ArgumentsAsList[0].TrimStart('@');
                 if (results == null) return $"/me {displayName} nu este inca in baza de date!";
                 var rankFormatted = _dataProcessor.GetRankFormatted(results.Rank, results.Points);
                 var hoursWatched = Math.Round(double.Parse(results.Minutes, CultureInfo.InvariantCulture) / 60, 1)
@@ -120,25 +120,28 @@ namespace EvilBot.Processors
 
         public async Task<string> FilterCommandAsync(OnChatCommandReceivedArgs e)
         {
-            if (e.Command.ArgumentsAsList.Count >= 1 && e.Command.ArgumentsAsList[0] == "get")
-            {
-                var filteredUsers = _filterManager.RetrieveFilteredUsers();
-                if (filteredUsers.Count <= 0) return "/me Nici un User filtrat!";
-                var builder = new StringBuilder();
-                builder.Append("Useri filtrati:");
-                for (var i = 0; i < filteredUsers.Count; i++) builder.Append($" {filteredUsers[i].DisplayName},");
-                return $"/me {builder}";
-            }
-
-            if (e.Command.ArgumentsAsList.Count < 2) return StandardMessages.FilterText;
+            if (e.Command.ArgumentsAsList.Count < 1) return StandardMessages.FilterText;
+            
             switch (e.Command.ArgumentsAsList[0])
             {
                 //TODO check cases for exceptions or invalid data, find some handles so filter manager methods throw no exception
+                case "get":
+                {
+                    var filteredUsers = _filterManager.RetrieveFilteredUsers();
+                    if (filteredUsers.Count <= 0) return "/me Nici un User filtrat!";
+                    var builder = new StringBuilder();
+                    builder.Append("Useri filtrati:");
+                    for (var i = 0; i < filteredUsers.Count; i++) builder.Append($" {filteredUsers[i].DisplayName},");
+                    return $"/me {builder}";
+                }
                 case "add":
                 {
+                    if (e.Command.ArgumentsAsList.Count < 2) return StandardMessages.FilterText;
+                    
                     var user = await _apiRetriever.GetUserByUsernameAsync(e.Command.ArgumentsAsList[1])
                         .ConfigureAwait(false);
                     if (user == null) return StandardMessages.UserMissingText;
+                    
                     if (await _filterManager.AddToFilterAsync(new UserBase(user.DisplayName, user.Id.Trim()))
                         .ConfigureAwait(false))
                         return $"/me {user.DisplayName} adaugat la Filtru!";
@@ -146,10 +149,13 @@ namespace EvilBot.Processors
                 }
                 case "remove":
                 {
+                    if (e.Command.ArgumentsAsList.Count < 2) return StandardMessages.FilterText;
+                    
                     var user = await _apiRetriever.GetUserByUsernameAsync(e.Command.ArgumentsAsList[1])
                         .ConfigureAwait(false);
                     if (user == null) return StandardMessages.UserMissingText;
-                    if (await _filterManager.RemoveFromFilterAsync(new UserBase(user.DisplayName, user.Id))
+                    
+                    if (await _filterManager.RemoveFromFilterAsync(new UserBase(user.DisplayName, user.Id.Trim()))
                         .ConfigureAwait(false))
                         return $"/me {user.DisplayName} sters din Filtru!";
                     return $"/me {user.DisplayName} nu este in Filtru!";

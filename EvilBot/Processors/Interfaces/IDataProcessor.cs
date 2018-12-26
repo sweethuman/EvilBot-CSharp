@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Timers;
 using EvilBot.DataStructures.Interfaces;
-using EvilBot.Utilities;
+using EvilBot.EventArguments;
 
 namespace EvilBot.Processors.Interfaces
 {
