@@ -109,43 +109,10 @@ namespace EvilBot.Processors
 
             if (e.Command.ArgumentsAsList.Count < 2 || userid == null)
                 return StandardMessages.ManageCommandText;
-            var pointModifier = 0;
-            var minuteModifier = 0;
-            var twoParams = false;
-            var parameters = new List<string> {e.Command.ArgumentsAsList[1]};
-
-            //NOTE with new version of ManageCommandSorter this could be simplified 
-            if (e.Command.ArgumentsAsList.Count == 3)
-            {
-                twoParams = true;
-                parameters =
-                    CommandHelpers.ManageCommandSorter(e.Command.ArgumentsAsList[1], e.Command.ArgumentsAsList[2]);
-            }
-
-            if (parameters[0].EndsWith("m", StringComparison.InvariantCultureIgnoreCase))
-            {
-                parameters[0] = parameters[0].TrimEnd('m', 'M');
-
-                if (!int.TryParse(parameters[0], out minuteModifier)) return StandardMessages.ManageCommandText;
-            }
-            else
-            {
-                if (!int.TryParse(parameters[0], out pointModifier)) return StandardMessages.ManageCommandText;
-            }
-
-            if (twoParams)
-            {
-                if (parameters[1].EndsWith("m", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    parameters[1] = parameters[1].TrimEnd('m', 'M');
-
-                    if (!int.TryParse(parameters[1], out minuteModifier)) return StandardMessages.ManageCommandText;
-                }
-                else
-                {
-                    return StandardMessages.ManageCommandText;
-                }
-            }
+            var (minuteString, pointsString) = CommandHelpers.ManageCommandSorter(
+                e.Command.ArgumentsAsList.ElementAtOrDefault(1), e.Command.ArgumentsAsList.ElementAtOrDefault(2));
+            if (!int.TryParse(minuteString ?? "0", out var minuteModifier)) return StandardMessages.ManageCommandText;
+            if (!int.TryParse(pointsString ?? "0", out var pointModifier)) return StandardMessages.ManageCommandText;
 
             await _dataAccess.ModifierUserIdAsync(userid, pointModifier, minuteModifier).ConfigureAwait(false);
             return $"/me Modificat {e.Command.ArgumentsAsList[0]} cu {pointModifier} puncte si {minuteModifier} minute";
@@ -169,17 +136,21 @@ namespace EvilBot.Processors
                 //TODO check cases for exceptions or invalid data, find some handles so filter manager methods throw no exception
                 case "add":
                 {
-                    var user = await _apiRetriever.GetUserByUsernameAsync(e.Command.ArgumentsAsList[1]).ConfigureAwait(false);
+                    var user = await _apiRetriever.GetUserByUsernameAsync(e.Command.ArgumentsAsList[1])
+                        .ConfigureAwait(false);
                     if (user == null) return StandardMessages.UserMissingText;
-                    if (await _filterManager.AddToFilterAsync(new UserBase(user.DisplayName, user.Id.Trim())).ConfigureAwait(false))
+                    if (await _filterManager.AddToFilterAsync(new UserBase(user.DisplayName, user.Id.Trim()))
+                        .ConfigureAwait(false))
                         return $"/me {user.DisplayName} adaugat la Filtru!";
                     return $"/me {user.DisplayName} deja in Filtru!";
                 }
                 case "remove":
                 {
-                    var user = await _apiRetriever.GetUserByUsernameAsync(e.Command.ArgumentsAsList[1]).ConfigureAwait(false);
+                    var user = await _apiRetriever.GetUserByUsernameAsync(e.Command.ArgumentsAsList[1])
+                        .ConfigureAwait(false);
                     if (user == null) return StandardMessages.UserMissingText;
-                    if (await _filterManager.RemoveFromFilterAsync(new UserBase(user.DisplayName, user.Id)).ConfigureAwait(false))
+                    if (await _filterManager.RemoveFromFilterAsync(new UserBase(user.DisplayName, user.Id))
+                        .ConfigureAwait(false))
                         return $"/me {user.DisplayName} sters din Filtru!";
                     return $"/me {user.DisplayName} nu este in Filtru!";
                 }
@@ -196,7 +167,8 @@ namespace EvilBot.Processors
         public async Task<string> TopCommandAsync(OnChatCommandReceivedArgs e)
         {
             Log.Debug("Top Command Started!");
-            var databaseUsers = await _dataAccess.RetrieveNumberOfUsersFromTableAsync(Enums.DatabaseTables.UserPoints, 6,
+            var databaseUsers = await _dataAccess.RetrieveNumberOfUsersFromTableAsync(Enums.DatabaseTables.UserPoints,
+                6,
                 Enums.DatabaseUserPointsOrderRow.Points).ConfigureAwait(false);
             if (databaseUsers == null) return "/me Baza de date este goala!";
             databaseUsers.RemoveAll(x => x.UserId == _apiRetriever.TwitchChannelId);
