@@ -10,17 +10,17 @@ namespace EvilBot.Utilities.Resources.Interfaces
 	{
 		string TwitchChannelId { get; }
 
-		Task<User> GetUserAsyncByUsername(string username);
+		Task<User> GetUserByUsernameAsync(string username);
 		
-		Task<User> GetUserAsyncById(string userId);
+		Task<User> GetUserByIdAsync(string userId);
 		
 		Task<string> GetUserIdAsync(string username);
 		
-		Task<List<IUserBase>> GetChannelSubscribers(string channelId);
+		Task<List<IUserBase>> GetChannelSubscribersAsync(string channelId);
 		
-		Task<List<IUser>> GetChattersUsers(string channelName);
+		Task<List<IUser>> GetChattersUsersAsync(string channelName);
 		
-		Task<List<User>> GetUsersAsyncByUsername(List<string> usernames);
+		Task<List<User>> GetUsersByUsernameAsync(List<string> usernames);
 
 		Task<List<TwitchLib.Api.Helix.Models.Users.User>> GetUsersHelixAsync
 			(List<string> ids = null, List<string> logins = null);

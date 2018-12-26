@@ -53,7 +53,7 @@ namespace EvilBot.Utilities.Resources
 			}
 		}
 		
-		public async Task<bool> ModifyFilteredUsers(Enums.FilteredUsersDatabaseAction databaseAction, string userId)
+		public async Task<bool> ModifyFilteredUsersAsync(Enums.FilteredUsersDatabaseAction databaseAction, string userId)
 		{
 			if (WriteConnection.State != ConnectionState.Open) WriteConnection.Open();
 			Log.Debug("Modifying filtered {userId}", userId);
@@ -62,14 +62,14 @@ namespace EvilBot.Utilities.Resources
 				case Enums.FilteredUsersDatabaseAction.Remove:
 				{
 					var rowsAffected =
-						await WriteConnection.ExecuteAsync("DELETE FROM FilteredUsers WHERE UserID = @UserId ", new {UserId = userId});
+						await WriteConnection.ExecuteAsync("DELETE FROM FilteredUsers WHERE UserID = @UserId ", new {UserId = userId}).ConfigureAwait(false);
 					return rowsAffected > 0;
 				}
 				case Enums.FilteredUsersDatabaseAction.Insert:
 				{
 					var rowsAffected =
 						await WriteConnection.ExecuteAsync(
-							"INSERT INTO FilteredUsers (UserID) VALUES (@UserId) ON CONFLICT DO NOTHING", new {UserId = userId});
+                            "INSERT INTO FilteredUsers (UserID) VALUES (@UserId) ON CONFLICT DO NOTHING", new {UserId = userId}).ConfigureAwait(false);
 					return rowsAffected > 0;
 				}
 				default:
@@ -79,21 +79,21 @@ namespace EvilBot.Utilities.Resources
 			}
 		}
 
-		public async Task<List<IDatabaseUser>> RetrieveAllUsersFromTable(Enums.DatabaseTables table)
+		public async Task<List<IDatabaseUser>> RetrieveAllUsersFromTableAsync(Enums.DatabaseTables table)
 		{
 			if (RetrieveConnection.State != ConnectionState.Open) RetrieveConnection.Open();
 			var retrievingTable = table.ToString();
 			Log.Debug("Retrieving all users from table {table}", retrievingTable);
 			var output =
 				(await RetrieveConnection.QueryAsync<DatabaseUser>($"SELECT * FROM {retrievingTable}",
-					new DynamicParameters())).ToList();
+                    new DynamicParameters()).ConfigureAwait(false)).ToList();
 			var results = output.ToList<IDatabaseUser>();
 			if (output.Any()) return results;
 			Log.Warning("{table} table is empty!", retrievingTable);
 			return null;
 		}
 
-		public async Task<IDatabaseUser> RetrieveUserFromTable(Enums.DatabaseTables table, string userId)
+		public async Task<IDatabaseUser> RetrieveUserFromTableAsync(Enums.DatabaseTables table, string userId)
 		{
 			if (userId == null) return null;
 			if (RetrieveConnection.State != ConnectionState.Open) RetrieveConnection.Open();
@@ -101,13 +101,13 @@ namespace EvilBot.Utilities.Resources
 			Log.Debug("Retrieving {userId} from table {table}", userId, retrievingTable);
 			//TODO: add QueryFirstOrDefault after you know what default returns
 			var output = (await RetrieveConnection.QueryAsync<DatabaseUser>(
-				$"SELECT * FROM {retrievingTable} WHERE UserID = @UserId ", new {RetrievingTable = retrievingTable ,UserId = userId})).ToList();
+                $"SELECT * FROM {retrievingTable} WHERE UserID = @UserId ", new {RetrievingTable = retrievingTable ,UserId = userId}).ConfigureAwait(false)).ToList();
 			if (output.Any()) return output.First();
 			Log.Warning("{userId} not in table {table}", userId, retrievingTable);
 			return null;
 		}
 
-		public async Task<List<IDatabaseUser>> RetrieveNumberOfUsersFromTable
+		public async Task<List<IDatabaseUser>> RetrieveNumberOfUsersFromTableAsync
 			(Enums.DatabaseTables table, int limit, Enums.DatabaseUserPointsOrderRow orderRow = Enums.DatabaseUserPointsOrderRow.None)
 		{
 			if (RetrieveConnection.State != ConnectionState.Open) RetrieveConnection.Open();
@@ -120,7 +120,7 @@ namespace EvilBot.Utilities.Resources
 				throw new Exception("Bad parameter. When using other than UserPoints table orderRow needs to be None.");
 			var output =
 				(await RetrieveConnection.QueryAsync<DatabaseUser>($"SELECT * FROM {retrievingTable} {orderString} DESC LIMIT {limit}",
-					new DynamicParameters())).ToList();
+                    new DynamicParameters()).ConfigureAwait(false)).ToList();
 			var results = output.ToList<IDatabaseUser>();
 			if (output.Any()) return results;
 			Log.Warning("{table} table is empty!", retrievingTable);	

@@ -44,11 +44,11 @@ namespace EvilBot.Tests
 					.Returns(Task.FromResult(default(object)))
 					.Verifiable();
 				mock.Mock<IDataAccess>()
-					.Setup(x => x.RetrieveUserFromTable(Enums.DatabaseTables.UserPoints, It.IsAny<string>()))
+					.Setup(x => x.RetrieveUserFromTableAsync(Enums.DatabaseTables.UserPoints, It.IsAny<string>()))
 					.ReturnsAsync(new DatabaseUser())
 					.Verifiable();
 				mock.Mock<IDataAccess>()
-					.Setup(x => x.RetrieveUserFromTable(Enums.DatabaseTables.UserPoints, "00000000"))
+					.Setup(x => x.RetrieveUserFromTableAsync(Enums.DatabaseTables.UserPoints, "00000000"))
 					.ReturnsAsync(new DatabaseUser
 					{
 						Id = 1,
@@ -59,7 +59,7 @@ namespace EvilBot.Tests
 					})
 					.Verifiable();
 				mock.Mock<IDataAccess>()
-					.Setup(x => x.RetrieveUserFromTable(Enums.DatabaseTables.UserPoints, "00000003"))
+					.Setup(x => x.RetrieveUserFromTableAsync(Enums.DatabaseTables.UserPoints, "00000003"))
 					.ReturnsAsync(new DatabaseUser
 					{
 						Id = 1,
@@ -77,7 +77,7 @@ namespace EvilBot.Tests
 					.SetupGet(x => x.TwitchChannelId)
 					.Returns("11122233");
 				mock.Mock<IApiRetriever>()
-					.Setup(x => x.GetChannelSubscribers("11122233"))
+					.Setup(x => x.GetChannelSubscribersAsync("11122233"))
 					.ReturnsAsync(GetSampleUserSubscribers());
 				mock.Mock<IConfiguration>()
 					.Setup(x => x.PointsMultiplier)
@@ -106,7 +106,7 @@ namespace EvilBot.Tests
 				mock.Mock<IDataAccess>()
 					.Verify(x => x.ModifyUserIdRankAsync("00000000", It.IsAny<int>()), Times.Exactly(1));
 				mock.Mock<IDataAccess>()
-					.Verify(x => x.RetrieveUserFromTable(Enums.DatabaseTables.UserPoints,
+					.Verify(x => x.RetrieveUserFromTableAsync(Enums.DatabaseTables.UserPoints,
 						It.Is<string>(z => z == "00000000" || z == "00000002" || z == "00000003")));
 				mock.Mock<IDataAccess>()
 					.VerifyNoOtherCalls();
@@ -151,7 +151,7 @@ namespace EvilBot.Tests
 					.Setup(x => x.GetUserIdAsync(It.IsAny<string>()))
 					.Throws(new Exception("Test Exception Handling"));
 				mock.Mock<IApiRetriever>()
-					.Setup(x => x.GetChannelSubscribers(It.IsAny<string>()))
+					.Setup(x => x.GetChannelSubscribersAsync(It.IsAny<string>()))
 					.Throws(new Exception("Test Exception Handling"));
 				mock.Mock<IConfiguration>()
 					.Setup(x => x.PointsMultiplier)

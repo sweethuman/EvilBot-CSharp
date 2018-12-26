@@ -74,7 +74,7 @@ namespace EvilBot.Processors
             //in case twitch says something went wrong, it throws exception, catch that exception
             try
             {
-                var userIdList = await _apiRetriever.GetChattersUsers(TwitchInfo.ChannelName);
+                var userIdList = await _apiRetriever.GetChattersUsersAsync(TwitchInfo.ChannelName).ConfigureAwait(false);
                 var userList = userIdList.Select(t => new UserBase(t.DisplayName, t.Id)).ToList<IUserBase>();
                 await AddToUserAsync(userList, minutes: 10).ConfigureAwait(false);
                 Log.Debug("Database updated! Lurkers present: {Lurkers}", userList.Count);
@@ -151,7 +151,7 @@ namespace EvilBot.Processors
                 try
                 {
                     if (subCheck)
-                        channelSubscribers = await _apiRetriever.GetChannelSubscribers(_apiRetriever.TwitchChannelId)
+                        channelSubscribers = await _apiRetriever.GetChannelSubscribersAsync(_apiRetriever.TwitchChannelId)
                             .ConfigureAwait(false);
                     else
                         channelSubscribers = new List<IUserBase>();
@@ -183,7 +183,7 @@ namespace EvilBot.Processors
             var usersUpdated = new List<IUserStructure>();
             var databaseRankUpdateTasks = new List<Task>();
             var getUserAttributesTasks = userList
-                .Select(t => _dataAccess.RetrieveUserFromTable(Enums.DatabaseTables.UserPoints, t.UserId)).ToList();
+                .Select(t => _dataAccess.RetrieveUserFromTableAsync(Enums.DatabaseTables.UserPoints, t.UserId)).ToList();
             var userAttributes = (await Task.WhenAll(getUserAttributesTasks).ConfigureAwait(false)).ToList();
             if (userAttributes.Contains(null))
                 Log.Error(

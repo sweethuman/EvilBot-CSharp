@@ -8,20 +8,24 @@ namespace EvilBot.Utilities
 {
 	public static class CommandHelpers
 	{
-		//returns, first string is minutes, second is
+        //TODO move to tuples
+		/// <summary>
+        /// This takes the minutes and points strings and arranges them;
+        /// </summary>
+        /// <param name="stringOne"></param>
+        /// <param name="stringTwo"></param>
+        /// <returns>First string is minutes. Second string is points</returns>
 		public static List<string> ManageCommandSorter(string stringOne, string stringTwo)
 		{
 			if (stringOne.EndsWith("m", StringComparison.InvariantCultureIgnoreCase))
 			{
 				var temporary = stringTwo;
 				stringTwo = stringOne;
-				stringOne = temporary;
+				stringOne = temporary;  
 			}
 
-			var stringOrder = new List<string>();
-			stringOrder.Add(stringOne);
-			stringOrder.Add(stringTwo);
-			return stringOrder;
+            var stringOrder = new List<string> {stringOne, stringTwo};
+            return stringOrder;
 		}
 
 		public static List<string> FilterAndPreparePollOptions(string arguments)

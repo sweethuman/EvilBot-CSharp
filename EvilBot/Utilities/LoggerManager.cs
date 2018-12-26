@@ -8,6 +8,10 @@ namespace EvilBot.Utilities
 {
 	public class LoggerManager : ILoggerManager
 	{
+		public ILogger<TwitchClient> ClientLogger { get; set; }
+		
+		public ILoggerFactory ApiLoggerFactory { get; set; }
+		
 		public LoggerManager()
 		{
 			//NOTE remove logging to seq
@@ -46,7 +50,5 @@ namespace EvilBot.Utilities
 				.CreateLogger();
 		}
 
-		public ILogger<TwitchClient> ClientLogger { get; set; }
-		public ILoggerFactory ApiLoggerFactory { get; set; }
 	}
 }

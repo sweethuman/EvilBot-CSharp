@@ -63,13 +63,13 @@ namespace EvilBot.Utilities
 			return PollItems.Select((t, i) => new PollItem(i,PollVotes[i], t)).ToList<IPollItem>();
 		}
 
-		public async Task<Enums.PollAddVoteFinishState> PollAddVote(string userId, int votedNumber)
+		public async Task<Enums.PollAddVoteFinishState> PollAddVoteAsync(string userId, int votedNumber)
 		{
 			if (!PollActive) return Enums.PollAddVoteFinishState.PollNotActive;
 			if (userId == null || _usersWhoVoted.Contains(userId)) return Enums.PollAddVoteFinishState.VoteFailed;
 			if (votedNumber > PollItems.Count || votedNumber < 1) return Enums.PollAddVoteFinishState.OptionOutOfRange;
 
-			var user = await _dataAccess.RetrieveUserFromTable(Enums.DatabaseTables.UserPoints, userId) ??
+			var user = await _dataAccess.RetrieveUserFromTableAsync(Enums.DatabaseTables.UserPoints, userId).ConfigureAwait(false) ??
 			           new DatabaseUser {UserId = userId, Rank = "0"};
 			if (int.TryParse(user.Rank, out var rank) && rank < InfluencePoints.Count)
 			{

@@ -128,20 +128,20 @@ namespace EvilBot.TwitchBot
                         e.Command.ChatMessage.Message);
                     if (e.Command.ChatMessage.UserType >= UserType.Moderator)
                         _twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel,
-                            await _commandProcessor.FilterCommand(e));
+                            await _commandProcessor.FilterCommandAsync(e).ConfigureAwait(false));
                     break;
                 case "top":
                     Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName,
                         e.Command.ChatMessage.Message);
                     _twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel,
-                        await _commandProcessor.TopCommand(e));
+                        await _commandProcessor.TopCommandAsync(e).ConfigureAwait(false));
                     break;
                 case "giveaway":
                     Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName,
                         e.Command.ChatMessage.Message);
                     if (e.Command.ChatMessage.UserType >= UserType.Moderator)
                     {
-                        var giveaway = await _commandProcessor.GiveawayCommand(e);
+                        var giveaway = await _commandProcessor.GiveawayCommandAsync(e).ConfigureAwait(false);
                         Log.Debug(giveaway.usersAnnouncement);
                         Log.Debug(giveaway.winnerAnnouncement);
                         _twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, giveaway.usersAnnouncement);
@@ -161,10 +161,10 @@ namespace EvilBot.TwitchBot
             _messageRepeaterMinutes = _configuration.MessageRepeaterMinutes;
             _bitsToPointsMultiplier = _configuration.BitsPointsMultiplier;
 
-            EventIntializer();
+            EventInitializer();
             TimedMessageInitializer();
             TimerInitializer();
-            _filterManager.InitializeFilter().Wait();
+            _filterManager.InitializeFilterAsync().Wait();
         }
 
         public void Disconnect()
@@ -199,7 +199,7 @@ namespace EvilBot.TwitchBot
             _messageRepeater.Start();
         }
 
-        private void EventIntializer()
+        private void EventInitializer()
         {
             _twitchConnection.Client.OnConnectionError += Client_OnConnectionError;
             _twitchConnection.Client.OnChatCommandReceived += Client_OnChatCommandReceivedAsync;

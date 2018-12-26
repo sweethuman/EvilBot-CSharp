@@ -17,12 +17,12 @@ namespace EvilBot.Processors.Interfaces
 
 		string PollEndCommand(OnChatCommandReceivedArgs e);
 
-		Task<string> FilterCommand(OnChatCommandReceivedArgs e);
+		Task<string> FilterCommandAsync(OnChatCommandReceivedArgs e);
 		
 		string RanksListCommand(OnChatCommandReceivedArgs e);
 		
-		Task<string> TopCommand(OnChatCommandReceivedArgs e);
+		Task<string> TopCommandAsync(OnChatCommandReceivedArgs e);
 		
-		Task<(string usersAnnouncement, string winnerAnnouncement)> GiveawayCommand(OnChatCommandReceivedArgs e);
+		Task<(string usersAnnouncement, string winnerAnnouncement)> GiveawayCommandAsync(OnChatCommandReceivedArgs e);
 	}
 }

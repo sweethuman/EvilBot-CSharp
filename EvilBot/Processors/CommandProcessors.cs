@@ -12,6 +12,7 @@ using EvilBot.Utilities.Interfaces;
 using EvilBot.Utilities.Resources;
 using EvilBot.Utilities.Resources.Interfaces;
 using Serilog;
+using TwitchLib.Api.Core.Exceptions;
 using TwitchLib.Api.Helix.Models.Users;
 using TwitchLib.Client.Events;
 
@@ -44,7 +45,7 @@ namespace EvilBot.Processors
             if (string.IsNullOrEmpty(e.Command.ArgumentsAsString))
             {
                 var results = await _dataAccess
-                    .RetrieveUserFromTable(Enums.DatabaseTables.UserPoints, e.Command.ChatMessage.UserId)
+                    .RetrieveUserFromTableAsync(Enums.DatabaseTables.UserPoints, e.Command.ChatMessage.UserId)
                     .ConfigureAwait(false);
                 var displayName = e.Command.ChatMessage.DisplayName;
                 if (results == null) return $"/me {displayName} nu esti inca in baza de date! Vei fi adaugat imediat!";
@@ -63,13 +64,23 @@ namespace EvilBot.Processors
                         .GetUserIdAsync(e.Command.ArgumentsAsString.TrimStart('@').ToLower()).ConfigureAwait(false);
                 }
                 //TODO find accurate exception to differentiate between bad parameters and any other exception
+                catch (BadParameterException exception)
+                {
+                    Log.Error(exception, "Bad parameter {parameter}", e.Command.ArgumentsAsString);
+                    return $"/me Numele \"{e.Command.ArgumentsAsString}\" este invalid.";
+                }
+                catch (BadRequestException exception)
+                {
+                    Log.Error(exception, "Bad parameter {parameter}", e.Command.ArgumentsAsString);
+                    return $"/me Numele \"{e.Command.ArgumentsAsString}\" este invalid.";
+                }
                 catch (Exception exception)
                 {
-                    Log.Error(exception, "Invalid username {username}", e.Command.ArgumentsAsString);
-                    return "/me Numele dat este invalid.";
+                    Log.Error(exception, "WRONG PARAMETER {parameter}", e.Command.ArgumentsAsString);
+                    return $"/me Unexpected error. Please report! Parameter: \"{e.Command.ArgumentsAsString}\"";
                 }
 
-                var results = await _dataAccess.RetrieveUserFromTable(Enums.DatabaseTables.UserPoints, userId)
+                var results = await _dataAccess.RetrieveUserFromTableAsync(Enums.DatabaseTables.UserPoints, userId)
                     .ConfigureAwait(false);
                 var displayName = e.Command.ArgumentsAsString.TrimStart('@');
                 if (results == null) return $"/me {displayName} nu este inca in baza de date!";
@@ -102,6 +113,8 @@ namespace EvilBot.Processors
             var minuteModifier = 0;
             var twoParams = false;
             var parameters = new List<string> {e.Command.ArgumentsAsList[1]};
+
+            //NOTE with new version of ManageCommandSorter this could be simplified 
             if (e.Command.ArgumentsAsList.Count == 3)
             {
                 twoParams = true;
@@ -138,7 +151,7 @@ namespace EvilBot.Processors
             return $"/me Modificat {e.Command.ArgumentsAsList[0]} cu {pointModifier} puncte si {minuteModifier} minute";
         }
 
-        public async Task<string> FilterCommand(OnChatCommandReceivedArgs e)
+        public async Task<string> FilterCommandAsync(OnChatCommandReceivedArgs e)
         {
             if (e.Command.ArgumentsAsList.Count >= 1 && e.Command.ArgumentsAsList[0] == "get")
             {
@@ -153,19 +166,20 @@ namespace EvilBot.Processors
             if (e.Command.ArgumentsAsList.Count < 2) return StandardMessages.FilterText;
             switch (e.Command.ArgumentsAsList[0])
             {
+                //TODO check cases for exceptions or invalid data, find some handles so filter manager methods throw no exception
                 case "add":
                 {
-                    var user = await _apiRetriever.GetUserAsyncByUsername(e.Command.ArgumentsAsList[1]);
+                    var user = await _apiRetriever.GetUserByUsernameAsync(e.Command.ArgumentsAsList[1]).ConfigureAwait(false);
                     if (user == null) return StandardMessages.UserMissingText;
-                    if (await _filterManager.AddToFiler(new UserBase(user.DisplayName, user.Id.Trim())))
+                    if (await _filterManager.AddToFilterAsync(new UserBase(user.DisplayName, user.Id.Trim())).ConfigureAwait(false))
                         return $"/me {user.DisplayName} adaugat la Filtru!";
                     return $"/me {user.DisplayName} deja in Filtru!";
                 }
                 case "remove":
                 {
-                    var user = await _apiRetriever.GetUserAsyncByUsername(e.Command.ArgumentsAsList[1]);
+                    var user = await _apiRetriever.GetUserByUsernameAsync(e.Command.ArgumentsAsList[1]).ConfigureAwait(false);
                     if (user == null) return StandardMessages.UserMissingText;
-                    if (await _filterManager.RemoveFromFilter(new UserBase(user.DisplayName, user.Id)))
+                    if (await _filterManager.RemoveFromFilterAsync(new UserBase(user.DisplayName, user.Id)).ConfigureAwait(false))
                         return $"/me {user.DisplayName} sters din Filtru!";
                     return $"/me {user.DisplayName} nu este in Filtru!";
                 }
@@ -179,11 +193,11 @@ namespace EvilBot.Processors
             return $"/me {RankListString}";
         }
 
-        public async Task<string> TopCommand(OnChatCommandReceivedArgs e)
+        public async Task<string> TopCommandAsync(OnChatCommandReceivedArgs e)
         {
             Log.Debug("Top Command Started!");
-            var databaseUsers = await _dataAccess.RetrieveNumberOfUsersFromTable(Enums.DatabaseTables.UserPoints, 6,
-                Enums.DatabaseUserPointsOrderRow.Points);
+            var databaseUsers = await _dataAccess.RetrieveNumberOfUsersFromTableAsync(Enums.DatabaseTables.UserPoints, 6,
+                Enums.DatabaseUserPointsOrderRow.Points).ConfigureAwait(false);
             if (databaseUsers == null) return "/me Baza de date este goala!";
             databaseUsers.RemoveAll(x => x.UserId == _apiRetriever.TwitchChannelId);
             if (databaseUsers.Count < 1) return "/me Nu am ce afisa!";
@@ -191,7 +205,7 @@ namespace EvilBot.Processors
             List<User> twitchUsers;
             try
             {
-                twitchUsers = await _apiRetriever.GetUsersHelixAsync(userIdList);
+                twitchUsers = await _apiRetriever.GetUsersHelixAsync(userIdList).ConfigureAwait(false);
             }
             catch (Exception exception)
             {
@@ -224,13 +238,13 @@ namespace EvilBot.Processors
             return $"/me {builder}";
         }
 
-        public async Task<(string usersAnnouncement, string winnerAnnouncement)> GiveawayCommand(
+        public async Task<(string usersAnnouncement, string winnerAnnouncement)> GiveawayCommandAsync(
             OnChatCommandReceivedArgs e)
         {
             Log.Information("Giveaway started!");
             try
             {
-                var userList = await _apiRetriever.GetChattersUsers(TwitchInfo.ChannelName);
+                var userList = await _apiRetriever.GetChattersUsersAsync(TwitchInfo.ChannelName).ConfigureAwait(false);
                 userList.RemoveAll(x =>
                     string.Equals(x.Name, TwitchInfo.ChannelName, StringComparison.CurrentCultureIgnoreCase));
                 var getDatabaseUsersTasks = new List<Task<IDatabaseUser>>();
@@ -239,7 +253,7 @@ namespace EvilBot.Processors
                     if (!_filterManager.CheckIfUserFiltered(new UserBase(userList[i].DisplayName, userList[i].Id)))
                     {
                         getDatabaseUsersTasks.Add(
-                            _dataAccess.RetrieveUserFromTable(Enums.DatabaseTables.UserPoints, userList[i].Id));
+                            _dataAccess.RetrieveUserFromTableAsync(Enums.DatabaseTables.UserPoints, userList[i].Id));
                         continue;
                     }
 
@@ -317,7 +331,7 @@ namespace EvilBot.Processors
         {
             if (!int.TryParse(e.Command.ArgumentsAsString, out var votedNumber))
                 return StandardMessages.PollVoteNotNumber;
-            var voteState = await _pollManager.PollAddVote(e.Command.ChatMessage.UserId, votedNumber)
+            var voteState = await _pollManager.PollAddVoteAsync(e.Command.ChatMessage.UserId, votedNumber)
                 .ConfigureAwait(false);
 
             switch (voteState)

@@ -19,20 +19,18 @@ namespace EvilBot.Utilities.Resources
     {
         private readonly ITwitchConnections _twitchConnections;
 
+        public string TwitchChannelId { get; }
+
         public ApiRetriever(ITwitchConnections twitchConnections)
         {
             _twitchConnections = twitchConnections;
             var twitchChannelId = GetUserIdAsync(TwitchInfo.ChannelName).Result;
-            if (twitchChannelId == null)
-                throw new Exception(
+            TwitchChannelId = twitchChannelId ?? throw new Exception(
                     "TwitchChannelId is null. Check if channel name is correct or connexions are made correctly");
-            TwitchChannelId = twitchChannelId;
         }
 
-        public string TwitchChannelId { get; }
-
-
-        public async Task<User> GetUserAsyncByUsername(string username)
+        //TODO this needs to throw exception
+        public async Task<User> GetUserByUsernameAsync(string username)
         {
             username = username.Trim('@');
             Log.Debug("AskedForID for {Username}", username);
@@ -44,7 +42,7 @@ namespace EvilBot.Utilities.Resources
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "GetUserAsyncByUsername blew up with {username}", username);
+                Log.Error(ex, "GetUserByUsernameAsync blew up with {username}", username);
                 return null;
             }
 
@@ -53,7 +51,27 @@ namespace EvilBot.Utilities.Resources
             return null;
         }
 
-        public async Task<List<User>> GetUsersAsyncByUsername(List<string> usernames)
+        //TODO this needs to throw
+        public async Task<User> GetUserByIdAsync(string userId)
+        {
+            Log.Debug("AskedForID for {Username}", userId);
+            User user;
+            try
+            {
+                user = await _twitchConnections.Api.V5.Users.GetUserByIDAsync(userId).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "GetUserByUsernameAsync blew up with {username}", userId);
+                return null;
+            }
+
+            if (user != null) return user;
+            Log.Warning("User does not exit {username}", userId);
+            return null;
+        }
+
+        public async Task<List<User>> GetUsersByUsernameAsync(List<string> usernames)
         {
             if (usernames == null || usernames.Count == 0)
                 return null;
@@ -81,25 +99,6 @@ namespace EvilBot.Utilities.Resources
                 Log.Warning(e, "BLEW UP WITH {usernames}", builder);
                 throw;
             }
-        }
-
-        public async Task<User> GetUserAsyncById(string userId)
-        {
-            Log.Debug("AskedForID for {Username}", userId);
-            User user;
-            try
-            {
-                user = await _twitchConnections.Api.V5.Users.GetUserByIDAsync(userId).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "GetUserAsyncByUsername blew up with {username}", userId);
-                return null;
-            }
-
-            if (user != null) return user;
-            Log.Warning("User does not exit {username}", userId);
-            return null;
         }
 
         public async Task<string> GetUserIdAsync(string username)
@@ -162,7 +161,7 @@ namespace EvilBot.Utilities.Resources
             }
         }
 
-        public async Task<List<IUserBase>> GetChannelSubscribers(string channelId)
+        public async Task<List<IUserBase>> GetChannelSubscribersAsync(string channelId)
         {
             var subscribers =
                 (await _twitchConnections.Api.V5.Channels.GetChannelSubscribersAsync(channelId).ConfigureAwait(false))
@@ -171,21 +170,21 @@ namespace EvilBot.Utilities.Resources
             return subscribers.Select(t => new UserBase(t.User.DisplayName, t.User.Id)).ToList<IUserBase>();
         }
 
-        public async Task<List<IUser>> GetChattersUsers(string channelName)
+        public async Task<List<IUser>> GetChattersUsersAsync(string channelName)
         {
             try
             {
                 var chatusers = await _twitchConnections.Api.Undocumented.GetChattersAsync(channelName)
                     .ConfigureAwait(false);
                 var usernamesList = chatusers.Select(t => t.Username).ToList();
-                var userList = await GetUsersAsyncByUsername(usernamesList).ConfigureAwait(false);
+                var userList = await GetUsersByUsernameAsync(usernamesList).ConfigureAwait(false);
                 if (userList == null) return null;
                 userList.RemoveAll(x => x == null);
                 return userList.ToList<IUser>();
             }
             catch (Exception e)
             {
-                Log.Error(e, "GetChattersUsers Failed, channel: {channel}", channelName);
+                Log.Error(e, "GetChattersUsersAsync Failed, channel: {channel}", channelName);
                 throw;
             }
         }

@@ -6,11 +6,11 @@ namespace EvilBot.Utilities.Interfaces
 {
 	public interface IFilterManager
 	{
-		Task InitializeFilter();
+		Task InitializeFilterAsync();
 		
-		Task<bool> AddToFiler(IUserBase user);
+		Task<bool> AddToFilterAsync(IUserBase user);
 		
-		Task<bool> RemoveFromFilter(IUserBase user);
+		Task<bool> RemoveFromFilterAsync(IUserBase user);
 		
 		List<IUserBase> RetrieveFilteredUsers();
 		

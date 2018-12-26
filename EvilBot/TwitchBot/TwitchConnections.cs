@@ -35,7 +35,6 @@ namespace EvilBot.TwitchBot
 			ApiInitialize();
 		}
 
-		
 		//NOTE probably this is temporary, and maybe there is a better solution with wich I can use this without needing to have a ref to this class everywhere
 		public void SendErrorMessage(string message)
 		{
