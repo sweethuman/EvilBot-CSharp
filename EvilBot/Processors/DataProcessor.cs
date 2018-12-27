@@ -69,14 +69,14 @@ namespace EvilBot.Processors
         {
             for (var i = 0; i < userList.Count; i++)
             {
-                if (!_filterManager.CheckIfUserFiltered(userList[i])) continue;
+                if (!_filterManager.CheckIfUserFiltered(userList[i].UserId)) continue;
                 userList.RemoveAll(x => x.UserId == userList[i].UserId);
                 i--;
             }
 
             return userList;
         }
-        
+
         #endregion GeneralProcessors
 
         #region TimedPointManagers
@@ -246,7 +246,7 @@ namespace EvilBot.Processors
                 OnRankUpdated(usersUpdated[i].DisplayName,
                     $"{_ranks[int.Parse(usersUpdated[i].Rank)].Item1} (Lvl. {usersUpdated[i].Rank})");
         }
-        
+
         public List<IRankItem> GetRankList()
         {
             return _ranks.Select((t, i) => new RankItem(i, t.Item1, t.Item2)).ToList<IRankItem>();

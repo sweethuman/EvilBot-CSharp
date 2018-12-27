@@ -137,18 +137,18 @@ namespace EvilBot.Processors
                 }
                 if (user == null) return StandardMessages.UserMissingText(e.Command.ArgumentsAsList[1]);
             }
-            
+
             switch (e.Command.ArgumentsAsList[0])
             {
                 case "get":
                 {
                     if (user != null)
                     {
-                        if (_filterManager.CheckIfUserFiltered(new UserBase(user.DisplayName, user.Id.Trim())))
+                        if (_filterManager.CheckIfUserFiltered(user.Id.Trim()))
                             return $"/me {user.DisplayName} este filtrat!";
                         return $"/me {user.DisplayName} nu este filtrat!";
                     }
-                    
+
                     var filteredUsers = _filterManager.RetrieveFilteredUsers();
                     if (filteredUsers.Count <= 0) return "/me Nici un User filtrat!";
                     var builder = new StringBuilder();
@@ -241,7 +241,7 @@ namespace EvilBot.Processors
                 var getDatabaseUsersTasks = new List<Task<IDatabaseUser>>();
                 for (var i = 0; i < userList.Count; i++)
                 {
-                    if (!_filterManager.CheckIfUserFiltered(new UserBase(userList[i].DisplayName, userList[i].Id)))
+                    if (!_filterManager.CheckIfUserFiltered(userList[i].Id))
                     {
                         getDatabaseUsersTasks.Add(
                             _dataAccess.RetrieveUserFromTableAsync(Enums.DatabaseTables.UserPoints, userList[i].Id));

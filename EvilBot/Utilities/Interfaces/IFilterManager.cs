@@ -14,7 +14,7 @@ namespace EvilBot.Utilities.Interfaces
 		
 		List<IUserBase> RetrieveFilteredUsers();
 		
-		/// <param name="user">Only users Id to identify filter. The DisplayName is used for Logging and can be ignored.</param>
-		bool CheckIfUserFiltered(IUserBase user);
+		/// <param name="userId">Check if userId is in the filter.</param>
+		bool CheckIfUserFiltered(string userId);
 	}
 }

@@ -240,8 +240,8 @@ namespace EvilBot.TwitchBot
             if (!e.ChatMessage.Message.StartsWith("!"))
             {
                 PointCounter.AddMessagePoint(new UserBase(e.ChatMessage.DisplayName, e.ChatMessage.UserId));
-                if (!_filterManager.CheckIfUserFiltered(new UserBase(e.ChatMessage.DisplayName,
-                        e.ChatMessage.UserId)) && PresenceCounter.IsNotPresent(e.ChatMessage.UserId))
+                if (!_filterManager.CheckIfUserFiltered(e.ChatMessage.UserId)
+                    && PresenceCounter.IsNotPresent(e.ChatMessage.UserId))
                     _twitchConnection.Client.SendMessage(e.ChatMessage.Channel,
                         $"/me Bine ai venit {e.ChatMessage.DisplayName}!");
             }

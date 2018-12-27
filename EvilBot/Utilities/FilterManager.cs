@@ -29,12 +29,12 @@ namespace EvilBot.Utilities
 			var users = await _dataAccess.RetrieveAllUsersFromTableAsync(Enums.DatabaseTables.FilteredUsers).ConfigureAwait(false);
 			if (users == null) return;
 			users.RemoveAll(x => x == null);
-			
+
 			//NOTE if GetUsersHelixAsync fails the program shouldn't start
 			var userIds = users.Select(x => x.UserId).ToList();
 			var userList = await _apiRetriever.GetUsersHelixAsync(userIds).ConfigureAwait(false);
 			userList.RemoveAll(user => user == null);
-			
+
 			for (var i = 0; i < userList.Count; i++)
 			{
 				Log.Debug("{user} {userId} adding to the filter", userList[i].DisplayName, userList[i].Id);
@@ -74,11 +74,11 @@ namespace EvilBot.Utilities
 			Log.Debug("Retrieving FilteredUsers");
 			return FilteredUsers;
 		}
-		//NOTE maybe i should only be working with userId's
-		public bool CheckIfUserFiltered(IUserBase user)
+
+		public bool CheckIfUserFiltered(string userId)
 		{
-			var stateOfCheck = FilteredUsers.Any(x => x.UserId == user.UserId);
-			Log.Debug("FilterCheck requested for {user} {userID} result: {result}", user.DisplayName, user.UserId,
+			var stateOfCheck = FilteredUsers.Any(x => x.UserId == userId);
+			Log.Debug("FilterCheck requested for {userID} result: {result}", userId,
 				stateOfCheck);
 			return stateOfCheck;
 		}
