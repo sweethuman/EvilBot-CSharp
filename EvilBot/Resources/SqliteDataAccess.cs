@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 using Dapper;
 using EvilBot.DataStructures.Database;
 using EvilBot.DataStructures.Database.Interfaces;
-using EvilBot.Utilities.Resources.Interfaces;
+using EvilBot.Resources.Interfaces;
 using Serilog;
 
-namespace EvilBot.Utilities.Resources
+namespace EvilBot.Resources
 {
 	public class SqliteDataAccess : IDataAccess
 	{

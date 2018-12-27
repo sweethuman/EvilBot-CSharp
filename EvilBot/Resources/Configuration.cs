@@ -1,7 +1,7 @@
 using System.Configuration;
-using EvilBot.Utilities.Resources.Interfaces;
+using EvilBot.Resources.Interfaces;
 
-namespace EvilBot.Utilities.Resources
+namespace EvilBot.Resources
 {
 	public class Configuration : IConfiguration
 	{

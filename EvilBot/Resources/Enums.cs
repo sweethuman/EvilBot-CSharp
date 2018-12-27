@@ -1,4 +1,4 @@
-﻿namespace EvilBot.Utilities.Resources
+﻿namespace EvilBot.Resources
 {
 	public static class Enums
 	{

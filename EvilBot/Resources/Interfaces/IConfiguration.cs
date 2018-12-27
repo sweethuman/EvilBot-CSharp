@@ -1,4 +1,4 @@
-namespace EvilBot.Utilities.Resources.Interfaces
+namespace EvilBot.Resources.Interfaces
 {
 	public interface IConfiguration
 	{

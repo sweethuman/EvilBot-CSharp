@@ -4,7 +4,7 @@ using EvilBot.DataStructures.Interfaces;
 using TwitchLib.Api.Core.Interfaces;
 using TwitchLib.Api.V5.Models.Users;
 
-namespace EvilBot.Utilities.Resources.Interfaces
+namespace EvilBot.Resources.Interfaces
 {
 	public interface IApiRetriever
 	{

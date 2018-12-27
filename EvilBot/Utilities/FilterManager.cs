@@ -3,9 +3,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using EvilBot.DataStructures;
 using EvilBot.DataStructures.Interfaces;
+using EvilBot.Resources;
+using EvilBot.Resources.Interfaces;
 using EvilBot.Utilities.Interfaces;
-using EvilBot.Utilities.Resources;
-using EvilBot.Utilities.Resources.Interfaces;
 using Serilog;
 
 namespace EvilBot.Utilities

@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 using EvilBot.DataStructures;
 using EvilBot.DataStructures.Interfaces;
 using EvilBot.Processors;
+using EvilBot.Resources.Interfaces;
 using EvilBot.TwitchBot.Interfaces;
-using EvilBot.Utilities.Resources.Interfaces;
 using Serilog;
 using TwitchLib.Api.Core.Interfaces;
 using TwitchLib.Api.Helix.Models.Users;
 using User = TwitchLib.Api.V5.Models.Users.User;
 
-namespace EvilBot.Utilities.Resources
+namespace EvilBot.Resources
 {
     public class ApiRetriever : IApiRetriever
     {

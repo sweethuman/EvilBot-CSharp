@@ -317,6 +317,14 @@
     <Compile Include="EventArguments\RankUpdateEventArgs.cs" />
     <Compile Include="Processors\CommandProcessors.cs" />
     <Compile Include="Processors\Interfaces\ICommandProcessors.cs" />
+    <Compile Include="Resources\ApiRetriever.cs" />
+    <Compile Include="Resources\Configuration.cs" />
+    <Compile Include="Resources\Enums.cs" />
+    <Compile Include="Resources\Interfaces\IApiRetriever.cs" />
+    <Compile Include="Resources\Interfaces\IConfiguration.cs" />
+    <Compile Include="Resources\Interfaces\IDataAccess.cs" />
+    <Compile Include="Resources\SqliteDataAccess.cs" />
+    <Compile Include="Resources\StandardMessages.cs" />
     <Compile Include="TwitchBot\TwitchConnections.cs" />
     <Compile Include="Utilities\CommandHelpers.cs" />
     <Compile Include="Utilities\FilterManager.cs" />
@@ -334,20 +342,12 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\PresenceCounter.cs" />
-    <Compile Include="Utilities\Resources\ApiRetriever.cs" />
-    <Compile Include="Utilities\Resources\Configuration.cs" />
-    <Compile Include="Utilities\Resources\Enums.cs" />
-    <Compile Include="Utilities\Resources\Interfaces\IApiRetriever.cs" />
-    <Compile Include="Utilities\Resources\Interfaces\IConfiguration.cs" />
-    <Compile Include="Utilities\Resources\Interfaces\IDataAccess.cs" />
-    <Compile Include="Utilities\Resources\SqliteDataAccess.cs" />
     <Compile Include="TwitchBot\TwitchChatBot.cs" />
     <Compile Include="TwitchInfo.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>TwitchInfo.resx</DependentUpon>
     </Compile>
-    <Compile Include="Utilities\Resources\StandardMessages.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

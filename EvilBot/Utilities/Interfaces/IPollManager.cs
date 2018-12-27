@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using EvilBot.DataStructures.Interfaces;
-using EvilBot.Utilities.Resources;
+using EvilBot.Resources;
 
 namespace EvilBot.Utilities.Interfaces
 {

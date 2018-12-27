@@ -6,10 +6,10 @@ using EvilBot.DataStructures;
 using EvilBot.DataStructures.Database;
 using EvilBot.DataStructures.Interfaces;
 using EvilBot.Processors;
+using EvilBot.Resources;
+using EvilBot.Resources.Interfaces;
 using EvilBot.TwitchBot.Interfaces;
 using EvilBot.Utilities.Interfaces;
-using EvilBot.Utilities.Resources;
-using EvilBot.Utilities.Resources.Interfaces;
 using Moq;
 using Xunit;
 

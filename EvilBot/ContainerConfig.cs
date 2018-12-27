@@ -1,12 +1,12 @@
 ﻿using Autofac;
 using EvilBot.Processors;
 using EvilBot.Processors.Interfaces;
+using EvilBot.Resources;
+using EvilBot.Resources.Interfaces;
 using EvilBot.TwitchBot;
 using EvilBot.TwitchBot.Interfaces;
 using EvilBot.Utilities;
 using EvilBot.Utilities.Interfaces;
-using EvilBot.Utilities.Resources;
-using EvilBot.Utilities.Resources.Interfaces;
 
 namespace EvilBot
 {
