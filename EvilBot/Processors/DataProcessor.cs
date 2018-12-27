@@ -65,6 +65,18 @@ namespace EvilBot.Processors
                 yield return list.GetRange(i, Math.Min(sizeOfSplit, list.Count - i));
         }
 
+        public List<T> RemoveFilteredUsers<T>(List<T> userList) where T : IUserBase
+        {
+            for (var i = 0; i < userList.Count; i++)
+            {
+                if (!_filterManager.CheckIfUserFiltered(userList[i])) continue;
+                userList.RemoveAll(x => x.UserId == userList[i].UserId);
+                i--;
+            }
+
+            return userList;
+        }
+        
         #endregion GeneralProcessors
 
         #region TimedPointManagers
@@ -139,13 +151,7 @@ namespace EvilBot.Processors
         {
             if (userList.Count != 0)
             {
-                //NOTE maybe this should be put in a function and moved upwards because it doesn't really fit the scope of this method
-                for (var i = 0; i < userList.Count; i++)
-                {
-                    if (!_filterManager.CheckIfUserFiltered(userList[i])) continue;
-                    userList.RemoveAll(x => x.UserId == userList[i].UserId);
-                    i--;
-                }
+                userList = RemoveFilteredUsers(userList);
 
                 var pointsMultiplier = _configuration.PointsMultiplier;
                 List<IUserBase> channelSubscribers;
@@ -163,11 +169,10 @@ namespace EvilBot.Processors
                     throw;
                 }
 
-                int pointAdderValue;
                 var addPointsTasks = new List<Task>();
                 for (var i = 0; i < userList.Count; i++)
                 {
-                    pointAdderValue = points;
+                    var pointAdderValue = points;
                     if (channelSubscribers.Any(x => x.UserId == userList[i].UserId))
                         pointAdderValue = (int) (pointAdderValue * pointsMultiplier);
                     addPointsTasks.Add(_dataAccess.ModifierUserIdAsync(userList[i].UserId, pointAdderValue, minutes));

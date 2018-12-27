@@ -41,11 +41,11 @@ namespace EvilBot.Utilities
             return options;
         }
 
-        public static string PollOptionsStringBuilder(List<IPollItem> pollItems)
+        public static string OptionsStringBuilder(int countOfOptions)
         {
             var builder = new StringBuilder();
             builder.Append("<1");
-            for (var i = 2; i <= pollItems.Count; i++) builder.AppendFormat(",{0}", i);
+            for (var i = 2; i <= countOfOptions; i++) builder.AppendFormat(",{0}", i);
 
             builder.Append(">");
             return builder.ToString();

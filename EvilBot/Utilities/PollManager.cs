@@ -34,8 +34,8 @@ namespace EvilBot.Utilities
 			PollItems = optionsList;
 			_usersWhoVoted = new List<string>();
 			PollVotes = new List<double>();
-			PollActive = true;
 			for (var i = 0; i < PollItems.Count; i++) PollVotes.Add(0);
+			PollActive = true;
 			Log.Debug("PollStarted");
 			return PollItems;
 		}

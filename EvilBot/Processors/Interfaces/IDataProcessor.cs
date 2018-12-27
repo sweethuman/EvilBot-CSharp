@@ -16,7 +16,7 @@ namespace EvilBot.Processors.Interfaces
 		/// <summary>
 		///     Adds Points to the Users asynchronously.
 		/// </summary>
-		/// <param name="userList">The users to add too the defined values.</param>
+		/// <param name="userList">The users to add to the defined values.</param>
 		/// <param name="points">The points to add.</param>
 		/// <param name="minutes">The minutes to add.</param>
 		/// <param name="subCheck">If set to <c>true</c> it will check if users are subscribers.</param>

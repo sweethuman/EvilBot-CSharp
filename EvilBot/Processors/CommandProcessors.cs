@@ -313,8 +313,7 @@ namespace EvilBot.Processors
             var builder = new StringBuilder();
             builder.Append("Poll Creat! Optiuni: ");
             for (var i = 0; i < resultItems.Count; i++) builder.AppendFormat(" //{0}:{1}", i + 1, resultItems[i]);
-            //NOTE FUCC, THIS IS MAY NOT BE STABLE IN THE FUTURE because we're not even in poll class and maybe I shouldn't have this if things change dinamically
-            PollOptionsString = CommandHelpers.PollOptionsStringBuilder(_pollManager.PollStats());
+            PollOptionsString = CommandHelpers.OptionsStringBuilder(_pollManager.PollStats().Count);
             return $"/me {builder}";
         }
 
