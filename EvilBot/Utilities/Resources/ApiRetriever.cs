@@ -63,7 +63,7 @@ namespace EvilBot.Utilities.Resources
             catch (Exception ex)
             {
                 Log.Error(ex, "GetUserByUsernameAsync blew up with {username}", userId);
-                return null;
+                throw;
             }
 
             if (user != null) return user;
