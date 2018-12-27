@@ -67,12 +67,12 @@ namespace EvilBot.Processors
                 catch (BadParameterException exception)
                 {
                     Log.Error(exception, "Bad parameter {parameter}", e.Command.ArgumentsAsString);
-                    return $"/me Numele \"{e.Command.ArgumentsAsList[0]}\" este invalid.";
+                    return StandardMessages.InvalidName(e.Command.ArgumentsAsList[0]);
                 }
                 catch (BadRequestException exception)
                 {
                     Log.Error(exception, "Bad request {parameter}", e.Command.ArgumentsAsString);
-                    return $"/me Numele \"{e.Command.ArgumentsAsList[0]}\" este invalid.";
+                    return StandardMessages.InvalidName(e.Command.ArgumentsAsList[0]);
                 }
                 catch (Exception exception)
                 {
@@ -104,7 +104,7 @@ namespace EvilBot.Processors
             catch (Exception exception)
             {
                 Log.Error(exception, "Invalid username {username}", e.Command.ArgumentsAsList[0].TrimStart('@'));
-                return "/me Numele dat este invalid.";
+                return StandardMessages.InvalidName(e.Command.ArgumentsAsList[0]);
             }
 
             if (e.Command.ArgumentsAsList.Count < 2 || userid == null)
@@ -121,12 +121,34 @@ namespace EvilBot.Processors
         public async Task<string> FilterCommandAsync(OnChatCommandReceivedArgs e)
         {
             if (e.Command.ArgumentsAsList.Count < 1) return StandardMessages.FilterText;
+
+            TwitchLib.Api.V5.Models.Users.User user = null;
+            if (e.Command.ArgumentsAsList.Count >= 2)
+            {
+                try
+                {
+                    user = await _apiRetriever.GetUserByUsernameAsync(e.Command.ArgumentsAsList[1])
+                        .ConfigureAwait(false);
+                }
+                catch (Exception exception)
+                {
+                    Log.Error(exception.Message,"Bad request {parameter}", e.Command.ArgumentsAsString);
+                    return StandardMessages.InvalidName(e.Command.ArgumentsAsList[1]);
+                }
+                if (user == null) return StandardMessages.UserMissingText(e.Command.ArgumentsAsList[1]);
+            }
             
             switch (e.Command.ArgumentsAsList[0])
             {
-                //TODO check cases for exceptions or invalid data, find some handles so filter manager methods throw no exception
                 case "get":
                 {
+                    if (user != null)
+                    {
+                        if (_filterManager.CheckIfUserFiltered(new UserBase(user.DisplayName, user.Id.Trim())))
+                            return $"/me {user.DisplayName} este filtrat!";
+                        return $"/me {user.DisplayName} nu este filtrat!";
+                    }
+                    
                     var filteredUsers = _filterManager.RetrieveFilteredUsers();
                     if (filteredUsers.Count <= 0) return "/me Nici un User filtrat!";
                     var builder = new StringBuilder();
@@ -136,25 +158,16 @@ namespace EvilBot.Processors
                 }
                 case "add":
                 {
-                    if (e.Command.ArgumentsAsList.Count < 2) return StandardMessages.FilterText;
-                    
-                    var user = await _apiRetriever.GetUserByUsernameAsync(e.Command.ArgumentsAsList[1])
-                        .ConfigureAwait(false);
-                    if (user == null) return StandardMessages.UserMissingText;
-                    
+                    if (user == null) return StandardMessages.FilterText;
                     if (await _filterManager.AddToFilterAsync(new UserBase(user.DisplayName, user.Id.Trim()))
                         .ConfigureAwait(false))
                         return $"/me {user.DisplayName} adaugat la Filtru!";
                     return $"/me {user.DisplayName} deja in Filtru!";
                 }
+                case "rem":
                 case "remove":
                 {
-                    if (e.Command.ArgumentsAsList.Count < 2) return StandardMessages.FilterText;
-                    
-                    var user = await _apiRetriever.GetUserByUsernameAsync(e.Command.ArgumentsAsList[1])
-                        .ConfigureAwait(false);
-                    if (user == null) return StandardMessages.UserMissingText;
-                    
+                    if (user == null) return StandardMessages.FilterText;
                     if (await _filterManager.RemoveFromFilterAsync(new UserBase(user.DisplayName, user.Id.Trim()))
                         .ConfigureAwait(false))
                         return $"/me {user.DisplayName} sters din Filtru!";

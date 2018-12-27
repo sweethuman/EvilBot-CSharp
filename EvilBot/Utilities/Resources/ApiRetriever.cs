@@ -29,7 +29,6 @@ namespace EvilBot.Utilities.Resources
                     "TwitchChannelId is null. Check if channel name is correct or connexions are made correctly");
         }
 
-        //TODO this needs to throw exception
         public async Task<User> GetUserByUsernameAsync(string username)
         {
             username = username.Trim('@');
@@ -43,7 +42,7 @@ namespace EvilBot.Utilities.Resources
             catch (Exception ex)
             {
                 Log.Error(ex, "GetUserByUsernameAsync blew up with {username}", username);
-                return null;
+                throw;
             }
 
             if (userList.Length != 0) return userList[0];
@@ -51,7 +50,6 @@ namespace EvilBot.Utilities.Resources
             return null;
         }
 
-        //TODO this needs to throw
         public async Task<User> GetUserByIdAsync(string userId)
         {
             Log.Debug("AskedForID for {Username}", userId);
@@ -140,8 +138,8 @@ namespace EvilBot.Utilities.Resources
                 var splitIds = DataProcessor.SplitList(ids).ToList();
                 var splitLogins = DataProcessor.SplitList(logins).ToList();
                 var minDistance = Math.Min(splitIds.Count, splitLogins.Count);
-                int i;
                 var getUsersTasks = new List<Task<GetUsersResponse>>();
+                int i;
                 for (i = 0; i < minDistance; i++)
                     getUsersTasks.Add(_twitchConnections.Api.Helix.Users.GetUsersAsync(splitIds[i], splitLogins[i]));
                 for (var j = i; j < splitIds.Count; j++)
