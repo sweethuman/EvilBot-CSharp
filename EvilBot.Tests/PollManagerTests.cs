@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Autofac.Extras.Moq;
 using EvilBot.Utilities;
 using EvilBot.Utilities.Resources.Interfaces;
@@ -44,7 +45,9 @@ namespace EvilBot.Tests
 			{
 				mock.Mock<IDataAccess>();
 				var cls = mock.Create<PollManager>();
-				var result = cls.PollCreate(input);
+				var state = cls.PollCreate(input);
+				var refutation = cls.PollStats();
+				var result = refutation.Select(t => t.Name);
 				Assert.Equal(expected,result);
 			}
 		}

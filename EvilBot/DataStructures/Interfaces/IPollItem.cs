@@ -2,7 +2,8 @@ namespace EvilBot.DataStructures.Interfaces
 {
 	public interface IPollItem
 	{
-		double ItemPoints { get; }
-		string Item { get; }
+		int Id { get; }
+		double Points { get; set; }
+		string Name { get; }
 	}
 }

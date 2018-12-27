@@ -27,7 +27,8 @@
 			PollNotActive,
 			VoteAdded,
 			OptionOutOfRange,
-			VoteFailed
+			VoteFailed,
+			AlreadyVoted
 		}
 	}
 }

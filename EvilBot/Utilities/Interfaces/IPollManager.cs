@@ -8,12 +8,16 @@ namespace EvilBot.Utilities.Interfaces
 	public interface IPollManager
 	{
 		bool PollActive { get; }
-		List<string> PollItems { get; }
-		List<double> PollVotes { get; }
+		List<IPollItem> PollItems { get; }
 
 		Task<Enums.PollAddVoteFinishState> PollAddVoteAsync(string userId, int votedNumber);
-
-		List<string> PollCreate(List<string> optionsList);
+		
+		/// <summary>
+		/// Initializes a new poll 
+		/// </summary>
+		/// <param name="optionsList">Text values of PollItems</param>
+		/// <returns>Creation success state</returns>
+		bool PollCreate(List<string> optionsList);
 
 		IPollItem PollEnd();
 

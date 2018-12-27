@@ -13,7 +13,7 @@ using EvilBot.Utilities.Resources;
 using EvilBot.Utilities.Resources.Interfaces;
 using Serilog;
 using TwitchLib.Api.Core.Exceptions;
-using TwitchLib.Api.Helix.Models.Users;
+using TwitchLib.Api.V5.Models.Users;
 using TwitchLib.Client.Events;
 
 namespace EvilBot.Processors
@@ -122,7 +122,7 @@ namespace EvilBot.Processors
         {
             if (e.Command.ArgumentsAsList.Count < 1) return StandardMessages.FilterText;
 
-            TwitchLib.Api.V5.Models.Users.User user = null;
+            User user = null;
             if (e.Command.ArgumentsAsList.Count >= 2)
             {
                 try
@@ -132,7 +132,7 @@ namespace EvilBot.Processors
                 }
                 catch (Exception exception)
                 {
-                    Log.Error(exception.Message,"Bad request {parameter}", e.Command.ArgumentsAsString);
+                    Log.Error(exception.Message, "Bad request {parameter}", e.Command.ArgumentsAsString);
                     return StandardMessages.InvalidName(e.Command.ArgumentsAsList[1]);
                 }
                 if (user == null) return StandardMessages.UserMissingText(e.Command.ArgumentsAsList[1]);
@@ -193,7 +193,7 @@ namespace EvilBot.Processors
             databaseUsers.RemoveAll(x => x.UserId == _apiRetriever.TwitchChannelId);
             if (databaseUsers.Count < 1) return "/me Nu am ce afisa!";
             var userIdList = databaseUsers.Select(t => t.UserId).ToList();
-            List<User> twitchUsers;
+            List<TwitchLib.Api.Helix.Models.Users.User> twitchUsers;
             try
             {
                 twitchUsers = await _apiRetriever.GetUsersHelixAsync(userIdList).ConfigureAwait(false);
@@ -303,16 +303,17 @@ namespace EvilBot.Processors
             var options = CommandHelpers.FilterAndPreparePollOptions(e.Command.ArgumentsAsString);
             if (options.Count < 2) return StandardMessages.PollCreateText;
 
-            var resultItems = _pollManager.PollCreate(options);
-            if (resultItems == null)
+            var creationSuccess = _pollManager.PollCreate(options);
+            if (!creationSuccess)
             {
                 Log.Error("Something major failed when creating the poll {paramString}", e.Command.ArgumentsAsString);
                 return StandardMessages.BigError;
             }
 
+            var resultItems = _pollManager.PollStats();
             var builder = new StringBuilder();
             builder.Append("Poll Creat! Optiuni: ");
-            for (var i = 0; i < resultItems.Count; i++) builder.AppendFormat(" //{0}:{1}", i + 1, resultItems[i]);
+            for (var i = 0; i < resultItems.Count; i++) builder.AppendFormat(" //{0}:{1}", i + 1, resultItems[i].Name);
             PollOptionsString = CommandHelpers.OptionsStringBuilder(_pollManager.PollStats().Count);
             return $"/me {builder}";
         }
@@ -330,11 +331,16 @@ namespace EvilBot.Processors
                     return StandardMessages.PollNotActiveText;
                 case Enums.PollAddVoteFinishState.VoteAdded:
                     return
-                        $"/me {e.Command.ChatMessage.DisplayName} a votat pentru {_pollManager.PollItems[votedNumber - 1]}";
+                        $"/me {e.Command.ChatMessage.DisplayName} a votat pentru {_pollManager.PollItems[votedNumber - 1].Name}";
                 case Enums.PollAddVoteFinishState.OptionOutOfRange:
                     if (PollOptionsString != null) return $"/me Foloseste !pollvote {PollOptionsString}";
                     Log.Error("PollOptionsString shouldn't be null when vote is out of range... returning null!");
                     return "/me Foloseste !pollvote ERROR: LIPSESC OPTIUNILE. SEND LOGS.";
+                case Enums.PollAddVoteFinishState.VoteFailed:
+                    Log.Error("Vote failer for {DisplayName}, chat message: {message}",
+                        e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.Message);
+                    return
+                        $"/me {e.Command.ChatMessage.DisplayName} votul tau a esuat. Te rog contacteaza un moderator!";
                 default:
                     return null;
             }
@@ -349,7 +355,7 @@ namespace EvilBot.Processors
             var builder = new StringBuilder();
             builder.Append("Statistici :");
             for (var i = 0; i < resultItems.Count; i++)
-                builder.AppendFormat(" //{0}:{1}", resultItems[i].Item, resultItems[i].ItemPoints);
+                builder.AppendFormat(" //{0}:{1}", resultItems[i].Name, resultItems[i].Points);
             return $"/me {builder}";
         }
 
@@ -359,7 +365,7 @@ namespace EvilBot.Processors
             if (resultItem == null)
                 return StandardMessages.PollNotActiveText;
             PollOptionsString = null;
-            var message = $"A Castigat || {resultItem.Item} || cu {resultItem.ItemPoints} puncte";
+            var message = $"A Castigat || {resultItem.Name} || cu {resultItem.Points} puncte";
             return $"/me {message}";
         }
 
