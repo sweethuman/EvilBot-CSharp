@@ -70,7 +70,7 @@ namespace EvilBot.Processors
 		{
 			for (var i = 0; i < userList.Count; i++)
 			{
-				if (!_filterManager.CheckIfUserIdFiltered(userList[i].UserId)) continue;
+				if (!_filterManager.CheckIfUserFiltered(userList[i])) continue;
 				userList.RemoveAll(x => x.UserId == userList[i].UserId);
 				i--;
 			}

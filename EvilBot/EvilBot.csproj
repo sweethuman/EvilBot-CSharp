@@ -341,6 +341,7 @@
     <Compile Include="TwitchBot\Interfaces\ITwitchConnections.cs" />
     <Compile Include="Utilities\Interfaces\ILoggerManager.cs" />
     <Compile Include="Utilities\LoggerManager.cs" />
+    <Compile Include="Utilities\SetsFilterManager.cs" />
     <Compile Include="Utilities\SetsPresenceCounter.cs" />
     <Compile Include="Utilities\SetsTalkerCounter.cs" />
     <Compile Include="Utilities\TalkerCounter.cs" />
