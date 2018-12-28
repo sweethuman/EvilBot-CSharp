@@ -26,8 +26,8 @@ namespace EvilBot
 			builder.RegisterType<FilterManager>().As<IFilterManager>().SingleInstance();
 			builder.RegisterType<Configuration>().As<IConfiguration>().SingleInstance();
 			builder.RegisterType<ApiRetriever>().As<IApiRetriever>().SingleInstance();
-			builder.RegisterType<TalkerCounter>().As<ITalkerCounter>().SingleInstance();
-			builder.RegisterType<PresenceCounter>().As<IPresenceCounter>().SingleInstance();
+			builder.RegisterType<SetsTalkerCounter>().As<ITalkerCounter>().SingleInstance();
+			builder.RegisterType<SetsPresenceCounter>().As<IPresenceCounter>().SingleInstance();
 
 			return builder.Build();
 		}
