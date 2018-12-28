@@ -1,20 +1,30 @@
 using System.Collections.Generic;
+using EvilBot.Utilities.Interfaces;
 using Serilog;
 
 namespace EvilBot.Utilities
 {
-    public static class PresenceCounter
+    public class PresenceCounter : IPresenceCounter
     {
-        public static readonly List<string> PresentUserIds = new List<string>();
+        private List<string> PresentUserIds { get; set; } = new List<string>();
 
-        public static bool IsNotPresent(string userId)
+        public void MakePresent(string userId)
+        {
+            PresentUserIds.Add(userId);
+            Log.Debug("Making present {UserId}...", userId);
+        }
+
+        public bool CheckIfPresent(string userId)
         {
             Log.Debug("Checking presence for {userid}", userId);
-            if (PresentUserIds.Contains(userId))
-                return false;
-            PresentUserIds.Add(userId);
-            Log.Debug("{UserId} not present. Adding...", userId);
-            return true;
+            return PresentUserIds.Contains(userId);
+        }
+
+        public List<string> ClearPresenceCounter()
+        {
+            var tempPresent = PresentUserIds;
+            PresentUserIds = new List<string>();
+            return tempPresent;
         }
     }
 }

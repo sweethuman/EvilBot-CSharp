@@ -10,7 +10,6 @@ using EvilBot.Processors.Interfaces;
 using EvilBot.Resources;
 using EvilBot.Resources.Interfaces;
 using EvilBot.TwitchBot.Interfaces;
-using EvilBot.Utilities;
 using EvilBot.Utilities.Interfaces;
 using Serilog;
 
@@ -24,16 +23,18 @@ namespace EvilBot.Processors
         private readonly IFilterManager _filterManager;
         private readonly List<Tuple<string, int>> _ranks = new List<Tuple<string, int>>();
         private readonly ITwitchConnections _twitchConnections;
+        private readonly ITalkerCounter _talkerCounter;
 
         public DataProcessor
         (IDataAccess dataAccess, IConfiguration configuration, IFilterManager filterManager,
-            IApiRetriever apiRetriever, ITwitchConnections twitchConnections)
+            IApiRetriever apiRetriever, ITwitchConnections twitchConnections, ITalkerCounter talkerCounter)
         {
             _dataAccess = dataAccess;
             _configuration = configuration;
             _apiRetriever = apiRetriever;
             _filterManager = filterManager;
             _twitchConnections = twitchConnections;
+            _talkerCounter = talkerCounter;
             InitializeRanks();
         }
 
@@ -102,7 +103,7 @@ namespace EvilBot.Processors
         public async void AddPointsTimer_ElapsedAsync(object sender, ElapsedEventArgs e)
         {
             Log.Debug("Updating Talkers!");
-            var temporaryTalkers = PointCounter.ClearTalkerPoints();
+            var temporaryTalkers = _talkerCounter.ClearTalkers();
             try
             {
                 await AddToUserAsync(temporaryTalkers).ConfigureAwait(false);

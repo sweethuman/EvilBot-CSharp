@@ -329,7 +329,9 @@
     <Compile Include="Utilities\CommandHelpers.cs" />
     <Compile Include="Utilities\FilterManager.cs" />
     <Compile Include="Utilities\Interfaces\IFilterManager.cs" />
+    <Compile Include="Utilities\Interfaces\ITalkerCounter.cs" />
     <Compile Include="Utilities\Interfaces\IPollManager.cs" />
+    <Compile Include="Utilities\Interfaces\IPresenceCounter.cs" />
     <Compile Include="Utilities\PollManager.cs" />
     <Compile Include="Processors\DataProcessor.cs" />
     <Compile Include="IApplication.cs" />
@@ -338,7 +340,7 @@
     <Compile Include="TwitchBot\Interfaces\ITwitchConnections.cs" />
     <Compile Include="Utilities\Interfaces\ILoggerManager.cs" />
     <Compile Include="Utilities\LoggerManager.cs" />
-    <Compile Include="Utilities\PointCounter.cs" />
+    <Compile Include="Utilities\TalkerCounter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\PresenceCounter.cs" />

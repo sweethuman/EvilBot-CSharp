@@ -52,11 +52,11 @@ namespace EvilBot.Resources
 				Log.Error(ex, "ModifyUserIDRankAsync blew up with: {UserID} {Rank}", userId, rank);
 			}
 		}
-		
+
 		public async Task<bool> ModifyFilteredUsersAsync(Enums.FilteredUsersDatabaseAction databaseAction, string userId)
 		{
 			if (WriteConnection.State != ConnectionState.Open) WriteConnection.Open();
-			Log.Debug("Modifying filtered {userId}", userId);
+			Log.Debug("Modifying filtered table {userId}", userId);
 			switch (databaseAction)
 			{
 				case Enums.FilteredUsersDatabaseAction.Remove:
@@ -123,7 +123,7 @@ namespace EvilBot.Resources
                     new DynamicParameters()).ConfigureAwait(false)).ToList();
 			var results = output.ToList<IDatabaseUser>();
 			if (output.Any()) return results;
-			Log.Warning("{table} table is empty!", retrievingTable);	
+			Log.Warning("{table} table is empty!", retrievingTable);
 			return null;
 		}
 		public void Close()

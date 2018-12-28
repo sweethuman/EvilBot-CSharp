@@ -24,7 +24,7 @@ namespace EvilBot.Tests
 		[InlineData("8", "60000", "Emperor (Lvl.8) XP: 60000")]
 		public void GetRankFormatted_ShouldReturnCorrectString(string rankString, string pointsString, string expected)
 		{
-			var dataProcessor = new DataProcessor(null, null, null, null, null);
+			var dataProcessor = new DataProcessor(null, null, null, null, null, null);
 			var result = dataProcessor.GetRankFormatted(rankString, pointsString);
 			Assert.Equal(expected, result);
 		}
@@ -86,7 +86,7 @@ namespace EvilBot.Tests
 					.Setup(x => x.CheckIfUserIdFiltered("00000001"))
 					.Returns(true);
 				var cls = mock.Create<DataProcessor>();
-				await cls.AddToUserAsync(userList, subCheck: subCheck);
+				await cls.AddToUserAsync(userList, subCheck: subCheck).ConfigureAwait(false);
 				mock.Mock<IDataAccess>()
 					.Verify(x => x.ModifierUserIdAsync("00000000", It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>()),
 						Times.Exactly(1));
@@ -161,7 +161,7 @@ namespace EvilBot.Tests
 					.Returns(true);
 				var cls = mock.Create<DataProcessor>();
 				mock.Mock<IApiRetriever>();
-				await Assert.ThrowsAnyAsync<Exception>(() => cls.AddToUserAsync(userList));
+				await Assert.ThrowsAnyAsync<Exception>(() => cls.AddToUserAsync(userList)).ConfigureAwait(false);
 			}
 		}
 	}

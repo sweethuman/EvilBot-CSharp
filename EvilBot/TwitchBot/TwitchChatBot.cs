@@ -8,7 +8,6 @@ using EvilBot.Processors.Interfaces;
 using EvilBot.Resources;
 using EvilBot.Resources.Interfaces;
 using EvilBot.TwitchBot.Interfaces;
-using EvilBot.Utilities;
 using EvilBot.Utilities.Interfaces;
 using Serilog;
 using TwitchLib.Client.Enums;
@@ -23,6 +22,8 @@ namespace EvilBot.TwitchBot
         private readonly IDataAccess _dataAccess;
         private readonly IDataProcessor _dataProcessor;
         private readonly IFilterManager _filterManager;
+        private readonly IPresenceCounter _presenceCounter;
+        private readonly ITalkerCounter _talkerCounter;
 
         private readonly List<string> _timedMessages = new List<string>();
         private readonly ITwitchConnections _twitchConnection;
@@ -36,7 +37,7 @@ namespace EvilBot.TwitchBot
         //TODO decrease the number of dependencies
         public TwitchChatBot(ITwitchConnections twitchConnection, IDataAccess dataAccess, IDataProcessor dataProcessor,
             ICommandProcessor commandProcessor, IFilterManager filterManager, IConfiguration configuration,
-            IApiRetriever apiRetriever)
+            IApiRetriever apiRetriever, IPresenceCounter presenceCounter, ITalkerCounter talkerCounter)
         {
             _twitchConnection = twitchConnection;
             _dataProcessor = dataProcessor;
@@ -44,7 +45,9 @@ namespace EvilBot.TwitchBot
             _filterManager = filterManager;
             _dataAccess = dataAccess;
             _configuration = configuration;
-            PresenceCounter.IsNotPresent(apiRetriever.TwitchChannelId);
+            _presenceCounter = presenceCounter;
+            _talkerCounter = talkerCounter;
+            presenceCounter.MakePresent(apiRetriever.TwitchChannelId);
             Connect();
         }
 
@@ -241,10 +244,13 @@ namespace EvilBot.TwitchBot
             {
                 if (!_filterManager.CheckIfUserIdFiltered(e.ChatMessage.UserId))
                 {
-                    PointCounter.AddMessagePoint(new UserBase(e.ChatMessage.DisplayName, e.ChatMessage.UserId));
-                    if (PresenceCounter.IsNotPresent(e.ChatMessage.UserId))
+                    _talkerCounter.AddTalker(new UserBase(e.ChatMessage.DisplayName, e.ChatMessage.UserId));
+                    if (!_presenceCounter.CheckIfPresent(e.ChatMessage.UserId))
+                    {
+                        _presenceCounter.MakePresent(e.ChatMessage.UserId);
                         _twitchConnection.Client.SendMessage(e.ChatMessage.Channel,
                             $"/me Bine ai venit {e.ChatMessage.DisplayName}!");
+                    }
                 }
             }
 
