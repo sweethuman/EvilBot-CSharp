@@ -7,13 +7,13 @@ namespace EvilBot.Utilities
 {
 	public static class CommandHelpers
 	{
-        /// <summary>
-        ///     This takes the minutes and points strings and arranges them;
-        /// </summary>
-        /// <param name="stringOne"></param>
-        /// <param name="stringTwo"></param>
-        /// <returns>First string is minutes. Second string is points</returns>
-        public static (string minutesString, string pointsString) ManageCommandSorter(string stringOne,
+		/// <summary>
+		///     This takes the minutes and points strings and arranges them;
+		/// </summary>
+		/// <param name="stringOne"></param>
+		/// <param name="stringTwo"></param>
+		/// <returns>First string is minutes. Second string is points</returns>
+		public static (string minutesString, string pointsString) ManageCommandSorter(string stringOne,
 			string stringTwo)
 		{
 			if ((stringTwo ?? "0").EndsWith("m", StringComparison.InvariantCultureIgnoreCase) ||

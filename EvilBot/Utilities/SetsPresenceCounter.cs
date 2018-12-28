@@ -7,7 +7,6 @@ namespace EvilBot.Utilities
 {
 	public class SetsPresenceCounter : IPresenceCounter
 	{
-
 		private HashSet<string> PresentUserIds { get; set; } = new HashSet<string>();
 
 		public void MakePresent(string userId)

@@ -145,7 +145,7 @@ namespace EvilBot.Processors
 				{
 					if (user != null)
 					{
-						if (_filterManager.CheckIfUserIdFiltered(user.Id.Trim()))
+						if (_filterManager.CheckIfUserIdFiltered(user.Id))
 							return $"/me {user.DisplayName} este filtrat!";
 						return $"/me {user.DisplayName} nu este filtrat!";
 					}
@@ -160,7 +160,7 @@ namespace EvilBot.Processors
 				case "add":
 				{
 					if (user == null) return StandardMessages.FilterText;
-					if (await _filterManager.AddToFilterAsync(new UserBase(user.DisplayName, user.Id.Trim()))
+					if (await _filterManager.AddToFilterAsync(new UserBase(user.DisplayName, user.Id))
 						.ConfigureAwait(false))
 						return $"/me {user.DisplayName} adaugat la Filtru!";
 					return $"/me {user.DisplayName} deja in Filtru!";
@@ -169,7 +169,7 @@ namespace EvilBot.Processors
 				case "remove":
 				{
 					if (user == null) return StandardMessages.FilterText;
-					if (await _filterManager.RemoveFromFilterAsync(new UserBase(user.DisplayName, user.Id.Trim()))
+					if (await _filterManager.RemoveFromFilterAsync(new UserBase(user.DisplayName, user.Id))
 						.ConfigureAwait(false))
 						return $"/me {user.DisplayName} sters din Filtru!";
 					return $"/me {user.DisplayName} nu este in Filtru!";

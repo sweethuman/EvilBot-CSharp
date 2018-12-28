@@ -13,7 +13,6 @@ namespace EvilBot.Utilities
 {
 	public class SetsFilterManager : IFilterManager
 	{
-
 		private readonly IApiRetriever _apiRetriever;
 		private readonly IDataAccess _dataAccess;
 
@@ -101,7 +100,7 @@ namespace EvilBot.Utilities
 		public bool CheckIfUserFiltered(IUserBase user)
 		{
 			var stateOfCheck = FilteredUserIds.Contains(user.UserId);
-			Log.Debug("FilterCheck requested for {user} {userID} result: {result}",user.DisplayName, user.UserId,
+			Log.Debug("FilterCheck requested for {user} {userID} result: {result}", user.DisplayName, user.UserId,
 				stateOfCheck);
 			return stateOfCheck;
 		}
