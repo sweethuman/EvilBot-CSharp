@@ -75,7 +75,7 @@ namespace EvilBot.Utilities
 			return FilteredUsers;
 		}
 
-		public bool CheckIfUserFiltered(string userId)
+		public bool CheckIfUserIdFiltered(string userId)
 		{
 			var stateOfCheck = FilteredUsers.Any(x => x.UserId == userId);
 			Log.Debug("FilterCheck requested for {userID} result: {result}", userId,

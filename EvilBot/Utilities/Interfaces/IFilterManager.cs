@@ -15,6 +15,6 @@ namespace EvilBot.Utilities.Interfaces
 		List<IUserBase> RetrieveFilteredUsers();
 		
 		/// <param name="userId">Check if userId is in the filter.</param>
-		bool CheckIfUserFiltered(string userId);
+		bool CheckIfUserIdFiltered(string userId);
 	}
 }

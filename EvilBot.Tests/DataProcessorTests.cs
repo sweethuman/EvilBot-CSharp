@@ -83,7 +83,7 @@ namespace EvilBot.Tests
 					.Setup(x => x.PointsMultiplier)
 					.Returns(2);
 				mock.Mock<IFilterManager>()
-					.Setup(x => x.CheckIfUserFiltered("00000001"))
+					.Setup(x => x.CheckIfUserIdFiltered("00000001"))
 					.Returns(true);
 				var cls = mock.Create<DataProcessor>();
 				await cls.AddToUserAsync(userList, subCheck: subCheck);
@@ -157,7 +157,7 @@ namespace EvilBot.Tests
 					.Setup(x => x.PointsMultiplier)
 					.Returns(2);
 				mock.Mock<IFilterManager>()
-					.Setup(x => x.CheckIfUserFiltered(user.UserId))
+					.Setup(x => x.CheckIfUserIdFiltered(user.UserId))
 					.Returns(true);
 				var cls = mock.Create<DataProcessor>();
 				mock.Mock<IApiRetriever>();

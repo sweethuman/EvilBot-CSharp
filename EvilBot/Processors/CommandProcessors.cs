@@ -144,7 +144,7 @@ namespace EvilBot.Processors
                 {
                     if (user != null)
                     {
-                        if (_filterManager.CheckIfUserFiltered(user.Id.Trim()))
+                        if (_filterManager.CheckIfUserIdFiltered(user.Id.Trim()))
                             return $"/me {user.DisplayName} este filtrat!";
                         return $"/me {user.DisplayName} nu este filtrat!";
                     }
@@ -241,7 +241,7 @@ namespace EvilBot.Processors
                 var getDatabaseUsersTasks = new List<Task<IDatabaseUser>>();
                 for (var i = 0; i < userList.Count; i++)
                 {
-                    if (!_filterManager.CheckIfUserFiltered(userList[i].Id))
+                    if (!_filterManager.CheckIfUserIdFiltered(userList[i].Id))
                     {
                         getDatabaseUsersTasks.Add(
                             _dataAccess.RetrieveUserFromTableAsync(Enums.DatabaseTables.UserPoints, userList[i].Id));
@@ -331,7 +331,7 @@ namespace EvilBot.Processors
                     return StandardMessages.PollNotActiveText;
                 case Enums.PollAddVoteFinishState.VoteAdded:
                     return
-                        $"/me {e.Command.ChatMessage.DisplayName} a votat pentru {_pollManager.PollItems[votedNumber - 1].Name}";
+                        $"/me {e.Command.ChatMessage.DisplayName} a votat pentru '{_pollManager.PollItems[votedNumber - 1].Name}'";
                 case Enums.PollAddVoteFinishState.OptionOutOfRange:
                     if (PollOptionsString != null) return $"/me Foloseste !pollvote {PollOptionsString}";
                     Log.Error("PollOptionsString shouldn't be null when vote is out of range... returning null!");
