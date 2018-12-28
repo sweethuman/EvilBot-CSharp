@@ -40,7 +40,7 @@ namespace EvilBot.TwitchBot
 		{
 			Client.SendMessage(TwitchInfo.ChannelName.ToLower(), $"/me {message}");
 		}
-		
+
 		public void Disconnect()
 		{
 			Log.Debug("Disconnecting");

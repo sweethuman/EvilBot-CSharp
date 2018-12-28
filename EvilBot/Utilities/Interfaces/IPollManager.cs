@@ -11,9 +11,9 @@ namespace EvilBot.Utilities.Interfaces
 		List<IPollItem> PollItems { get; }
 
 		Task<Enums.PollAddVoteFinishState> PollAddVoteAsync(string userId, int votedNumber);
-		
+
 		/// <summary>
-		/// Initializes a new poll 
+		///     Initializes a new poll
 		/// </summary>
 		/// <param name="optionsList">Text values of PollItems</param>
 		/// <returns>Creation success state</returns>

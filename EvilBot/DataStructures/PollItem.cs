@@ -10,7 +10,7 @@ namespace EvilBot.DataStructures
 			Points = itemPoints;
 			Name = item;
 		}
-		
+
 		public int Id { get; }
 		public double Points { get; set; }
 		public string Name { get; }

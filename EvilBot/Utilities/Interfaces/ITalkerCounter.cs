@@ -3,10 +3,10 @@ using EvilBot.DataStructures.Interfaces;
 
 namespace EvilBot.Utilities.Interfaces
 {
-    public interface ITalkerCounter
-    {
-        void AddTalker(IUserBase user);
-        bool CheckIfTalker(string userId);
-        List<IUserBase> ClearTalkers();
-    }
+	public interface ITalkerCounter
+	{
+		void AddTalker(IUserBase user);
+		bool CheckIfTalker(string userId);
+		List<IUserBase> ClearTalkers();
+	}
 }

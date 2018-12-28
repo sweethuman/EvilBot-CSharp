@@ -2,18 +2,18 @@
 {
 	public static class Enums
 	{
+		public enum DatabaseTables
+		{
+			UserPoints,
+			FilteredUsers
+		}
+
 		public enum DatabaseUserPointsOrderRow
 		{
 			Points,
 			Minutes,
 			Rank,
 			None
-		}
-
-		public enum DatabaseTables
-		{
-			UserPoints,
-			FilteredUsers
 		}
 
 		public enum FilteredUsersDatabaseAction

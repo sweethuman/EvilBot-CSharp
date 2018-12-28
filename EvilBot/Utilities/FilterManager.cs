@@ -23,10 +23,12 @@ namespace EvilBot.Utilities
 
 		//TODO add somewhere code that if FilteredUsers table does not exist to be created
 		private List<IUserBase> FilteredUsers { get; } = new List<IUserBase>();
+
 		public async Task InitializeFilterAsync()
 		{
 			Log.Debug("Initializing filter!");
-			var users = await _dataAccess.RetrieveAllUsersFromTableAsync(Enums.DatabaseTables.FilteredUsers).ConfigureAwait(false);
+			var users = await _dataAccess.RetrieveAllUsersFromTableAsync(Enums.DatabaseTables.FilteredUsers)
+				.ConfigureAwait(false);
 			if (users == null) return;
 			users.RemoveAll(x => x == null);
 
@@ -43,9 +45,9 @@ namespace EvilBot.Utilities
 		}
 
 		public Task<bool> AddToFilterAsync(IUserBase user)
-        {
-            //NO EXCEPTION SHOULD OR CAN BE THROWN HERE
-            //await eliding is okay because the methods above this will not throw exceptions, or shouldn't
+		{
+			//NO EXCEPTION SHOULD OR CAN BE THROWN HERE
+			//await eliding is okay because the methods above this will not throw exceptions, or shouldn't
 			if (FilteredUsers.All(x => x.UserId != user.UserId))
 			{
 				Log.Debug("{user} {userId} adding to the filter", user.DisplayName, user.UserId);
@@ -57,13 +59,13 @@ namespace EvilBot.Utilities
 					user.DisplayName;
 			}
 
-            return _dataAccess.ModifyFilteredUsersAsync(Enums.FilteredUsersDatabaseAction.Insert, user.UserId);
-        }
+			return _dataAccess.ModifyFilteredUsersAsync(Enums.FilteredUsersDatabaseAction.Insert, user.UserId);
+		}
 
 		public Task<bool> RemoveFromFilterAsync(IUserBase user)
 		{
-            //NO EXCEPTION SHOULD OR CAN BE THROWN HERE
-            //await eliding is okay because the methods above this will not throw exceptions, or shouldn't
+			//NO EXCEPTION SHOULD OR CAN BE THROWN HERE
+			//await eliding is okay because the methods above this will not throw exceptions, or shouldn't
 			Log.Debug("{user} {userId} removing from the filter", user.DisplayName, user.UserId);
 			FilteredUsers.RemoveAll(x => x.UserId == user.UserId);
 			return _dataAccess.ModifyFilteredUsersAsync(Enums.FilteredUsersDatabaseAction.Remove, user.UserId);

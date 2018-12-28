@@ -23,6 +23,8 @@ namespace EvilBot.Processors.Interfaces
 		/// <returns>Just a task.</returns>
 		Task AddToUserAsync(List<IUserBase> userList, int points = 1, int minutes = 0, bool subCheck = true);
 
+		List<IRankItem> GetRankList();
+
 #pragma warning disable RCS1047 // Non-asynchronous method name should not end with 'Async'.
 
 		void AddLurkerPointsTimer_ElapsedAsync(object sender, ElapsedEventArgs e);
@@ -30,7 +32,5 @@ namespace EvilBot.Processors.Interfaces
 		void AddPointsTimer_ElapsedAsync(object sender, ElapsedEventArgs e);
 
 #pragma warning restore RCS1047 // Non-asynchronous method name should not end with 'Async'.
-		
-		List<IRankItem> GetRankList();
 	}
 }

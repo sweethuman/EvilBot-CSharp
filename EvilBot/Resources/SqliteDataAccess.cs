@@ -44,7 +44,8 @@ namespace EvilBot.Resources
 			Log.Information("Advancing a User with {UserID} with [{Rank}]", userId, rank);
 			try
 			{
-				await WriteConnection.ExecuteAsync("UPDATE UserPoints SET Rank = @Rank WHERE UserID = @UserId", new {Rank = rank, UserID = userId})
+				await WriteConnection.ExecuteAsync("UPDATE UserPoints SET Rank = @Rank WHERE UserID = @UserId",
+						new {Rank = rank, UserID = userId})
 					.ConfigureAwait(false);
 			}
 			catch (Exception ex)
@@ -53,7 +54,8 @@ namespace EvilBot.Resources
 			}
 		}
 
-		public async Task<bool> ModifyFilteredUsersAsync(Enums.FilteredUsersDatabaseAction databaseAction, string userId)
+		public async Task<bool> ModifyFilteredUsersAsync(Enums.FilteredUsersDatabaseAction databaseAction,
+			string userId)
 		{
 			if (WriteConnection.State != ConnectionState.Open) WriteConnection.Open();
 			Log.Debug("Modifying filtered table {userId}", userId);
@@ -62,14 +64,17 @@ namespace EvilBot.Resources
 				case Enums.FilteredUsersDatabaseAction.Remove:
 				{
 					var rowsAffected =
-						await WriteConnection.ExecuteAsync("DELETE FROM FilteredUsers WHERE UserID = @UserId ", new {UserId = userId}).ConfigureAwait(false);
+						await WriteConnection
+							.ExecuteAsync("DELETE FROM FilteredUsers WHERE UserID = @UserId ", new {UserId = userId})
+							.ConfigureAwait(false);
 					return rowsAffected > 0;
 				}
 				case Enums.FilteredUsersDatabaseAction.Insert:
 				{
 					var rowsAffected =
 						await WriteConnection.ExecuteAsync(
-                            "INSERT INTO FilteredUsers (UserID) VALUES (@UserId) ON CONFLICT DO NOTHING", new {UserId = userId}).ConfigureAwait(false);
+							"INSERT INTO FilteredUsers (UserID) VALUES (@UserId) ON CONFLICT DO NOTHING",
+							new {UserId = userId}).ConfigureAwait(false);
 					return rowsAffected > 0;
 				}
 				default:
@@ -86,7 +91,7 @@ namespace EvilBot.Resources
 			Log.Debug("Retrieving all users from table {table}", retrievingTable);
 			var output =
 				(await RetrieveConnection.QueryAsync<DatabaseUser>($"SELECT * FROM {retrievingTable}",
-                    new DynamicParameters()).ConfigureAwait(false)).ToList();
+					new DynamicParameters()).ConfigureAwait(false)).ToList();
 			var results = output.ToList<IDatabaseUser>();
 			if (output.Any()) return results;
 			Log.Warning("{table} table is empty!", retrievingTable);
@@ -101,14 +106,16 @@ namespace EvilBot.Resources
 			Log.Debug("Retrieving {userId} from table {table}", userId, retrievingTable);
 			//TODO: add QueryFirstOrDefault after you know what default returns
 			var output = (await RetrieveConnection.QueryAsync<DatabaseUser>(
-                $"SELECT * FROM {retrievingTable} WHERE UserID = @UserId ", new {RetrievingTable = retrievingTable ,UserId = userId}).ConfigureAwait(false)).ToList();
+				$"SELECT * FROM {retrievingTable} WHERE UserID = @UserId ",
+				new {RetrievingTable = retrievingTable, UserId = userId}).ConfigureAwait(false)).ToList();
 			if (output.Any()) return output.First();
 			Log.Warning("{userId} not in table {table}", userId, retrievingTable);
 			return null;
 		}
 
 		public async Task<List<IDatabaseUser>> RetrieveNumberOfUsersFromTableAsync
-			(Enums.DatabaseTables table, int limit, Enums.DatabaseUserPointsOrderRow orderRow = Enums.DatabaseUserPointsOrderRow.None)
+		(Enums.DatabaseTables table, int limit,
+			Enums.DatabaseUserPointsOrderRow orderRow = Enums.DatabaseUserPointsOrderRow.None)
 		{
 			if (RetrieveConnection.State != ConnectionState.Open) RetrieveConnection.Open();
 			var retrievingTable = table.ToString();
@@ -116,16 +123,18 @@ namespace EvilBot.Resources
 			var orderString = "";
 			if (orderRow != Enums.DatabaseUserPointsOrderRow.None)
 				orderString = $"ORDER BY {orderRow.ToString()}";
-			if(table != Enums.DatabaseTables.UserPoints && orderRow != Enums.DatabaseUserPointsOrderRow.None)
+			if (table != Enums.DatabaseTables.UserPoints && orderRow != Enums.DatabaseUserPointsOrderRow.None)
 				throw new Exception("Bad parameter. When using other than UserPoints table orderRow needs to be None.");
 			var output =
-				(await RetrieveConnection.QueryAsync<DatabaseUser>($"SELECT * FROM {retrievingTable} {orderString} DESC LIMIT {limit}",
-                    new DynamicParameters()).ConfigureAwait(false)).ToList();
+				(await RetrieveConnection.QueryAsync<DatabaseUser>(
+					$"SELECT * FROM {retrievingTable} {orderString} DESC LIMIT {limit}",
+					new DynamicParameters()).ConfigureAwait(false)).ToList();
 			var results = output.ToList<IDatabaseUser>();
 			if (output.Any()) return results;
 			Log.Warning("{table} table is empty!", retrievingTable);
 			return null;
 		}
+
 		public void Close()
 		{
 			Log.Debug("Closing database connections!");

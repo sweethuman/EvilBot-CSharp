@@ -5,8 +5,8 @@ using System.Text;
 
 namespace EvilBot.Utilities
 {
-    public static class CommandHelpers
-    {
+	public static class CommandHelpers
+	{
         /// <summary>
         ///     This takes the minutes and points strings and arranges them;
         /// </summary>
@@ -14,40 +14,40 @@ namespace EvilBot.Utilities
         /// <param name="stringTwo"></param>
         /// <returns>First string is minutes. Second string is points</returns>
         public static (string minutesString, string pointsString) ManageCommandSorter(string stringOne,
-            string stringTwo)
-        {
-            if ((stringTwo ?? "0").EndsWith("m", StringComparison.InvariantCultureIgnoreCase) ||
-                !(stringOne ?? "0").EndsWith("m", StringComparison.InvariantCultureIgnoreCase))
-            {
-                var temporary = stringOne;
-                stringOne = stringTwo;
-                stringTwo = temporary;
-            }
+			string stringTwo)
+		{
+			if ((stringTwo ?? "0").EndsWith("m", StringComparison.InvariantCultureIgnoreCase) ||
+			    !(stringOne ?? "0").EndsWith("m", StringComparison.InvariantCultureIgnoreCase))
+			{
+				var temporary = stringOne;
+				stringOne = stringTwo;
+				stringTwo = temporary;
+			}
 
-            stringOne = stringOne?.Trim('m', 'M');
+			stringOne = stringOne?.Trim('m', 'M');
 
-            return (stringOne, stringTwo);
-        }
+			return (stringOne, stringTwo);
+		}
 
-        public static List<string> FilterAndPreparePollOptions(string arguments)
-        {
-            arguments = arguments.Trim();
-            arguments = arguments.Trim('|');
-            arguments = arguments.Trim();
-            var options = arguments.Split('|').ToList();
-            for (var i = 0; i < options.Count; i++) options[i] = options[i].Trim();
-            options.RemoveAll(string.IsNullOrEmpty);
-            return options;
-        }
+		public static List<string> FilterAndPreparePollOptions(string arguments)
+		{
+			arguments = arguments.Trim();
+			arguments = arguments.Trim('|');
+			arguments = arguments.Trim();
+			var options = arguments.Split('|').ToList();
+			for (var i = 0; i < options.Count; i++) options[i] = options[i].Trim();
+			options.RemoveAll(string.IsNullOrEmpty);
+			return options;
+		}
 
-        public static string OptionsStringBuilder(int countOfOptions)
-        {
-            var builder = new StringBuilder();
-            builder.Append("<1");
-            for (var i = 2; i <= countOfOptions; i++) builder.AppendFormat(",{0}", i);
+		public static string OptionsStringBuilder(int countOfOptions)
+		{
+			var builder = new StringBuilder();
+			builder.Append("<1");
+			for (var i = 2; i <= countOfOptions; i++) builder.AppendFormat(",{0}", i);
 
-            builder.Append(">");
-            return builder.ToString();
-        }
-    }
+			builder.Append(">");
+			return builder.ToString();
+		}
+	}
 }
