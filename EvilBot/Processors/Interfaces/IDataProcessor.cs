@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Timers;
 using EvilBot.DataStructures.Interfaces;
-using EvilBot.EventArguments;
 
 namespace EvilBot.Processors.Interfaces
 {
 	public interface IDataProcessor
 	{
-		event EventHandler<RankUpdateEventArgs> RankUpdated;
-
-		string GetRankFormatted(string rankString, string pointsString);
 
 		/// <summary>
 		///     Adds Points to the Users asynchronously.
@@ -22,8 +17,6 @@ namespace EvilBot.Processors.Interfaces
 		/// <param name="subCheck">If set to <c>true</c> it will check if users are subscribers.</param>
 		/// <returns>Just a task.</returns>
 		Task AddToUserAsync(List<IUserBase> userList, int points = 1, int minutes = 0, bool subCheck = true);
-
-		List<IRankItem> GetRankList();
 
 #pragma warning disable RCS1047 // Non-asynchronous method name should not end with 'Async'.
 

@@ -319,7 +319,9 @@
     <Compile Include="Managers\FilterManager.cs" />
     <Compile Include="Managers\Interfaces\IFilterManager.cs" />
     <Compile Include="Managers\Interfaces\IPollManager.cs" />
+    <Compile Include="Managers\Interfaces\IRankManager.cs" />
     <Compile Include="Managers\PollManager.cs" />
+    <Compile Include="Managers\RankManager.cs" />
     <Compile Include="Managers\SetsFilterManager.cs" />
     <Compile Include="Processors\CommandProcessors.cs" />
     <Compile Include="Processors\Interfaces\ICommandProcessors.cs" />

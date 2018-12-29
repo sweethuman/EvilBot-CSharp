@@ -5,6 +5,7 @@ using Autofac.Extras.Moq;
 using EvilBot.DataStructures;
 using EvilBot.DataStructures.Database;
 using EvilBot.DataStructures.Interfaces;
+using EvilBot.Managers;
 using EvilBot.Managers.Interfaces;
 using EvilBot.Processors;
 using EvilBot.Resources;
@@ -24,8 +25,8 @@ namespace EvilBot.Tests
 		[InlineData("8", "60000", "Emperor (Lvl.8) XP: 60000")]
 		public void GetRankFormatted_ShouldReturnCorrectString(string rankString, string pointsString, string expected)
 		{
-			var dataProcessor = new DataProcessor(null, null, null, null, null, null);
-			var result = dataProcessor.GetRankFormatted(rankString, pointsString);
+			var rankManager = new RankManager(null);
+			var result = rankManager.GetRankFormatted(rankString, pointsString);
 			Assert.Equal(expected, result);
 		}
 

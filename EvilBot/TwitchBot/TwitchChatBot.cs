@@ -25,9 +25,10 @@ namespace EvilBot.TwitchBot
 		private readonly IFilterManager _filterManager;
 		private readonly IPresenceCounter _presenceCounter;
 		private readonly ITalkerCounter _talkerCounter;
+		private readonly ITwitchConnections _twitchConnection;
+		private readonly IRankManager _rankManager;
 
 		private readonly List<string> _timedMessages = new List<string>();
-		private readonly ITwitchConnections _twitchConnection;
 		private Timer _addLurkerPointsTimer;
 		private Timer _addPointsTimer;
 
@@ -38,7 +39,7 @@ namespace EvilBot.TwitchBot
 		//TODO decrease the number of dependencies
 		public TwitchChatBot(ITwitchConnections twitchConnection, IDataAccess dataAccess, IDataProcessor dataProcessor,
 			ICommandProcessor commandProcessor, IFilterManager filterManager, IConfiguration configuration,
-			IApiRetriever apiRetriever, IPresenceCounter presenceCounter, ITalkerCounter talkerCounter)
+			IApiRetriever apiRetriever, IPresenceCounter presenceCounter, ITalkerCounter talkerCounter, IRankManager rankManager)
 		{
 			_twitchConnection = twitchConnection;
 			_dataProcessor = dataProcessor;
@@ -48,6 +49,7 @@ namespace EvilBot.TwitchBot
 			_configuration = configuration;
 			_presenceCounter = presenceCounter;
 			_talkerCounter = talkerCounter;
+			_rankManager = rankManager;
 			presenceCounter.MakePresent(apiRetriever.TwitchChannelId);
 			Connect();
 		}
@@ -209,7 +211,7 @@ namespace EvilBot.TwitchBot
 			_twitchConnection.Client.OnConnectionError += Client_OnConnectionError;
 			_twitchConnection.Client.OnChatCommandReceived += Client_OnChatCommandReceivedAsync;
 			_twitchConnection.Client.OnMessageReceived += Client_OnMessageReceived;
-			_dataProcessor.RankUpdated += _dataProcessor_RankUpdated;
+			_rankManager.RankUpdated += _dataProcessor_RankUpdated;
 			_twitchConnection.Client.OnMessageSent += Client_OnMessageSent;
 		}
 

@@ -22,18 +22,18 @@ namespace EvilBot.Processors
 	{
 		private readonly IApiRetriever _apiRetriever;
 		private readonly IDataAccess _dataAccess;
-		private readonly IDataProcessor _dataProcessor;
 		private readonly IFilterManager _filterManager;
 		private readonly IPollManager _pollManager;
+		private readonly IRankManager _rankManager;
 
-		public CommandProcessor(IDataProcessor dataProcessor, IDataAccess dataAccess, IPollManager pollManager,
-			IFilterManager filterManager, IApiRetriever apiRetriever)
+		public CommandProcessor(IDataAccess dataAccess, IPollManager pollManager,
+			IFilterManager filterManager, IApiRetriever apiRetriever, IRankManager rankManager)
 		{
-			_dataProcessor = dataProcessor;
 			_dataAccess = dataAccess;
 			_pollManager = pollManager;
 			_filterManager = filterManager;
 			_apiRetriever = apiRetriever;
+			_rankManager = rankManager;
 			BuildRankListString();
 		}
 
@@ -50,7 +50,7 @@ namespace EvilBot.Processors
 					.ConfigureAwait(false);
 				var displayName = e.Command.ChatMessage.DisplayName;
 				if (results == null) return $"/me {displayName} nu esti inca in baza de date! Vei fi adaugat imediat!";
-				var rankFormatted = _dataProcessor.GetRankFormatted(results.Rank, results.Points);
+				var rankFormatted = _rankManager.GetRankFormatted(results.Rank, results.Points);
 				var hoursWatched = Math.Round(double.Parse(results.Minutes, CultureInfo.InvariantCulture) / 60, 1)
 					.ToString(CultureInfo.CurrentCulture);
 				return
@@ -86,7 +86,7 @@ namespace EvilBot.Processors
 				var displayName = e.Command.ArgumentsAsList[0].TrimStart('@');
 				if (results == null) return $"/me {displayName} nu este inca in baza de date!";
 
-				var rankFormatted = _dataProcessor.GetRankFormatted(results.Rank, results.Points);
+				var rankFormatted = _rankManager.GetRankFormatted(results.Rank, results.Points);
 				var hoursWatched = Math.Round(double.Parse(results.Minutes, CultureInfo.InvariantCulture) / 60, 1)
 					.ToString(CultureInfo.CurrentCulture);
 				return
@@ -292,7 +292,7 @@ namespace EvilBot.Processors
 
 		private void BuildRankListString()
 		{
-			var rankList = _dataProcessor.GetRankList();
+			var rankList = _rankManager.GetRankList();
 			var builder = new StringBuilder();
 			for (var i = 1; i < rankList.Count; i++)
 				builder.AppendFormat("{0}.{1}:{2} ", rankList[i].Id, rankList[i].Name, rankList[i].RequiredPoints);

@@ -32,6 +32,7 @@ namespace EvilBot
 			builder.RegisterType<ApiRetriever>().As<IApiRetriever>().SingleInstance();
 			builder.RegisterType<SetsTalkerCounter>().As<ITalkerCounter>().SingleInstance();
 			builder.RegisterType<SetsPresenceCounter>().As<IPresenceCounter>().SingleInstance();
+			builder.RegisterType<RankManager>().As<IRankManager>().SingleInstance();
 
 			return builder.Build();
 		}
