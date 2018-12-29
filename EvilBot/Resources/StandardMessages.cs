@@ -22,14 +22,14 @@
 		public static string BigError { get; } = "/me Ok. UMM, SOMETHING HUGE FAILED, PLEASE REPORT ERORR";
 
 		//TODO change this to String.format format
-		public static string UserMissingText(string name)
-		{
-			return $"/me \"{name}\" nu exista!";
-		}
+		/// <summary>
+		/// <c>{0}</c> is the Name
+		/// </summary>
+		public static string UserMissingText { get; } = "/me \"{0}\" nu exista!";
 
-		public static string InvalidName(string name)
-		{
-			return $"/me Numele \"{name}\" este invalid.";
-		}
+		/// <summary>
+		/// <c>{0}</c> is the Name
+		/// </summary>
+		public static string InvalidName { get; } =  "/me Numele \"{0}\" este invalid.";
 	}
 }

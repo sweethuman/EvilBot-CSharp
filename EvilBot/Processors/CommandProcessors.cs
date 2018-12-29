@@ -67,19 +67,19 @@ namespace EvilBot.Processors
 				catch (BadParameterException exception)
 				{
 					Log.Error(exception, "Bad parameter {parameter}", e.Command.ArgumentsAsString);
-					return StandardMessages.InvalidName(e.Command.ArgumentsAsList[0]);
+					return String.Format(StandardMessages.InvalidName, e.Command.ArgumentsAsList[0]);
 				}
 				catch (BadRequestException exception)
 				{
 					Log.Error(exception, "Bad request {parameter}", e.Command.ArgumentsAsString);
-					return StandardMessages.InvalidName(e.Command.ArgumentsAsList[0]);
+					return String.Format(StandardMessages.InvalidName, e.Command.ArgumentsAsList[0]);
 				}
 				catch (Exception exception)
 				{
 					Log.Error(exception, "WRONG PARAMETER {parameter}", e.Command.ArgumentsAsString);
 					return $"/me Unexpected error. Please report! Parameter: \"{e.Command.ArgumentsAsString}\"";
 				}
-
+				if(userId == null) return String.Format(StandardMessages.UserMissingText, e.Command.ArgumentsAsList[0].TrimStart('@'));
 				var results = await _dataAccess.RetrieveUserFromTableAsync(Enums.DatabaseTables.UserPoints, userId)
 					.ConfigureAwait(false);
 				var displayName = e.Command.ArgumentsAsList[0].TrimStart('@');
@@ -104,7 +104,7 @@ namespace EvilBot.Processors
 			catch (Exception exception)
 			{
 				Log.Error(exception, "Invalid username {username}", e.Command.ArgumentsAsList[0].TrimStart('@'));
-				return StandardMessages.InvalidName(e.Command.ArgumentsAsList[0]);
+				return String.Format(StandardMessages.InvalidName, e.Command.ArgumentsAsList[0]);
 			}
 
 			if (e.Command.ArgumentsAsList.Count < 2 || userid == null)
@@ -133,10 +133,10 @@ namespace EvilBot.Processors
 				catch (Exception exception)
 				{
 					Log.Error(exception.Message, "Bad request {parameter}", e.Command.ArgumentsAsString);
-					return StandardMessages.InvalidName(e.Command.ArgumentsAsList[1]);
+					return String.Format(StandardMessages.InvalidName, e.Command.ArgumentsAsList[1]);
 				}
 
-				if (user == null) return StandardMessages.UserMissingText(e.Command.ArgumentsAsList[1]);
+				if (user == null) return String.Format(StandardMessages.UserMissingText, e.Command.ArgumentsAsList[1]);
 			}
 
 			switch (e.Command.ArgumentsAsList[0])
