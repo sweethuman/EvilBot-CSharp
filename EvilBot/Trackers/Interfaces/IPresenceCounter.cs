@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace EvilBot.Utilities.Interfaces
+namespace EvilBot.Trackers.Interfaces
 {
 	public interface IPresenceCounter
 	{

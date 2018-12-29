@@ -3,10 +3,10 @@ using System.Linq;
 using EvilBot.DataStructures;
 using EvilBot.DataStructures.Interfaces;
 using EvilBot.DataStructures.Interfaces.Comparers;
-using EvilBot.Utilities.Interfaces;
+using EvilBot.Trackers.Interfaces;
 using Serilog;
 
-namespace EvilBot.Utilities
+namespace EvilBot.Trackers
 {
 	public class SetsTalkerCounter : ITalkerCounter
 	{

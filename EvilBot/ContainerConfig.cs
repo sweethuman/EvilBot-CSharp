@@ -5,6 +5,8 @@ using EvilBot.Processors;
 using EvilBot.Processors.Interfaces;
 using EvilBot.Resources;
 using EvilBot.Resources.Interfaces;
+using EvilBot.Trackers;
+using EvilBot.Trackers.Interfaces;
 using EvilBot.TwitchBot;
 using EvilBot.TwitchBot.Interfaces;
 using EvilBot.Utilities;

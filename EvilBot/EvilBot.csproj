@@ -331,10 +331,14 @@
     <Compile Include="Resources\Interfaces\IDataAccess.cs" />
     <Compile Include="Resources\SqliteDataAccess.cs" />
     <Compile Include="Resources\StandardMessages.cs" />
+    <Compile Include="Trackers\Interfaces\IPresenceCounter.cs" />
+    <Compile Include="Trackers\Interfaces\ITalkerCounter.cs" />
+    <Compile Include="Trackers\PresenceCounter.cs" />
+    <Compile Include="Trackers\SetsPresenceCounter.cs" />
+    <Compile Include="Trackers\SetsTalkerCounter.cs" />
+    <Compile Include="Trackers\TalkerCounter.cs" />
     <Compile Include="TwitchBot\TwitchConnections.cs" />
     <Compile Include="Utilities\CommandHelpers.cs" />
-    <Compile Include="Utilities\Interfaces\ITalkerCounter.cs" />
-    <Compile Include="Utilities\Interfaces\IPresenceCounter.cs" />
     <Compile Include="Processors\DataProcessor.cs" />
     <Compile Include="IApplication.cs" />
     <Compile Include="Processors\Interfaces\IDataProcessor.cs" />
@@ -342,12 +346,8 @@
     <Compile Include="TwitchBot\Interfaces\ITwitchConnections.cs" />
     <Compile Include="Utilities\Interfaces\ILoggerUtility.cs" />
     <Compile Include="Utilities\LoggerUtility.cs" />
-    <Compile Include="Utilities\SetsPresenceCounter.cs" />
-    <Compile Include="Utilities\SetsTalkerCounter.cs" />
-    <Compile Include="Utilities\TalkerCounter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Utilities\PresenceCounter.cs" />
     <Compile Include="TwitchBot\TwitchChatBot.cs" />
     <Compile Include="TwitchInfo.Designer.cs">
       <AutoGen>True</AutoGen>

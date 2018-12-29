@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using EvilBot.DataStructures.Interfaces;
 
-namespace EvilBot.Utilities.Interfaces
+namespace EvilBot.Trackers.Interfaces
 {
 	public interface ITalkerCounter
 	{

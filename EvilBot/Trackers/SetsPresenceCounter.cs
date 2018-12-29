@@ -1,12 +1,13 @@
 using System.Collections.Generic;
-using EvilBot.Utilities.Interfaces;
+using System.Linq;
+using EvilBot.Trackers.Interfaces;
 using Serilog;
 
-namespace EvilBot.Utilities
+namespace EvilBot.Trackers
 {
-	public class PresenceCounter : IPresenceCounter
+	public class SetsPresenceCounter : IPresenceCounter
 	{
-		private List<string> PresentUserIds { get; set; } = new List<string>();
+		private HashSet<string> PresentUserIds { get; set; } = new HashSet<string>();
 
 		public void MakePresent(string userId)
 		{
@@ -22,9 +23,9 @@ namespace EvilBot.Utilities
 
 		public List<string> ClearPresenceCounter()
 		{
-			var tempPresent = PresentUserIds;
-			PresentUserIds = new List<string>();
-			return tempPresent;
+			var tempIds = PresentUserIds;
+			PresentUserIds = new HashSet<string>();
+			return tempIds.ToList();
 		}
 	}
 }

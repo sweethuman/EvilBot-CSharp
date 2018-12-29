@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using EvilBot.DataStructures.Interfaces;
-using EvilBot.Utilities.Interfaces;
+using EvilBot.Trackers.Interfaces;
 using Serilog;
 
-namespace EvilBot.Utilities
+namespace EvilBot.Trackers
 {
 	internal class TalkerCounter : ITalkerCounter
 	{

@@ -10,8 +10,8 @@ using EvilBot.Managers.Interfaces;
 using EvilBot.Processors.Interfaces;
 using EvilBot.Resources;
 using EvilBot.Resources.Interfaces;
+using EvilBot.Trackers.Interfaces;
 using EvilBot.TwitchBot.Interfaces;
-using EvilBot.Utilities.Interfaces;
 using Serilog;
 
 namespace EvilBot.Processors
