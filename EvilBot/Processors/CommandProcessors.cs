@@ -80,10 +80,12 @@ namespace EvilBot.Processors
 					return $"/me Unexpected error. Please report! Parameter: \"{e.Command.ArgumentsAsString}\"";
 				}
 				if(userId == null) return String.Format(StandardMessages.UserMissingText, e.Command.ArgumentsAsList[0].TrimStart('@'));
+
 				var results = await _dataAccess.RetrieveUserFromTableAsync(Enums.DatabaseTables.UserPoints, userId)
 					.ConfigureAwait(false);
 				var displayName = e.Command.ArgumentsAsList[0].TrimStart('@');
 				if (results == null) return $"/me {displayName} nu este inca in baza de date!";
+
 				var rankFormatted = _dataProcessor.GetRankFormatted(results.Rank, results.Points);
 				var hoursWatched = Math.Round(double.Parse(results.Minutes, CultureInfo.InvariantCulture) / 60, 1)
 					.ToString(CultureInfo.CurrentCulture);
@@ -94,7 +96,9 @@ namespace EvilBot.Processors
 
 		public async Task<string> ManageCommandAsync(OnChatCommandReceivedArgs e)
 		{
-			if (string.IsNullOrEmpty(e.Command.ArgumentsAsString)) return StandardMessages.ManageCommandText;
+			if (e.Command.ArgumentsAsList.Count < 2)
+				return StandardMessages.ManageCommandText;
+
 			string userid;
 			try
 			{
@@ -107,8 +111,9 @@ namespace EvilBot.Processors
 				return String.Format(StandardMessages.InvalidName, e.Command.ArgumentsAsList[0]);
 			}
 
-			if (e.Command.ArgumentsAsList.Count < 2 || userid == null)
-				return StandardMessages.ManageCommandText;
+			if (userid == null)
+				return String.Format(StandardMessages.UserMissingText, e.Command.ArgumentsAsList[0].TrimStart('@'));
+
 			var (minuteString, pointsString) = CommandHelpers.ManageCommandSorter(
 				e.Command.ArgumentsAsList.ElementAtOrDefault(1), e.Command.ArgumentsAsList.ElementAtOrDefault(2));
 			if (!int.TryParse(minuteString ?? "0", out var minuteModifier)) return StandardMessages.ManageCommandText;
