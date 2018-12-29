@@ -5,11 +5,11 @@ using Autofac.Extras.Moq;
 using EvilBot.DataStructures;
 using EvilBot.DataStructures.Database;
 using EvilBot.DataStructures.Interfaces;
+using EvilBot.Managers.Interfaces;
 using EvilBot.Processors;
 using EvilBot.Resources;
 using EvilBot.Resources.Interfaces;
 using EvilBot.TwitchBot.Interfaces;
-using EvilBot.Utilities.Interfaces;
 using Moq;
 using Xunit;
 

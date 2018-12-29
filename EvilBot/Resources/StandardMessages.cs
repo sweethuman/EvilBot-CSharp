@@ -21,6 +21,7 @@
 
 		public static string BigError { get; } = "/me Ok. UMM, SOMETHING HUGE FAILED, PLEASE REPORT ERORR";
 
+		//TODO change this to String.format format
 		public static string UserMissingText(string name)
 		{
 			return $"/me \"{name}\" nu exista!";

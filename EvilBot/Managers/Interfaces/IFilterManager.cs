@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using EvilBot.DataStructures.Interfaces;
 
-namespace EvilBot.Utilities.Interfaces
+namespace EvilBot.Managers.Interfaces
 {
 	public interface IFilterManager
 	{

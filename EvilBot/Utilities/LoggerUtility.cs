@@ -6,9 +6,9 @@ using ILogger = Serilog.ILogger;
 
 namespace EvilBot.Utilities
 {
-	public class LoggerManager : ILoggerManager
+	public class LoggerUtility : ILoggerUtility
 	{
-		public LoggerManager()
+		public LoggerUtility()
 		{
 			//NOTE remove logging to seq
 			ILogger clientSerilogLogger = new LoggerConfiguration()

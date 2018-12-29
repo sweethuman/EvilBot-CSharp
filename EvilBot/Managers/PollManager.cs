@@ -4,12 +4,12 @@ using System.Threading.Tasks;
 using EvilBot.DataStructures;
 using EvilBot.DataStructures.Database;
 using EvilBot.DataStructures.Interfaces;
+using EvilBot.Managers.Interfaces;
 using EvilBot.Resources;
 using EvilBot.Resources.Interfaces;
-using EvilBot.Utilities.Interfaces;
 using Serilog;
 
-namespace EvilBot.Utilities
+namespace EvilBot.Managers
 {
 	public class PollManager : IPollManager
 	{

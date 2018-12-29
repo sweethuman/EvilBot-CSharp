@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using EvilBot.DataStructures.Interfaces;
 using EvilBot.Resources;
 
-namespace EvilBot.Utilities.Interfaces
+namespace EvilBot.Managers.Interfaces
 {
 	public interface IPollManager
 	{

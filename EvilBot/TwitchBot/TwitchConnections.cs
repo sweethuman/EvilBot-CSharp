@@ -16,11 +16,11 @@ namespace EvilBot.TwitchBot
 		private readonly ConnectionCredentials _credentials =
 			new ConnectionCredentials(TwitchInfo.BotUsername, TwitchInfo.BotToken);
 
-		private readonly ILoggerManager _loggerManager;
+		private readonly ILoggerUtility _loggerUtility;
 
-		public TwitchConnections(ILoggerManager loggerManager)
+		public TwitchConnections(ILoggerUtility loggerUtility)
 		{
-			_loggerManager = loggerManager;
+			_loggerUtility = loggerUtility;
 			Connect();
 		}
 
@@ -57,14 +57,14 @@ namespace EvilBot.TwitchBot
 				ThrottlingPeriod = TimeSpan.FromSeconds(30)
 			};
 			var customClient = new WebSocketClient(clientOptions);
-			Client = new TwitchClient(customClient, logger: _loggerManager.ClientLogger);
+			Client = new TwitchClient(customClient, logger: _loggerUtility.ClientLogger);
 			Client.Initialize(_credentials, TwitchInfo.ChannelName);
 			Client.Connect();
 		}
 
 		private void ApiInitialize()
 		{
-			Api = new TwitchAPI(_loggerManager.ApiLoggerFactory);
+			Api = new TwitchAPI(_loggerUtility.ApiLoggerFactory);
 			Api.Settings.ClientId = TwitchInfo.ClientID;
 			Api.Settings.AccessToken = TwitchInfo.BotToken;
 		}

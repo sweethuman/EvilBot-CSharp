@@ -3,7 +3,7 @@ using TwitchLib.Client;
 
 namespace EvilBot.Utilities.Interfaces
 {
-	public interface ILoggerManager
+	public interface ILoggerUtility
 	{
 		ILogger<TwitchClient> ClientLogger { get; set; }
 		ILoggerFactory ApiLoggerFactory { get; set; }

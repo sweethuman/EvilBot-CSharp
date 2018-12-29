@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Autofac.Extras.Moq;
+using EvilBot.Managers;
 using EvilBot.Resources.Interfaces;
-using EvilBot.Utilities;
 using Xunit;
 
 namespace EvilBot.Tests

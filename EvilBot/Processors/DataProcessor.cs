@@ -6,6 +6,7 @@ using System.Timers;
 using EvilBot.DataStructures;
 using EvilBot.DataStructures.Interfaces;
 using EvilBot.EventArguments;
+using EvilBot.Managers.Interfaces;
 using EvilBot.Processors.Interfaces;
 using EvilBot.Resources;
 using EvilBot.Resources.Interfaces;
