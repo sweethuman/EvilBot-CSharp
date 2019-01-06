@@ -14,7 +14,7 @@ namespace EvilBot.Managers
 {
 	public class RankManager : IRankManager
 	{
-		private readonly List<Tuple<string, int>> _ranks = new List<Tuple<string, int>>();
+		private readonly List<IRankItem> _ranks = new List<IRankItem>();
 		private readonly IDataAccess _dataAccess;
 
 
@@ -33,15 +33,15 @@ namespace EvilBot.Managers
 
 		private void InitializeRanks()
 		{
-			_ranks.Add(new Tuple<string, int>("Fara Rank", 0));
-			_ranks.Add(new Tuple<string, int>("Rookie", 50));
-			_ranks.Add(new Tuple<string, int>("Alpha", 500));
-			_ranks.Add(new Tuple<string, int>("Thug", 2500));
-			_ranks.Add(new Tuple<string, int>("Sage", 6000));
-			_ranks.Add(new Tuple<string, int>("Lord", 10000));
-			_ranks.Add(new Tuple<string, int>("Initiate", 15000));
-			_ranks.Add(new Tuple<string, int>("Veteran", 22000));
-			_ranks.Add(new Tuple<string, int>("Emperor", 30000));
+			_ranks.Add(new RankItem(0, "Fara Rank", 0));
+			_ranks.Add(new RankItem(1, "Rookie", 50));
+			_ranks.Add(new RankItem(2, "Alpha", 500));
+			_ranks.Add(new RankItem(3, "Thug", 2500));
+			_ranks.Add(new RankItem(4, "Sage", 6000));
+			_ranks.Add(new RankItem(5, "Lord", 10000));
+			_ranks.Add(new RankItem(6, "Initiate", 15000));
+			_ranks.Add(new RankItem(7, "Veteran", 22000));
+			_ranks.Add(new RankItem(8, "Emperor", 30000));
 		}
 
 
@@ -49,9 +49,9 @@ namespace EvilBot.Managers
 		{
 			if (int.TryParse(rankString, out var rank) && int.TryParse(pointsString, out var points))
 			{
-				if (rank == 0) return $"{_ranks[rank].Item1} XP: {points}/{_ranks[rank + 1].Item2}";
-				if (rank == _ranks.Count - 1) return $"{_ranks[rank].Item1} (Lvl.{rank}) XP: {points}";
-				return $"{_ranks[rank].Item1} (Lvl.{rank}) XP: {points}/{_ranks[rank + 1].Item2}";
+				if (rank == 0) return $"{_ranks[rank].Name} XP: {points}/{_ranks[rank + 1].RequiredPoints}";
+				if (rank == _ranks.Count - 1) return $"{_ranks[rank].Name} (Lvl.{rank}) XP: {points}";
+				return $"{_ranks[rank].Name} (Lvl.{rank}) XP: {points}/{_ranks[rank + 1].RequiredPoints}";
 			}
 
 			Log.Error("{rankString} {pointsString} is not a parseable value to int {method}", rankString, pointsString,
@@ -64,7 +64,7 @@ namespace EvilBot.Managers
 			var place = 0;
 			for (var i = 0; i < _ranks.Count - 1; i++)
 			{
-				if (points < _ranks[i + 1].Item2) break;
+				if (points < _ranks[i + 1].RequiredPoints) break;
 				place = i + 1;
 			}
 
@@ -134,12 +134,12 @@ namespace EvilBot.Managers
 			await Task.WhenAll(databaseRankUpdateTasks).ConfigureAwait(false);
 			for (var i = 0; i < usersUpdated.Count; i++)
 				OnRankUpdated(usersUpdated[i].DisplayName,
-					$"{_ranks[int.Parse(usersUpdated[i].Rank)].Item1} (Lvl. {usersUpdated[i].Rank})");
+					$"{_ranks[int.Parse(usersUpdated[i].Rank)].Name} (Lvl. {usersUpdated[i].Rank})");
 		}
 
 		public List<IRankItem> GetRankList()
 		{
-			return _ranks.Select((t, i) => new RankItem(i, t.Item1, t.Item2)).ToList<IRankItem>();
+			return _ranks;
 		}
 	}
 }

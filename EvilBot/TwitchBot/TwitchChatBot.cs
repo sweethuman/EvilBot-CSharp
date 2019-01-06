@@ -32,14 +32,13 @@ namespace EvilBot.TwitchBot
 		private Timer _addLurkerPointsTimer;
 		private Timer _addPointsTimer;
 
-		private int _bitsToPointsMultiplier;
 		private Timer _messageRepeater;
-		private float _messageRepeaterMinutes;
 
 		//TODO decrease the number of dependencies
 		public TwitchChatBot(ITwitchConnections twitchConnection, IDataAccess dataAccess, IDataProcessor dataProcessor,
 			ICommandProcessor commandProcessor, IFilterManager filterManager, IConfiguration configuration,
-			IApiRetriever apiRetriever, IPresenceCounter presenceCounter, ITalkerCounter talkerCounter, IRankManager rankManager)
+			IApiRetriever apiRetriever, IPresenceCounter presenceCounter, ITalkerCounter talkerCounter,
+			IRankManager rankManager)
 		{
 			_twitchConnection = twitchConnection;
 			_dataProcessor = dataProcessor;
@@ -165,8 +164,6 @@ namespace EvilBot.TwitchBot
 		public void Connect()
 		{
 			Log.Debug("Starting EvilBot");
-			_messageRepeaterMinutes = _configuration.MessageRepeaterMinutes;
-			_bitsToPointsMultiplier = _configuration.BitsPointsMultiplier;
 
 			EventInitializer();
 			TimedMessageInitializer();
@@ -193,15 +190,15 @@ namespace EvilBot.TwitchBot
 
 		private void TimerInitializer()
 		{
-			_addPointsTimer = new Timer(1000 * 60 * 1);
+			_addPointsTimer = new Timer(1000 * 60 * _configuration.TalkerMinutes);
 			_addPointsTimer.Elapsed += _dataProcessor.AddPointsTimer_ElapsedAsync;
 			_addPointsTimer.Start();
 
-			_addLurkerPointsTimer = new Timer(1000 * 60 * 10);
+			_addLurkerPointsTimer = new Timer(1000 * 60 * _configuration.LurkerMinutes);
 			_addLurkerPointsTimer.Elapsed += _dataProcessor.AddLurkerPointsTimer_ElapsedAsync;
 			_addLurkerPointsTimer.Start();
 
-			_messageRepeater = new Timer(1000 * 60 * _messageRepeaterMinutes);
+			_messageRepeater = new Timer(1000 * 60 * _configuration.MessageRepeaterMinutes);
 			_messageRepeater.Elapsed += MessageRepeater_Elapsed;
 			_messageRepeater.Start();
 		}
@@ -261,9 +258,9 @@ namespace EvilBot.TwitchBot
 			{
 				_dataProcessor.AddToUserAsync(
 					new List<IUserBase> {new UserBase(e.ChatMessage.DisplayName, e.ChatMessage.UserId)},
-					e.ChatMessage.Bits * _bitsToPointsMultiplier + 11, subCheck: false);
+					e.ChatMessage.Bits * _configuration.BitsPointsMultiplier + 11, subCheck: false);
 				message =
-					$"/me {e.ChatMessage.DisplayName} a fost recompensat {e.ChatMessage.Bits * _bitsToPointsMultiplier + 11} puncte! Bravo!";
+					$"/me {e.ChatMessage.DisplayName} a fost recompensat {e.ChatMessage.Bits * _configuration.BitsPointsMultiplier + 11} puncte! Bravo!";
 			}
 			catch (Exception exception)
 			{

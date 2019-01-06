@@ -21,7 +21,6 @@
 
 		public static string BigError { get; } = "/me Ok. UMM, SOMETHING HUGE FAILED, PLEASE REPORT ERORR";
 
-		//TODO change this to String.format format
 		/// <summary>
 		/// <c>{0}</c> is the Name
 		/// </summary>

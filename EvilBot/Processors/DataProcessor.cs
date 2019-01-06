@@ -73,7 +73,7 @@ namespace EvilBot.Processors
 				var userIdList =
 					await _apiRetriever.GetChattersUsersAsync(TwitchInfo.ChannelName).ConfigureAwait(false);
 				var userList = userIdList.Select(t => new UserBase(t.DisplayName, t.Id)).ToList<IUserBase>();
-				await AddToUserAsync(userList, minutes: 10).ConfigureAwait(false);
+				await AddToUserAsync(userList,_configuration.LurkerPoints ,10).ConfigureAwait(false);
 				Log.Debug("Database updated! Lurkers present: {Lurkers}", userList.Count);
 			}
 			catch (Exception exception)
@@ -89,7 +89,7 @@ namespace EvilBot.Processors
 			var temporaryTalkers = _talkerCounter.ClearTalkers();
 			try
 			{
-				await AddToUserAsync(temporaryTalkers).ConfigureAwait(false);
+				await AddToUserAsync(temporaryTalkers, _configuration.TalkerPoints).ConfigureAwait(false);
 				Log.Debug("Database updated! Talkers present: {Talkers}", temporaryTalkers.Count);
 			}
 			catch (Exception exception)
