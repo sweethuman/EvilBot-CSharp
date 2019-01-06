@@ -156,6 +156,13 @@ namespace EvilBot.TwitchBot
 					}
 
 					break;
+				case "pointrate":
+					Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName,
+						e.Command.ChatMessage.Message);
+					var rateString = String.Format(StandardMessages.PointRateString, _configuration.LurkerPoints,
+						_configuration.LurkerMinutes, _configuration.TalkerPoints, _configuration.TalkerMinutes);
+					_twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, rateString);
+					break;
 			}
 		}
 

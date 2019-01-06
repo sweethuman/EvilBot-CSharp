@@ -30,5 +30,15 @@
 		/// <c>{0}</c> is the Name
 		/// </summary>
 		public static string InvalidName { get; } =  "/me Numele \"{0}\" este invalid.";
+
+		/// <summary>
+		/// <c>{0}</c> is LurkerPoints
+		/// <c>{1}</c> is LurkerMinutes
+		/// <c>{2}</c> is TalkerPoints
+		/// <c>{3}</c> is TalkerMinutes
+		/// </summary>
+		public static string PointRateString { get; } = "/me Lurker: {0}XP pe {1} minute; Talker: {2}XP pe {3} minute";
+
+
 	}
 }
