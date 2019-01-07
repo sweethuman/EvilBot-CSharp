@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## Unreleased
+## [v0.5.0-b] - 2019-01-07
 - Exceptions are better handled and more are passed upwards
 - Bot doesn't say hi anymore to own user
 - !manage Command logic condensed
@@ -17,7 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - PollManager has more states, better handled polls
 - Modularized and Separated to more files different pieces of logic
 - Better Async => more responsive
-- !pointrate Command Added
+- !pointrate, !about, !changelog Commands Added
 
 ## [v0.4.17.4-b] - 2018-11-22
 - text correction
@@ -40,7 +40,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [v0.4.5-b] - 2018-11-13
 - has some instabilites and didn't work out, next release is perfect
 
-## [v0.4.2-b] - 2018-11-9
+## [v0.4.2-b] - 2018-11-09
 - took a month for this beta release, this has unit tests
 
 ## [v0.3.3-b] - 2018-10-18
@@ -58,6 +58,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [v0.2.3-b] - 2018-10-13
 - first proper versioning of the program as I see
 
+[v0.5.0-b]: https://dev.azure.com/sweethuman/_git/EvilBot?version=GTv0.5.0-b
 [v0.4.17.4-b]: https://dev.azure.com/sweethuman/_git/EvilBot?version=GTv0.4.17.4-b
 [v0.4.17.3-b]: https://dev.azure.com/sweethuman/_git/EvilBot?version=GTv0.4.17.3-b
 [v0.4.17-b]: https://dev.azure.com/sweethuman/_git/EvilBot?version=GTv0.4.17-b

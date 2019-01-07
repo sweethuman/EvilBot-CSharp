@@ -2,7 +2,7 @@
 {
 	public static class StandardMessages
 	{
-		public static string AboutBot { get; } = "EvilBot v0.4.17.4beta by M0rtuary";
+		public static string AboutBot { get; } = "EvilBot v0.5.0beta by M0rtuary";
 
 		public static string ChangelogBot { get; } = "http://goo.gl/1mWQ18";
 
@@ -28,7 +28,7 @@
 		/// <summary>
 		/// <c>{0}</c> is the Name
 		/// </summary>
-		public static string UserMissingText { get; } = "/me \"{0}\" nu exista!";
+		public static string UserMissingText { get; } = "/me Utilizatorul \"{0}\" nu exista!";
 
 		/// <summary>
 		/// <c>{0}</c> is the Name
