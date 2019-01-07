@@ -2,6 +2,13 @@
 {
 	public static class StandardMessages
 	{
+		public static string AboutBot { get; } = "EvilBot v0.4.17.4beta by M0rtuary";
+
+		public static string ChangelogBot { get; } = "http://goo.gl/1mWQ18";
+
+		public static string ComenziText { get; } =
+			"/me !rank !ranklist !top !pointrate !pollvote !pollstats !pollcreate(mod) !pollend(mod) !manage(mod) !filter(mod) !giveaway(mod) !about !changelog";
+
 		public static string ManageCommandText { get; } =
 			"/me Command format !manage <username> <(-)pointnumber> <(-)minutenumber>m";
 
@@ -13,9 +20,6 @@
 		public static string PollVoteNotNumber { get; } = "/me Optiunea data nu este un numar!";
 
 		public static string PollNotActiveText { get; } = "/me Nu exista poll activ!";
-
-		public static string ComenziText { get; } =
-			"/me !rank !ranklist !top !pointrate !pollvote !pollstats !pollcreate(mod) !pollend(mod) !manage(mod) !filter(mod) !giveaway(mod)";
 
 		public static string FilterText { get; } = "/me !filter get/add/remove <username>";
 

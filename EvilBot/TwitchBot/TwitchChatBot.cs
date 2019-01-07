@@ -163,6 +163,16 @@ namespace EvilBot.TwitchBot
 						_configuration.LurkerMinutes, _configuration.TalkerPoints, _configuration.TalkerMinutes);
 					_twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, rateString);
 					break;
+				case "about":
+					Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName,
+						e.Command.ChatMessage.Message);
+					_twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, $"/me {StandardMessages.AboutBot}");
+					break;
+				case "changelog":
+					Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName,
+						e.Command.ChatMessage.Message);
+					_twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, $"/me Changelog: {StandardMessages.ChangelogBot}");
+					break;
 			}
 		}
 

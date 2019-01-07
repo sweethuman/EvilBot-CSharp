@@ -1,4 +1,5 @@
 ﻿using System;
+using EvilBot.Resources;
 using EvilBot.TwitchBot.Interfaces;
 using Serilog;
 
@@ -33,7 +34,7 @@ namespace EvilBot
 
 		private static void SetConsoleMode()
 		{
-			Console.Title = @"EvilBot v0.4.17.4beta for Twitch by M0rtuary";
+			Console.Title = StandardMessages.AboutBot;
 			Console.TreatControlCAsInput = true;
 		}
 
