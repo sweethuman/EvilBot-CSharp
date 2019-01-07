@@ -15,7 +15,7 @@
 		public static string PollNotActiveText { get; } = "/me Nu exista poll activ!";
 
 		public static string ComenziText { get; } =
-			"/me !rank !ranklist !top !pollvote !pollstats !pollcreate(mod) !pollend(mod) !manage(mod) !filter(mod) !giveaway(mod)";
+			"/me !rank !ranklist !top !pointrate !pollvote !pollstats !pollcreate(mod) !pollend(mod) !manage(mod) !filter(mod) !giveaway(mod)";
 
 		public static string FilterText { get; } = "/me !filter get/add/remove <username>";
 
