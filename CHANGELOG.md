@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## Unreleased
+- !manage command now also says the number of hours and points the user currently has
+
 ## [v0.5.0-b] - 2019-01-07
 - Exceptions are better handled and more are passed upwards
 - Bot doesn't say hi anymore to own user

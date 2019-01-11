@@ -58,11 +58,11 @@ namespace EvilBot.Processors
 			}
 			else
 			{
-				string userId;
+				User user;
 				try
 				{
-					userId = await _apiRetriever
-						.GetUserIdAsync(e.Command.ArgumentsAsList[0].TrimStart('@').ToLower()).ConfigureAwait(false);
+					user = await _apiRetriever.GetUserByUsernameAsync(e.Command.ArgumentsAsList[0].TrimStart('@'))
+						.ConfigureAwait(false);
 				}
 				catch (BadParameterException exception)
 				{
@@ -79,18 +79,17 @@ namespace EvilBot.Processors
 					Log.Error(exception, "WRONG PARAMETER {parameter}", e.Command.ArgumentsAsString);
 					return $"/me Unexpected error. Please report! Parameter: \"{e.Command.ArgumentsAsString}\"";
 				}
-				if(userId == null) return String.Format(StandardMessages.UserMissingText, e.Command.ArgumentsAsList[0].TrimStart('@'));
+				if(user == null) return String.Format(StandardMessages.UserMissingText, e.Command.ArgumentsAsList[0].TrimStart('@'));
 
-				var results = await _dataAccess.RetrieveUserFromTableAsync(Enums.DatabaseTables.UserPoints, userId)
+				var results = await _dataAccess.RetrieveUserFromTableAsync(Enums.DatabaseTables.UserPoints, user.Id)
 					.ConfigureAwait(false);
-				var displayName = e.Command.ArgumentsAsList[0].TrimStart('@');
-				if (results == null) return $"/me {displayName} nu este inca in baza de date!";
+				if (results == null) return $"/me {user.DisplayName} nu este inca in baza de date!";
 
 				var rankFormatted = _rankManager.GetRankFormatted(results.Rank, results.Points);
 				var hoursWatched = Math.Round(double.Parse(results.Minutes, CultureInfo.InvariantCulture) / 60, 1)
 					.ToString(CultureInfo.CurrentCulture);
 				return
-					$"/me {displayName} este {rankFormatted} cu {hoursWatched} ore!";
+					$"/me {user.DisplayName} este {rankFormatted} cu {hoursWatched} ore!";
 			}
 		}
 
@@ -99,10 +98,10 @@ namespace EvilBot.Processors
 			if (e.Command.ArgumentsAsList.Count < 2)
 				return StandardMessages.ManageCommandText;
 
-			string userid;
+			User user;
 			try
 			{
-				userid = await _apiRetriever.GetUserIdAsync(e.Command.ArgumentsAsList[0].TrimStart('@'))
+				user = await _apiRetriever.GetUserByUsernameAsync(e.Command.ArgumentsAsList[0].TrimStart('@'))
 					.ConfigureAwait(false);
 			}
 			catch (Exception exception)
@@ -111,7 +110,7 @@ namespace EvilBot.Processors
 				return String.Format(StandardMessages.InvalidName, e.Command.ArgumentsAsList[0]);
 			}
 
-			if (userid == null)
+			if (user == null)
 				return String.Format(StandardMessages.UserMissingText, e.Command.ArgumentsAsList[0].TrimStart('@'));
 
 			var (minuteString, pointsString) = CommandHelpers.ManageCommandSorter(
@@ -119,8 +118,11 @@ namespace EvilBot.Processors
 			if (!int.TryParse(minuteString ?? "0", out var minuteModifier)) return StandardMessages.ManageCommandText;
 			if (!int.TryParse(pointsString ?? "0", out var pointModifier)) return StandardMessages.ManageCommandText;
 
-			await _dataAccess.ModifierUserIdAsync(userid, pointModifier, minuteModifier).ConfigureAwait(false);
-			return $"/me Modificat {e.Command.ArgumentsAsList[0]} cu {pointModifier} puncte si {minuteModifier} minute";
+			await _dataAccess.ModifierUserIdAsync(user.Id, pointModifier, minuteModifier).ConfigureAwait(false);
+			var results = await _dataAccess.RetrieveUserFromTableAsync(Enums.DatabaseTables.UserPoints, user.Id)
+				.ConfigureAwait(false);
+			var hoursWatched = Math.Round(double.Parse(results.Minutes, CultureInfo.InvariantCulture) / 60, 1);
+			return $"/me Modificat {user.DisplayName} cu {pointModifier} puncte si {minuteModifier} minute. Acum are {results.Points}xp si {hoursWatched}h";
 		}
 
 		public async Task<string> FilterCommandAsync(OnChatCommandReceivedArgs e)
