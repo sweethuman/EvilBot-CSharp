@@ -38,7 +38,7 @@ namespace EvilBot.Processors
 		}
 
 		private string PollOptionsString { get; set; }
-		private string RankListString { get; set; }
+		public string RankListString { get; private set; }
 
 
 		public async Task<string> RankCommandAsync(OnChatCommandReceivedArgs e)
@@ -184,11 +184,6 @@ namespace EvilBot.Processors
 				default:
 					return StandardMessages.FilterText;
 			}
-		}
-
-		public string RanksListCommand(OnChatCommandReceivedArgs e)
-		{
-			return $"/me {RankListString}";
 		}
 
 		public async Task<string> TopCommandAsync(OnChatCommandReceivedArgs e)
@@ -345,7 +340,7 @@ namespace EvilBot.Processors
 					Log.Error("PollOptionsString shouldn't be null when vote is out of range... returning null!");
 					return "/me Foloseste !pollvote ERROR: LIPSESC OPTIUNILE. SEND LOGS.";
 				case Enums.PollAddVoteFinishState.VoteFailed:
-					Log.Error("Vote failer for {DisplayName}, chat message: {message}",
+					Log.Error("Vote failed for {DisplayName}, chat message: {message}",
 						e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.Message);
 					return
 						$"/me {e.Command.ChatMessage.DisplayName} votul tau a esuat. Te rog contacteaza un moderator!";

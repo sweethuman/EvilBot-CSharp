@@ -5,6 +5,7 @@ namespace EvilBot.Processors.Interfaces
 {
 	internal interface ICommandProcessor
 	{
+		string RankListString { get; }
 		Task<string> RankCommandAsync(OnChatCommandReceivedArgs e);
 
 		Task<string> ManageCommandAsync(OnChatCommandReceivedArgs e);
@@ -18,8 +19,6 @@ namespace EvilBot.Processors.Interfaces
 		string PollEndCommand(OnChatCommandReceivedArgs e);
 
 		Task<string> FilterCommandAsync(OnChatCommandReceivedArgs e);
-
-		string RanksListCommand(OnChatCommandReceivedArgs e);
 
 		Task<string> TopCommandAsync(OnChatCommandReceivedArgs e);
 

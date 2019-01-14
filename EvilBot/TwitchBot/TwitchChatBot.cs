@@ -1,5 +1,6 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Timers;
 using EvilBot.DataStructures;
 using EvilBot.DataStructures.Interfaces;
@@ -34,7 +35,11 @@ namespace EvilBot.TwitchBot
 
 		private Timer _messageRepeater;
 
-		//TODO decrease the number of dependencies
+		private readonly Dictionary<string, Func<OnChatCommandReceivedArgs, Task<string>>> _commands =
+			new Dictionary<string, Func<OnChatCommandReceivedArgs, Task<string>>>();
+
+		private string PointRateString { get; }
+
 		public TwitchChatBot(ITwitchConnections twitchConnection, IDataAccess dataAccess, IDataProcessor dataProcessor,
 			ICommandProcessor commandProcessor, IFilterManager filterManager, IConfiguration configuration,
 			IApiRetriever apiRetriever, IPresenceCounter presenceCounter, ITalkerCounter talkerCounter,
@@ -50,7 +55,10 @@ namespace EvilBot.TwitchBot
 			_talkerCounter = talkerCounter;
 			_rankManager = rankManager;
 			presenceCounter.MakePresent(apiRetriever.TwitchChannelId);
+			PointRateString = string.Format(StandardMessages.PointRateString, configuration.LurkerPoints,
+				configuration.LurkerMinutes, configuration.TalkerPoints, configuration.TalkerMinutes);
 			Connect();
+			CommandsInitializer();
 		}
 
 		~TwitchChatBot()
@@ -61,120 +69,79 @@ namespace EvilBot.TwitchBot
 			_messageRepeater.Dispose();
 		}
 
+		#region Commands Logic
 		private async void Client_OnChatCommandReceivedAsync(object sender, OnChatCommandReceivedArgs e)
 		{
-			switch (e.Command.CommandText.ToLower())
-			{
-				case "colorme":
-					Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName,
-						e.Command.ChatMessage.Message);
-					_twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel,
-						$"/color {e.Command.ArgumentsAsString}");
-					break;
-
-				case "rank":
-					Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName,
-						e.Command.ChatMessage.Message);
-					_twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel,
-						await _commandProcessor.RankCommandAsync(e).ConfigureAwait(false));
-					break;
-				case "ranks":
-				case "ranklist":
-					Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName,
-						e.Command.ChatMessage.Message);
-					_twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel,
-						_commandProcessor.RanksListCommand(e));
-					break;
-				case "manage":
-					Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName,
-						e.Command.ChatMessage.Message);
-					if (e.Command.ChatMessage.UserType >= UserType.Moderator)
-						_twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel,
-							await _commandProcessor.ManageCommandAsync(e).ConfigureAwait(false));
-					break;
-
-				case "pollcreate":
-					Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName,
-						e.Command.ChatMessage.Message);
-					if (e.Command.ChatMessage.UserType >= UserType.Moderator)
-						_twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel,
-							_commandProcessor.PollCreateCommand(e));
-					break;
-
-				case "pollvote":
-					Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName,
-						e.Command.ChatMessage.Message);
-					_twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel,
-						await _commandProcessor.PollVoteCommandAsync(e).ConfigureAwait(false));
-					break;
-
-				case "pollstats":
-					Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName,
-						e.Command.ChatMessage.Message);
-					_twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel,
-						_commandProcessor.PollStatsCommand(e));
-					break;
-
-				case "pollend":
-					Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName,
-						e.Command.ChatMessage.Message);
-					if (e.Command.ChatMessage.UserType >= UserType.Moderator)
-						_twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel,
-							_commandProcessor.PollEndCommand(e));
-					break;
-
-				case "comenzi":
-					Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName,
-						e.Command.ChatMessage.Message);
-					_twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, StandardMessages.ComenziText);
-					break;
-
-				case "filter":
-					Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName,
-						e.Command.ChatMessage.Message);
-					if (e.Command.ChatMessage.UserType >= UserType.Moderator)
-						_twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel,
-							await _commandProcessor.FilterCommandAsync(e).ConfigureAwait(false));
-					break;
-				case "top":
-					Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName,
-						e.Command.ChatMessage.Message);
-					_twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel,
-						await _commandProcessor.TopCommandAsync(e).ConfigureAwait(false));
-					break;
-				case "giveaway":
-					Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName,
-						e.Command.ChatMessage.Message);
-					if (e.Command.ChatMessage.UserType >= UserType.Moderator)
-					{
-						var giveaway = await _commandProcessor.GiveawayCommandAsync(e).ConfigureAwait(false);
-						Log.Debug(giveaway.usersAnnouncement);
-						Log.Debug(giveaway.winnerAnnouncement);
-						_twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, giveaway.usersAnnouncement);
-						_twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel,
-							giveaway.winnerAnnouncement);
-					}
-
-					break;
-				case "pointrate":
-					Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName,
-						e.Command.ChatMessage.Message);
-					var rateString = String.Format(StandardMessages.PointRateString, _configuration.LurkerPoints,
-						_configuration.LurkerMinutes, _configuration.TalkerPoints, _configuration.TalkerMinutes);
-					_twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, rateString);
-					break;
-				case "about":
-					Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName,
-						e.Command.ChatMessage.Message);
-					_twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, $"/me {StandardMessages.AboutBot}");
-					break;
-				case "changelog":
-					Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName,
-						e.Command.ChatMessage.Message);
-					_twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, $"/me Changelog: {StandardMessages.ChangelogBot}");
-					break;
-			}
+			var success = _commands.TryGetValue(e.Command.CommandText.ToLower(), out var runner);
+			if(success == false) return;
+			Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName,
+				e.Command.ChatMessage.Message);
+				_twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, await runner(e).ConfigureAwait(false));
 		}
+
+		private Task<string> ColorMeCommandAsync(OnChatCommandReceivedArgs e) =>
+			Task.FromResult($"/color {e.Command.ArgumentsAsString}");
+
+		private Task<string> AboutCommandAsync(OnChatCommandReceivedArgs e) =>
+			Task.FromResult($"/me {StandardMessages.AboutBot}");
+
+		private Task<string> ChangelogCommandAsync(OnChatCommandReceivedArgs e) =>
+			Task.FromResult($"/me Changelog: {StandardMessages.ChangelogBot}");
+
+		private Task<string> CommandsCommandAsync(OnChatCommandReceivedArgs e) =>
+			Task.FromResult(StandardMessages.ComenziText);
+
+		private Task<string> PointRateCommandAsync(OnChatCommandReceivedArgs e) => Task.FromResult(PointRateString);
+
+		private Task<string> RankCommandAsync(OnChatCommandReceivedArgs e) => _commandProcessor.RankCommandAsync(e);
+
+		private Task<string> RankListCommandAsync(OnChatCommandReceivedArgs e) =>
+			Task.FromResult($"/me {_commandProcessor.RankListString}");
+
+		private Task<string> ManageCommandAsync(OnChatCommandReceivedArgs e)
+		{
+			if (e.Command.ChatMessage.UserType < UserType.Moderator) return Task.FromResult<string>(null);
+			return _commandProcessor.ManageCommandAsync(e);
+		}
+
+		private Task<string> PollVoteCommandAsync(OnChatCommandReceivedArgs e) =>
+			_commandProcessor.PollVoteCommandAsync(e);
+
+		private Task<string> PollStatsCommandAsync(OnChatCommandReceivedArgs e) =>
+			Task.Run(() => _commandProcessor.PollStatsCommand(e));
+
+		private Task<string> PollCreateCommandAsync(OnChatCommandReceivedArgs e)
+		{
+			if (e.Command.ChatMessage.UserType < UserType.Moderator) return Task.FromResult<string>(null);
+			return Task.Run(() => _commandProcessor.PollCreateCommand(e));
+		}
+
+		private Task<string> PollEndCommandAsync(OnChatCommandReceivedArgs e)
+		{
+			if (e.Command.ChatMessage.UserType < UserType.Moderator) return Task.FromResult<string>(null);
+			return Task.Run( () => _commandProcessor.PollEndCommand(e));
+		}
+
+		private Task<string> FilterCommandAsync(OnChatCommandReceivedArgs e)
+		{
+			if (e.Command.ChatMessage.UserType < UserType.Moderator) return Task.FromResult<string>(null);
+			return _commandProcessor.FilterCommandAsync(e);
+		}
+
+		private Task<string> TopCommandAsync(OnChatCommandReceivedArgs e) => _commandProcessor.TopCommandAsync(e);
+
+		private async Task<string> GiveawayCommandAsync(OnChatCommandReceivedArgs e)
+		{
+			if (e.Command.ChatMessage.UserType < UserType.Moderator) return null;
+			var (usersAnnouncement, winnerAnnouncement) = await _commandProcessor.GiveawayCommandAsync(e).ConfigureAwait(false);
+			Log.Debug(usersAnnouncement);
+			Log.Debug(winnerAnnouncement);
+			_twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel, usersAnnouncement);
+			return winnerAnnouncement;
+		}
+
+
+		#endregion Commands Logic
 
 		#region TwitchChatBot Initializers
 
@@ -229,9 +196,24 @@ namespace EvilBot.TwitchBot
 			_twitchConnection.Client.OnMessageSent += Client_OnMessageSent;
 		}
 
-		private void Client_OnMessageSent(object sender, OnMessageSentArgs e)
+		private void CommandsInitializer()
 		{
-			Log.Information("Message sent: {message}", e.SentMessage.Message);
+			_commands.Add("colorme", ColorMeCommandAsync);
+			_commands.Add("about", AboutCommandAsync);
+			_commands.Add("changelog", ChangelogCommandAsync);
+			_commands.Add("comenzi", CommandsCommandAsync);
+			_commands.Add("rank", RankCommandAsync);
+			_commands.Add("ranks", RankListCommandAsync);
+			_commands.Add("ranklist", RankListCommandAsync);
+			_commands.Add("manage", ManageCommandAsync);
+			_commands.Add("pollvote", PollVoteCommandAsync);
+			_commands.Add("pollstats", PollStatsCommandAsync);
+			_commands.Add("pollcreate", PollCreateCommandAsync);
+			_commands.Add("pollend", PollEndCommandAsync);
+			_commands.Add("filter", FilterCommandAsync);
+			_commands.Add("top", TopCommandAsync);
+			_commands.Add("giveaway", GiveawayCommandAsync);
+			_commands.Add("pointrate", PointRateCommandAsync);
 		}
 
 		#endregion TwitchChatBot Initializers
@@ -253,6 +235,11 @@ namespace EvilBot.TwitchBot
 		private static void Client_OnConnectionError(object sender, OnConnectionErrorArgs e)
 		{
 			Log.Error("Error!!! {ErrorMessage}", e.Error.Message);
+		}
+
+		private void Client_OnMessageSent(object sender, OnMessageSentArgs e)
+		{
+			Log.Information("Message sent: {message}", e.SentMessage.Message);
 		}
 
 		private void Client_OnMessageReceived(object sender, OnMessageReceivedArgs e)

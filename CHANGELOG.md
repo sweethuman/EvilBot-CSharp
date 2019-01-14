@@ -5,6 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 - !manage command now also says the number of hours and points the user currently has
+- Commands are now handled better under the hood
 
 ## [v0.5.0-b] - 2019-01-07
 - Exceptions are better handled and more are passed upwards
