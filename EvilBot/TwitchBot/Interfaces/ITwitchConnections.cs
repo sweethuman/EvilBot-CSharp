@@ -1,5 +1,5 @@
-﻿using TwitchLib.Api;
-using TwitchLib.Client;
+﻿using TwitchLib.Api.Interfaces;
+using TwitchLib.Client.Interfaces;
 
 namespace EvilBot.TwitchBot.Interfaces
 {
@@ -8,8 +8,8 @@ namespace EvilBot.TwitchBot.Interfaces
 	/// </summary>
 	public interface ITwitchConnections
 	{
-		TwitchAPI Api { get; }
-		TwitchClient Client { get; }
+		ITwitchAPI Api { get; }
+		ITwitchClient Client { get; }
 
 		void Connect();
 

@@ -3,7 +3,9 @@ using EvilBot.TwitchBot.Interfaces;
 using EvilBot.Utilities.Interfaces;
 using Serilog;
 using TwitchLib.Api;
+using TwitchLib.Api.Interfaces;
 using TwitchLib.Client;
+using TwitchLib.Client.Interfaces;
 using TwitchLib.Client.Models;
 using TwitchLib.Communication.Clients;
 using TwitchLib.Communication.Enums;
@@ -24,9 +26,9 @@ namespace EvilBot.TwitchBot
 			Connect();
 		}
 
-		public TwitchClient Client { get; private set; }
+		public ITwitchClient Client { get; private set; }
 
-		public TwitchAPI Api { get; private set; }
+		public ITwitchAPI Api { get; private set; }
 
 		public void Connect()
 		{
