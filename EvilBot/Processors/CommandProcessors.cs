@@ -67,19 +67,19 @@ namespace EvilBot.Processors
 				catch (BadParameterException exception)
 				{
 					Log.Error(exception, "Bad parameter {parameter}", e.Command.ArgumentsAsString);
-					return String.Format(StandardMessages.InvalidName, e.Command.ArgumentsAsList[0]);
+					return String.Format(StandardMessages.UserErrorMessages.InvalidName, e.Command.ArgumentsAsList[0]);
 				}
 				catch (BadRequestException exception)
 				{
 					Log.Error(exception, "Bad request {parameter}", e.Command.ArgumentsAsString);
-					return String.Format(StandardMessages.InvalidName, e.Command.ArgumentsAsList[0]);
+					return String.Format(StandardMessages.UserErrorMessages.InvalidName, e.Command.ArgumentsAsList[0]);
 				}
 				catch (Exception exception)
 				{
 					Log.Error(exception, "WRONG PARAMETER {parameter}", e.Command.ArgumentsAsString);
 					return $"/me Unexpected error. Please report! Parameter: \"{e.Command.ArgumentsAsString}\"";
 				}
-				if(user == null) return String.Format(StandardMessages.UserMissingText, e.Command.ArgumentsAsList[0].TrimStart('@'));
+				if(user == null) return String.Format(StandardMessages.UserErrorMessages.UserMissingText, e.Command.ArgumentsAsList[0].TrimStart('@'));
 
 				var results = await _dataAccess.RetrieveUserFromTableAsync(Enums.DatabaseTables.UserPoints, user.Id)
 					.ConfigureAwait(false);
@@ -107,11 +107,11 @@ namespace EvilBot.Processors
 			catch (Exception exception)
 			{
 				Log.Error(exception, "Invalid username {username}", e.Command.ArgumentsAsList[0].TrimStart('@'));
-				return String.Format(StandardMessages.InvalidName, e.Command.ArgumentsAsList[0]);
+				return String.Format(StandardMessages.UserErrorMessages.InvalidName, e.Command.ArgumentsAsList[0]);
 			}
 
 			if (user == null)
-				return String.Format(StandardMessages.UserMissingText, e.Command.ArgumentsAsList[0].TrimStart('@'));
+				return String.Format(StandardMessages.UserErrorMessages.UserMissingText, e.Command.ArgumentsAsList[0].TrimStart('@'));
 
 			var (minuteString, pointsString) = CommandHelpers.ManageCommandSorter(
 				e.Command.ArgumentsAsList.ElementAtOrDefault(1), e.Command.ArgumentsAsList.ElementAtOrDefault(2));
@@ -140,10 +140,10 @@ namespace EvilBot.Processors
 				catch (Exception exception)
 				{
 					Log.Error(exception.Message, "Bad request {parameter}", e.Command.ArgumentsAsString);
-					return String.Format(StandardMessages.InvalidName, e.Command.ArgumentsAsList[1]);
+					return String.Format(StandardMessages.UserErrorMessages.InvalidName, e.Command.ArgumentsAsList[1]);
 				}
 
-				if (user == null) return String.Format(StandardMessages.UserMissingText, e.Command.ArgumentsAsList[1]);
+				if (user == null) return String.Format(StandardMessages.UserErrorMessages.UserMissingText, e.Command.ArgumentsAsList[1]);
 			}
 
 			switch (e.Command.ArgumentsAsList[0])
@@ -301,10 +301,10 @@ namespace EvilBot.Processors
 		public string PollCreateCommand(OnChatCommandReceivedArgs e)
 		{
 			if (string.IsNullOrEmpty(e.Command.ArgumentsAsString) || e.Command.ArgumentsAsString.Contains("||"))
-				return StandardMessages.PollCreateText;
+				return StandardMessages.PollMessages.PollCreateText;
 
 			var options = CommandHelpers.FilterAndPreparePollOptions(e.Command.ArgumentsAsString);
-			if (options.Count < 2) return StandardMessages.PollCreateText;
+			if (options.Count < 2) return StandardMessages.PollMessages.PollCreateText;
 
 			var creationSuccess = _pollManager.PollCreate(options);
 			if (!creationSuccess)
@@ -324,14 +324,14 @@ namespace EvilBot.Processors
 		public async Task<string> PollVoteCommandAsync(OnChatCommandReceivedArgs e)
 		{
 			if (!int.TryParse(e.Command.ArgumentsAsString, out var votedNumber))
-				return StandardMessages.PollVoteNotNumber;
+				return StandardMessages.PollMessages.PollVoteNotNumber;
 			var voteState = await _pollManager.PollAddVoteAsync(e.Command.ChatMessage.UserId, votedNumber)
 				.ConfigureAwait(false);
 
 			switch (voteState)
 			{
 				case Enums.PollAddVoteFinishState.PollNotActive:
-					return StandardMessages.PollNotActiveText;
+					return StandardMessages.PollMessages.PollNotActiveText;
 				case Enums.PollAddVoteFinishState.VoteAdded:
 					return
 						$"/me {e.Command.ChatMessage.DisplayName} a votat pentru '{_pollManager.PollItems[votedNumber - 1].Name}'";
@@ -353,7 +353,7 @@ namespace EvilBot.Processors
 		{
 			var resultItems = _pollManager.PollStats();
 			if (resultItems == null)
-				return StandardMessages.PollNotActiveText;
+				return StandardMessages.PollMessages.PollNotActiveText;
 
 			var builder = new StringBuilder();
 			builder.Append("Statistici :");
@@ -366,7 +366,7 @@ namespace EvilBot.Processors
 		{
 			var resultItem = _pollManager.PollEnd();
 			if (resultItem == null)
-				return StandardMessages.PollNotActiveText;
+				return StandardMessages.PollMessages.PollNotActiveText;
 			PollOptionsString = null;
 			var message = $"A Castigat || {resultItem.Name} || cu {resultItem.Points} puncte";
 			return $"/me {message}";

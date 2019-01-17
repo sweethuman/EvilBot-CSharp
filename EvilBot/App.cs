@@ -34,7 +34,7 @@ namespace EvilBot
 
 		private static void SetConsoleMode()
 		{
-			Console.Title = StandardMessages.AboutBot;
+			Console.Title = StandardMessages.BotInformation.AboutBot;
 			Console.TreatControlCAsInput = true;
 		}
 

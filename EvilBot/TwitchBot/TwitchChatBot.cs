@@ -83,10 +83,10 @@ namespace EvilBot.TwitchBot
 			Task.FromResult($"/color {e.Command.ArgumentsAsString}");
 
 		private Task<string> AboutCommandAsync(OnChatCommandReceivedArgs e) =>
-			Task.FromResult($"/me {StandardMessages.AboutBot}");
+			Task.FromResult($"/me {StandardMessages.BotInformation.AboutBot}");
 
 		private Task<string> ChangelogCommandAsync(OnChatCommandReceivedArgs e) =>
-			Task.FromResult($"/me Changelog: {StandardMessages.ChangelogBot}");
+			Task.FromResult($"/me Changelog: {StandardMessages.BotInformation.ChangelogBot}");
 
 		private Task<string> CommandsCommandAsync(OnChatCommandReceivedArgs e) =>
 			Task.FromResult(StandardMessages.ComenziText);
