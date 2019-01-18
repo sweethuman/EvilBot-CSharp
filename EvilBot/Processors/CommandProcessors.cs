@@ -323,7 +323,7 @@ namespace EvilBot.Processors
 
 		public async Task<string> PollVoteCommandAsync(OnChatCommandReceivedArgs e)
 		{
-			if (!int.TryParse(e.Command.ArgumentsAsString, out var votedNumber))
+			if (string.IsNullOrEmpty(e.Command.ArgumentsAsString) || !int.TryParse(e.Command.ArgumentsAsList[0], out var votedNumber))
 				return StandardMessages.PollMessages.PollVoteNotNumber;
 			var voteState = await _pollManager.PollAddVoteAsync(e.Command.ChatMessage.UserId, votedNumber)
 				.ConfigureAwait(false);
