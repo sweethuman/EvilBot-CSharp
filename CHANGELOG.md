@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## Unreleased
+## [v0.5.4-b] - 2019-01-18
 - !manage command now also says the number of hours and points the user currently has
 - Commands are now handled better under the hood
 - No more Migration Announcement
@@ -64,6 +64,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [v0.2.3-b] - 2018-10-13
 - first proper versioning of the program as I see
 
+[v0.5.4-b]: https://dev.azure.com/sweethuman/_git/EvilBot?version=GTv0.5.4-b
 [v0.5.0-b]: https://dev.azure.com/sweethuman/_git/EvilBot?version=GTv0.5.0-b
 [v0.4.17.4-b]: https://dev.azure.com/sweethuman/_git/EvilBot?version=GTv0.4.17.4-b
 [v0.4.17.3-b]: https://dev.azure.com/sweethuman/_git/EvilBot?version=GTv0.4.17.3-b
