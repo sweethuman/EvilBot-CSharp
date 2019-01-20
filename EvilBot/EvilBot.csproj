@@ -259,32 +259,41 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="TwitchLib.Api, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\TwitchLib.Api.3.0.0\lib\netstandard2.0\TwitchLib.Api.dll</HintPath>
+    <Reference Include="TwitchLib.Api, Version=3.0.1.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\TwitchLib.Api.3.0.1-CI-20190120-063133\lib\netstandard2.0\TwitchLib.Api.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="TwitchLib.Api.Core, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\TwitchLib.Api.Core.1.1.0\lib\netstandard2.0\TwitchLib.Api.Core.dll</HintPath>
+    <Reference Include="TwitchLib.Api.Core, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\TwitchLib.Api.Core.3.0.1-CI-20190120-063148\lib\netstandard2.0\TwitchLib.Api.Core.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="TwitchLib.Api.Core.Enums, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\TwitchLib.Api.Core.Enums.1.1.0\lib\netstandard2.0\TwitchLib.Api.Core.Enums.dll</HintPath>
+    <Reference Include="TwitchLib.Api.Core.Enums, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\TwitchLib.Api.Core.Enums.3.0.1-CI-20190120-063157\lib\netstandard2.0\TwitchLib.Api.Core.Enums.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="TwitchLib.Api.Core.Interfaces, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\TwitchLib.Api.Core.Interfaces.1.1.0\lib\netstandard2.0\TwitchLib.Api.Core.Interfaces.dll</HintPath>
+    <Reference Include="TwitchLib.Api.Core.Interfaces, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\TwitchLib.Api.Core.Interfaces.3.0.1-CI-20190120-063154\lib\netstandard2.0\TwitchLib.Api.Core.Interfaces.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="TwitchLib.Api.Core.Models, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\TwitchLib.Api.Core.Models.1.1.0\lib\netstandard2.0\TwitchLib.Api.Core.Models.dll</HintPath>
+    <Reference Include="TwitchLib.Api.Core.Models, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\TwitchLib.Api.Core.Models.3.0.1-CI-20190120-063151\lib\netstandard2.0\TwitchLib.Api.Core.Models.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="TwitchLib.Api.Helix, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\TwitchLib.Api.Helix.1.1.0\lib\netstandard2.0\TwitchLib.Api.Helix.dll</HintPath>
+    <Reference Include="TwitchLib.Api.Helix, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\TwitchLib.Api.Helix.3.0.1-CI-20190120-063136\lib\netstandard2.0\TwitchLib.Api.Helix.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="TwitchLib.Api.Helix.Models, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\TwitchLib.Api.Helix.Models.1.1.0\lib\netstandard2.0\TwitchLib.Api.Helix.Models.dll</HintPath>
+    <Reference Include="TwitchLib.Api.Helix.Models, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\TwitchLib.Api.Helix.Models.3.0.1-CI-20190120-063142\lib\netstandard2.0\TwitchLib.Api.Helix.Models.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="TwitchLib.Api.V5, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\TwitchLib.Api.V5.1.1.0\lib\netstandard2.0\TwitchLib.Api.V5.dll</HintPath>
+    <Reference Include="TwitchLib.Api.V5, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\TwitchLib.Api.V5.3.0.1-CI-20190120-063139\lib\netstandard2.0\TwitchLib.Api.V5.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="TwitchLib.Api.V5.Models, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\TwitchLib.Api.V5.Models.1.1.0\lib\netstandard2.0\TwitchLib.Api.V5.Models.dll</HintPath>
+    <Reference Include="TwitchLib.Api.V5.Models, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\TwitchLib.Api.V5.Models.3.0.1-CI-20190120-063145\lib\netstandard2.0\TwitchLib.Api.V5.Models.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="TwitchLib.Client, Version=3.0.4.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\packages\TwitchLib.Client.3.0.4\lib\netstandard2.0\TwitchLib.Client.dll</HintPath>
