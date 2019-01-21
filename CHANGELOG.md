@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Changed
 - !commands command list is dynamically generated
 - Moderator checks for commands inside get unified
+- Logs generated in logs folder
 
 ## [v0.5.4.1-b] - 2019-01-20
 - Updated dependencies, Now vip users are read
