@@ -71,7 +71,7 @@ namespace EvilBot.Processors
 			try
 			{
 				var userIdList =
-					await _apiRetriever.GetChattersUsersAsync(TwitchInfo.ChannelName).ConfigureAwait(false);
+					await _apiRetriever.GetChattersUsersAsync(_configuration.ChannelName).ConfigureAwait(false);
 				var userList = userIdList.Select(t => new UserBase(t.DisplayName, t.Id)).ToList<IUserBase>();
 				await AddToUserAsync(userList,_configuration.LurkerPoints ,10).ConfigureAwait(false);
 				Log.Debug("Database updated! Lurkers present: {Lurkers}", userList.Count);

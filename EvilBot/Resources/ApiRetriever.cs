@@ -19,10 +19,10 @@ namespace EvilBot.Resources
 	{
 		private readonly ITwitchConnections _twitchConnections;
 
-		public ApiRetriever(ITwitchConnections twitchConnections)
+		public ApiRetriever(ITwitchConnections twitchConnections, IConfiguration configuration)
 		{
 			_twitchConnections = twitchConnections;
-			var twitchChannelId = GetUserIdAsync(TwitchInfo.ChannelName).Result;
+			var twitchChannelId = GetUserIdAsync(configuration.ChannelName).Result;
 			TwitchChannelId = twitchChannelId ?? throw new Exception(
 				                  "TwitchChannelId is null. Check if channel name is correct or connexions are made correctly");
 		}

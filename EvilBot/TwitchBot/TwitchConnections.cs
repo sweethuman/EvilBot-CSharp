@@ -1,6 +1,7 @@
 ﻿using System;
 using EvilBot.TwitchBot.Interfaces;
 using EvilBot.Utilities.Interfaces;
+using EvilBot.Resources.Interfaces;
 using Serilog;
 using TwitchLib.Api;
 using TwitchLib.Api.Interfaces;
@@ -15,14 +16,16 @@ namespace EvilBot.TwitchBot
 {
 	internal class TwitchConnections : ITwitchConnections
 	{
-		private readonly ConnectionCredentials _credentials =
-			new ConnectionCredentials(TwitchInfo.BotUsername, TwitchInfo.BotToken);
+		private readonly ConnectionCredentials _credentials;
 
 		private readonly ILoggerUtility _loggerUtility;
+		private readonly IConfiguration _configuration;
 
-		public TwitchConnections(ILoggerUtility loggerUtility)
+		public TwitchConnections(ILoggerUtility loggerUtility, IConfiguration configuration)
 		{
 			_loggerUtility = loggerUtility;
+			_configuration = configuration;
+			_credentials = new ConnectionCredentials(configuration.BotUsername, configuration.BotToken);
 			Connect();
 		}
 
@@ -40,7 +43,7 @@ namespace EvilBot.TwitchBot
 		//NOTE probably this is temporary, and maybe there is a better solution with wich I can use this without needing to have a ref to this class everywhere
 		public void SendErrorMessage(string message)
 		{
-			Client.SendMessage(TwitchInfo.ChannelName.ToLower(), $"/me {message}");
+			Client.SendMessage(_configuration.ChannelName.ToLower(), $"/me {message}");
 		}
 
 		public void Disconnect()
@@ -60,15 +63,15 @@ namespace EvilBot.TwitchBot
 			};
 			var customClient = new WebSocketClient(clientOptions);
 			Client = new TwitchClient(customClient, logger: _loggerUtility.ClientLogger);
-			Client.Initialize(_credentials, TwitchInfo.ChannelName);
+			Client.Initialize(_credentials, _configuration.ChannelName);
 			Client.Connect();
 		}
 
 		private void ApiInitialize()
 		{
 			Api = new TwitchAPI(_loggerUtility.ApiLoggerFactory);
-			Api.Settings.ClientId = TwitchInfo.ClientID;
-			Api.Settings.AccessToken = TwitchInfo.BotToken;
+			Api.Settings.ClientId = _configuration.ClientId;
+			Api.Settings.AccessToken = _configuration.BotToken;
 		}
 	}
 }

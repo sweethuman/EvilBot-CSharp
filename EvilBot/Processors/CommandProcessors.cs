@@ -25,15 +25,17 @@ namespace EvilBot.Processors
 		private readonly IFilterManager _filterManager;
 		private readonly IPollManager _pollManager;
 		private readonly IRankManager _rankManager;
+		private readonly IConfiguration _configuration;
 
 		public CommandProcessor(IDataAccess dataAccess, IPollManager pollManager,
-			IFilterManager filterManager, IApiRetriever apiRetriever, IRankManager rankManager)
+			IFilterManager filterManager, IApiRetriever apiRetriever, IRankManager rankManager, IConfiguration configuration)
 		{
 			_dataAccess = dataAccess;
 			_pollManager = pollManager;
 			_filterManager = filterManager;
 			_apiRetriever = apiRetriever;
 			_rankManager = rankManager;
+			_configuration = configuration;
 			BuildRankListString();
 		}
 
@@ -238,9 +240,9 @@ namespace EvilBot.Processors
 			Log.Information("Giveaway started!");
 			try
 			{
-				var userList = await _apiRetriever.GetChattersUsersAsync(TwitchInfo.ChannelName).ConfigureAwait(false);
+				var userList = await _apiRetriever.GetChattersUsersAsync(_configuration.ChannelName).ConfigureAwait(false);
 				userList.RemoveAll(x =>
-					string.Equals(x.Name, TwitchInfo.ChannelName, StringComparison.CurrentCultureIgnoreCase));
+					string.Equals(x.Name, _configuration.ChannelName, StringComparison.CurrentCultureIgnoreCase));
 				var getDatabaseUsersTasks = new List<Task<IDatabaseUser>>();
 				for (var i = 0; i < userList.Count; i++)
 				{

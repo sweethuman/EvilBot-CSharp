@@ -150,7 +150,7 @@ namespace EvilBot.TwitchBot
 			//_timedMessages.Add("Pentru a migra punctele te rog da !myrank si tag unui moderator");
 			_timedMessages.Add("Incearca !rank si vezi cat de activ ai fost");
 			_timedMessages.Add("Fii activ ca sa castigi XP");
-			_timedMessages.Add("Pentru a migra punctele te rog da !myrank si tag unui moderator");
+			//_timedMessages.Add("Pentru a migra punctele te rog da !myrank si tag unui moderator");
 			_timedMessages.Add("Subscriberii primesc x2 puncte!");
 			_timedMessages.Add("Daca iti place, apasa butonul de FOLLOW! Multumesc pentru sustinere!");
 			//_timedMessages.Add("Pentru a migra punctele te rog da !myrank si tag unui moderator");
@@ -215,13 +215,13 @@ namespace EvilBot.TwitchBot
 
 		private void _dataProcessor_RankUpdated(object sender, RankUpdateEventArgs e)
 		{
-			_twitchConnection.Client.SendMessage(TwitchInfo.ChannelName, $"/me {e.Name} ai avansat la {e.Rank}");
+			_twitchConnection.Client.SendMessage(_configuration.ChannelName, $"/me {e.Name} ai avansat la {e.Rank}");
 		}
 
 		private void MessageRepeater_Elapsed(object sender, ElapsedEventArgs e)
 		{
 			var rnd = new Random();
-			_twitchConnection.Client.SendMessage(TwitchInfo.ChannelName,
+			_twitchConnection.Client.SendMessage(_configuration.ChannelName,
 				$"/me {_timedMessages[rnd.Next(0, _timedMessages.Count)]}");
 		}
 
