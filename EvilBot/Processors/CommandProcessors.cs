@@ -14,6 +14,7 @@ using EvilBot.Utilities;
 using Serilog;
 using TwitchLib.Api.Core.Exceptions;
 using TwitchLib.Api.V5.Models.Users;
+using TwitchLib.Client.Enums;
 using TwitchLib.Client.Events;
 
 namespace EvilBot.Processors
@@ -300,18 +301,41 @@ namespace EvilBot.Processors
 
 		#region PollCommands
 
-		public string PollCreateCommand(OnChatCommandReceivedArgs e)
+
+		public async Task<string> PollCommandAsync(OnChatCommandReceivedArgs e)
 		{
-			if (string.IsNullOrEmpty(e.Command.ArgumentsAsString) || e.Command.ArgumentsAsString.Contains("||"))
+			if (e.Command.ArgumentsAsList == null || e.Command.ArgumentsAsList.Count == 0) return StandardMessages.PollMessages.PollManDefault;
+			switch (e.Command.ArgumentsAsList[0].ToLower())
+			{
+				case "create":
+					if (e.Command.ChatMessage.UserType < UserType.Moderator) return null;
+					var pollOptions = e.Command.ArgumentsAsString.Trim().Remove(0, "create".Length).Trim();
+					return PollCreateCommand(pollOptions);
+				case "end":
+					if (e.Command.ChatMessage.UserType < UserType.Moderator) return null;
+					return PollEndCommand();
+				case "vote":
+					return await PollVoteCommandAsync(e).ConfigureAwait(false);
+				case "stats":
+					return PollStatsCommand();
+				default:
+					return StandardMessages.PollMessages.PollManDefault;
+			}
+		}
+
+
+		private string PollCreateCommand(string pollOptionsString)
+		{
+			if (string.IsNullOrEmpty(pollOptionsString) || pollOptionsString.Contains("||"))
 				return StandardMessages.PollMessages.PollCreateText;
 
-			var options = CommandHelpers.FilterAndPreparePollOptions(e.Command.ArgumentsAsString);
+			var options = CommandHelpers.FilterAndPreparePollOptions(pollOptionsString);
 			if (options.Count < 2) return StandardMessages.PollMessages.PollCreateText;
 
 			var creationSuccess = _pollManager.PollCreate(options);
 			if (!creationSuccess)
 			{
-				Log.Error("Something major failed when creating the poll {paramString}", e.Command.ArgumentsAsString);
+				Log.Error("Something major failed when creating the poll {paramString}", pollOptionsString);
 				return StandardMessages.BigError;
 			}
 
@@ -323,9 +347,9 @@ namespace EvilBot.Processors
 			return $"/me {builder}";
 		}
 
-		public async Task<string> PollVoteCommandAsync(OnChatCommandReceivedArgs e)
+		private async Task<string> PollVoteCommandAsync(OnChatCommandReceivedArgs e)
 		{
-			if (string.IsNullOrEmpty(e.Command.ArgumentsAsString) || !int.TryParse(e.Command.ArgumentsAsList[0], out var votedNumber))
+			if (e.Command.ArgumentsAsList.Count <= 1 || !int.TryParse(e.Command.ArgumentsAsList[1], out var votedNumber))
 				return StandardMessages.PollMessages.PollVoteNotNumber;
 			var voteState = await _pollManager.PollAddVoteAsync(e.Command.ChatMessage.UserId, votedNumber)
 				.ConfigureAwait(false);
@@ -338,9 +362,9 @@ namespace EvilBot.Processors
 					return
 						$"/me {e.Command.ChatMessage.DisplayName} a votat pentru '{_pollManager.PollItems[votedNumber - 1].Name}'";
 				case Enums.PollAddVoteFinishState.OptionOutOfRange:
-					if (PollOptionsString != null) return $"/me Foloseste !pollvote {PollOptionsString}";
+					if (PollOptionsString != null) return $"/me Foloseste !poll vote {PollOptionsString}";
 					Log.Error("PollOptionsString shouldn't be null when vote is out of range... returning null!");
-					return "/me Foloseste !pollvote ERROR: LIPSESC OPTIUNILE. SEND LOGS.";
+					return "/me Foloseste !poll vote ERROR: LIPSESC OPTIUNILE. SEND LOGS.";
 				case Enums.PollAddVoteFinishState.VoteFailed:
 					Log.Error("Vote failed for {DisplayName}, chat message: {message}",
 						e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.Message);
@@ -351,7 +375,7 @@ namespace EvilBot.Processors
 			}
 		}
 
-		public string PollStatsCommand(OnChatCommandReceivedArgs e)
+		private string PollStatsCommand()
 		{
 			var resultItems = _pollManager.PollStats();
 			if (resultItems == null)
@@ -364,7 +388,7 @@ namespace EvilBot.Processors
 			return $"/me {builder}";
 		}
 
-		public string PollEndCommand(OnChatCommandReceivedArgs e)
+		private string PollEndCommand()
 		{
 			var resultItem = _pollManager.PollEnd();
 			if (resultItem == null)

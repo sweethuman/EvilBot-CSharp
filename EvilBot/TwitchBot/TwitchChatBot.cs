@@ -87,7 +87,7 @@ namespace EvilBot.TwitchBot
 			Task.FromResult($"/me {StandardMessages.BotInformation.AboutBot}");
 
 		private Task<string> ChangelogCommandAsync(OnChatCommandReceivedArgs e) =>
-			Task.FromResult($"/me Changelog: {StandardMessages.BotInformation.ChangelogBot}");
+			Task.FromResult($"/me {StandardMessages.BotInformation.ChangelogBot}");
 
 		private Task<string> CommandsCommandAsync(OnChatCommandReceivedArgs e) =>
 			Task.FromResult(CommandsString);
@@ -100,16 +100,6 @@ namespace EvilBot.TwitchBot
 			Task.FromResult($"/me {_commandProcessor.RankListString}");
 
 		private Task<string> ManageCommandAsync(OnChatCommandReceivedArgs e) => _commandProcessor.ManageCommandAsync(e);
-
-		private Task<string> PollVoteCommandAsync(OnChatCommandReceivedArgs e) =>
-			_commandProcessor.PollVoteCommandAsync(e);
-
-		private Task<string> PollStatsCommandAsync(OnChatCommandReceivedArgs e) =>
-			Task.Run(() => _commandProcessor.PollStatsCommand(e));
-
-		private Task<string> PollCreateCommandAsync(OnChatCommandReceivedArgs e) => Task.Run(() => _commandProcessor.PollCreateCommand(e));
-
-		private Task<string> PollEndCommandAsync(OnChatCommandReceivedArgs e) => Task.Run( () => _commandProcessor.PollEndCommand(e));
 
 		private Task<string> FilterCommandAsync(OnChatCommandReceivedArgs e) => _commandProcessor.FilterCommandAsync(e);
 
@@ -187,10 +177,7 @@ namespace EvilBot.TwitchBot
 			_commands.Add("ranks",		(RankListCommandAsync, false));
 			_commands.Add("top",		(TopCommandAsync, false));
 			_commands.Add("pointrate",	(PointRateCommandAsync, false));
-			_commands.Add("pollvote",	(PollVoteCommandAsync, false));
-			_commands.Add("pollstats",	(PollStatsCommandAsync, false));
-			_commands.Add("pollcreate",	(PollCreateCommandAsync, true));
-			_commands.Add("pollend",	(PollEndCommandAsync, true));
+			_commands.Add("poll", 		(_commandProcessor.PollCommandAsync, false));
 			_commands.Add("giveaway",	(GiveawayCommandAsync, true));
 			_commands.Add("manage",		(ManageCommandAsync, true));
 			_commands.Add("filter",		(FilterCommandAsync, true));

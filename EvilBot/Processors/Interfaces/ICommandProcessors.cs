@@ -10,18 +10,11 @@ namespace EvilBot.Processors.Interfaces
 
 		Task<string> ManageCommandAsync(OnChatCommandReceivedArgs e);
 
-		string PollCreateCommand(OnChatCommandReceivedArgs e);
-
-		Task<string> PollVoteCommandAsync(OnChatCommandReceivedArgs e);
-
-		string PollStatsCommand(OnChatCommandReceivedArgs e);
-
-		string PollEndCommand(OnChatCommandReceivedArgs e);
-
 		Task<string> FilterCommandAsync(OnChatCommandReceivedArgs e);
 
 		Task<string> TopCommandAsync(OnChatCommandReceivedArgs e);
 
 		Task<(string usersAnnouncement, string winnerAnnouncement)> GiveawayCommandAsync(OnChatCommandReceivedArgs e);
+		Task<string> PollCommandAsync(OnChatCommandReceivedArgs e);
 	}
 }

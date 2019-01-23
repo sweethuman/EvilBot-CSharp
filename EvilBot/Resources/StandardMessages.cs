@@ -6,15 +6,18 @@
 		{
 			public static string AboutBot { get; } = "EvilBot v0.5.4.1beta by M0rtuary";
 
-			public static string ChangelogBot { get; } = "http://goo.gl/1mWQ18";
+			public static string ChangelogBot { get; } = "Changelog: http://goo.gl/1mWQ18";
 		}
 
 		public static class PollMessages
 		{
-			public static string PollCreateText { get; } =
-				"/me Command format !pollcreate option1 | option2 | [option3] | [option4]";
 
-			public static string PollVoteText { get; } = "/me Foloseste !pollvote <1,2,3,4>";
+			public static string PollManDefault { get; } = "/me !poll vote/stats/create/end";
+
+			public static string PollCreateText { get; } =
+				"/me Command format !poll create option1 | option2 | [option3] | [option4]";
+
+			public static string PollVoteText { get; } = "/me Foloseste !poll vote <1,2,3,4>";
 
 			public static string PollVoteNotNumber { get; } = "/me Optiunea data nu este un numar!";
 
