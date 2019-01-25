@@ -338,7 +338,10 @@
     <Compile Include="Processors\Interfaces\ICommandProcessors.cs" />
     <Compile Include="Resources\ApiRetriever.cs" />
     <Compile Include="Resources\Configuration.cs" />
-    <Compile Include="Resources\Enums.cs" />
+    <Compile Include="Resources\Enums\DatabaseTables.cs" />
+    <Compile Include="Resources\Enums\DatabaseUserPointsOrderRow.cs" />
+    <Compile Include="Resources\Enums\FilteredUsersDatabaseAction.cs" />
+    <Compile Include="Resources\Enums\PollAddVoteFinishState.cs" />
     <Compile Include="Resources\Interfaces\IApiRetriever.cs" />
     <Compile Include="Resources\Interfaces\IConfiguration.cs" />
     <Compile Include="Resources\Interfaces\IDataAccess.cs" />

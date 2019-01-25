@@ -6,7 +6,7 @@ using EvilBot.DataStructures;
 using EvilBot.DataStructures.Interfaces;
 using EvilBot.EventArguments;
 using EvilBot.Managers.Interfaces;
-using EvilBot.Resources;
+using EvilBot.Resources.Enums;
 using EvilBot.Resources.Interfaces;
 using Serilog;
 
@@ -78,7 +78,7 @@ namespace EvilBot.Managers
 			var usersUpdated = new List<IUserStructure>();
 			var databaseRankUpdateTasks = new List<Task>();
 			var getUserAttributesTasks = userList
-				.Select(t => _dataAccess.RetrieveUserFromTableAsync(Enums.DatabaseTables.UserPoints, t.UserId))
+				.Select(t => _dataAccess.RetrieveUserFromTableAsync(DatabaseTables.UserPoints, t.UserId))
 				.ToList();
 			var userAttributes = (await Task.WhenAll(getUserAttributesTasks).ConfigureAwait(false)).ToList();
 			if (userAttributes.Contains(null))

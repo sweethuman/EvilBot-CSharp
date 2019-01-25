@@ -5,7 +5,7 @@ using EvilBot.DataStructures;
 using EvilBot.DataStructures.Interfaces;
 using EvilBot.DataStructures.Interfaces.Comparers;
 using EvilBot.Managers.Interfaces;
-using EvilBot.Resources;
+using EvilBot.Resources.Enums;
 using EvilBot.Resources.Interfaces;
 using Serilog;
 
@@ -40,7 +40,7 @@ namespace EvilBot.Managers
 		public async Task InitializeFilterAsync()
 		{
 			Log.Debug("Initializing filter!");
-			var users = await _dataAccess.RetrieveAllUsersFromTableAsync(Enums.DatabaseTables.FilteredUsers)
+			var users = await _dataAccess.RetrieveAllUsersFromTableAsync(DatabaseTables.FilteredUsers)
 				.ConfigureAwait(false);
 			if (users == null) return;
 			users.RemoveAll(x => x == null);
@@ -71,7 +71,7 @@ namespace EvilBot.Managers
 					user.DisplayName;
 			}
 
-			return _dataAccess.ModifyFilteredUsersAsync(Enums.FilteredUsersDatabaseAction.Insert, user.UserId);
+			return _dataAccess.ModifyFilteredUsersAsync(FilteredUsersDatabaseAction.Insert, user.UserId);
 		}
 
 		public Task<bool> RemoveFromFilterAsync(IUserBase user)
@@ -80,7 +80,7 @@ namespace EvilBot.Managers
 			//await eliding is okay because the methods above this will not throw exceptions, or shouldn't
 			Log.Debug("{user} {userId} removing from the filter", user.DisplayName, user.UserId);
 			RemoveUser(user);
-			return _dataAccess.ModifyFilteredUsersAsync(Enums.FilteredUsersDatabaseAction.Remove, user.UserId);
+			return _dataAccess.ModifyFilteredUsersAsync(FilteredUsersDatabaseAction.Remove, user.UserId);
 		}
 
 		public List<IUserBase> RetrieveFilteredUsers()

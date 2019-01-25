@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using EvilBot.DataStructures.Interfaces;
-using EvilBot.Resources;
+using EvilBot.Resources.Enums;
 
 namespace EvilBot.Managers.Interfaces
 {
@@ -10,7 +10,7 @@ namespace EvilBot.Managers.Interfaces
 		bool PollActive { get; }
 		List<IPollItem> PollItems { get; }
 
-		Task<Enums.PollAddVoteFinishState> PollAddVoteAsync(string userId, int votedNumber);
+		Task<PollAddVoteFinishState> PollAddVoteAsync(string userId, int votedNumber);
 
 		/// <summary>
 		///     Initializes a new poll

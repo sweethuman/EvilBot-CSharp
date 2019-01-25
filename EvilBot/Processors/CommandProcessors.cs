@@ -9,6 +9,7 @@ using EvilBot.DataStructures.Database.Interfaces;
 using EvilBot.Managers.Interfaces;
 using EvilBot.Processors.Interfaces;
 using EvilBot.Resources;
+using EvilBot.Resources.Enums;
 using EvilBot.Resources.Interfaces;
 using EvilBot.Utilities;
 using Serilog;
@@ -49,7 +50,7 @@ namespace EvilBot.Processors
 			if (string.IsNullOrEmpty(e.Command.ArgumentsAsString))
 			{
 				var results = await _dataAccess
-					.RetrieveUserFromTableAsync(Enums.DatabaseTables.UserPoints, e.Command.ChatMessage.UserId)
+					.RetrieveUserFromTableAsync(DatabaseTables.UserPoints, e.Command.ChatMessage.UserId)
 					.ConfigureAwait(false);
 				var displayName = e.Command.ChatMessage.DisplayName;
 				if (results == null) return $"/me {displayName} nu esti inca in baza de date! Vei fi adaugat imediat!";
@@ -84,7 +85,7 @@ namespace EvilBot.Processors
 				}
 				if(user == null) return String.Format(StandardMessages.UserErrorMessages.UserMissingText, e.Command.ArgumentsAsList[0].TrimStart('@'));
 
-				var results = await _dataAccess.RetrieveUserFromTableAsync(Enums.DatabaseTables.UserPoints, user.Id)
+				var results = await _dataAccess.RetrieveUserFromTableAsync(DatabaseTables.UserPoints, user.Id)
 					.ConfigureAwait(false);
 				if (results == null) return $"/me {user.DisplayName} nu este inca in baza de date!";
 
@@ -122,7 +123,7 @@ namespace EvilBot.Processors
 			if (!int.TryParse(pointsString ?? "0", out var pointModifier)) return StandardMessages.ManageCommandText;
 
 			await _dataAccess.ModifierUserIdAsync(user.Id, pointModifier, minuteModifier).ConfigureAwait(false);
-			var results = await _dataAccess.RetrieveUserFromTableAsync(Enums.DatabaseTables.UserPoints, user.Id)
+			var results = await _dataAccess.RetrieveUserFromTableAsync(DatabaseTables.UserPoints, user.Id)
 				.ConfigureAwait(false);
 			var hoursWatched = Math.Round(double.Parse(results.Minutes, CultureInfo.InvariantCulture) / 60, 1);
 			return $"/me Modificat {user.DisplayName} cu {pointModifier} puncte si {minuteModifier} minute. Acum are {results.Points}xp si {hoursWatched}h";
@@ -192,9 +193,9 @@ namespace EvilBot.Processors
 		public async Task<string> TopCommandAsync(OnChatCommandReceivedArgs e)
 		{
 			Log.Debug("Top Command Started!");
-			var databaseUsers = await _dataAccess.RetrieveNumberOfUsersFromTableAsync(Enums.DatabaseTables.UserPoints,
+			var databaseUsers = await _dataAccess.RetrieveNumberOfUsersFromTableAsync(DatabaseTables.UserPoints,
 				6,
-				Enums.DatabaseUserPointsOrderRow.Points).ConfigureAwait(false);
+				DatabaseUserPointsOrderRow.Points).ConfigureAwait(false);
 			if (databaseUsers == null) return "/me Baza de date este goala!";
 			databaseUsers.RemoveAll(x => x.UserId == _apiRetriever.TwitchChannelId);
 			if (databaseUsers.Count < 1) return "/me Nu am ce afisa!";
@@ -252,7 +253,7 @@ namespace EvilBot.Processors
 					if (!_filterManager.CheckIfUserIdFiltered(userList[i].Id))
 					{
 						getDatabaseUsersTasks.Add(
-							_dataAccess.RetrieveUserFromTableAsync(Enums.DatabaseTables.UserPoints, userList[i].Id));
+							_dataAccess.RetrieveUserFromTableAsync(DatabaseTables.UserPoints, userList[i].Id));
 						continue;
 					}
 
@@ -361,16 +362,16 @@ namespace EvilBot.Processors
 
 			switch (voteState)
 			{
-				case Enums.PollAddVoteFinishState.PollNotActive:
+				case PollAddVoteFinishState.PollNotActive:
 					return StandardMessages.PollMessages.PollNotActiveText;
-				case Enums.PollAddVoteFinishState.VoteAdded:
+				case PollAddVoteFinishState.VoteAdded:
 					return
 						$"/me {e.Command.ChatMessage.DisplayName} a votat pentru '{_pollManager.PollItems[votedNumber - 1].Name}'";
-				case Enums.PollAddVoteFinishState.OptionOutOfRange:
+				case PollAddVoteFinishState.OptionOutOfRange:
 					if (PollOptionsString != null) return $"/me Foloseste !poll vote {PollOptionsString}";
 					Log.Error("PollOptionsString shouldn't be null when vote is out of range... returning null!");
 					return "/me Foloseste !poll vote ERROR: LIPSESC OPTIUNILE. SEND LOGS.";
-				case Enums.PollAddVoteFinishState.VoteFailed:
+				case PollAddVoteFinishState.VoteFailed:
 					Log.Error("Vote failed for {DisplayName}, chat message: {message}",
 						e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.Message);
 					return

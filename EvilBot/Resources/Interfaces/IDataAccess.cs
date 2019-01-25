@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using EvilBot.DataStructures.Database.Interfaces;
+using EvilBot.Resources.Enums;
 
 namespace EvilBot.Resources.Interfaces
 {
@@ -31,7 +32,7 @@ namespace EvilBot.Resources.Interfaces
 		/// <param name="userId">If no userId is given it will retrieve all users.</param>
 		/// <remarks>In case of FilteredUsers only Id and UserId is populated.</remarks>
 		/// <returns>Returns a container with all the resources it could get. Not guaranteed it will populate all.</returns>
-		Task<IDatabaseUser> RetrieveUserFromTableAsync(Enums.DatabaseTables table, string userId = null);
+		Task<IDatabaseUser> RetrieveUserFromTableAsync(DatabaseTables table, string userId = null);
 
 		/// <summary>
 		///     Modifies the list of FilteredUsers in the database.
@@ -39,7 +40,7 @@ namespace EvilBot.Resources.Interfaces
 		/// <param name="userId">The user identifier.</param>
 		/// <param name="databaseAction">Represents the action to do in the database</param>
 		/// <returns>True if the user was removed or added. False means database was not changed.</returns>
-		Task<bool> ModifyFilteredUsersAsync(Enums.FilteredUsersDatabaseAction databaseAction, string userId);
+		Task<bool> ModifyFilteredUsersAsync(FilteredUsersDatabaseAction databaseAction, string userId);
 
 		/// <summary>
 		///     Closes the database connections.
@@ -52,7 +53,7 @@ namespace EvilBot.Resources.Interfaces
 		/// <param name="table">The table to retrieve users from.</param>
 		/// <remarks>In case of FilteredUsers only Id and UserId is populated.</remarks>
 		/// <returns>Returns a container with all the resources it could get. Not guaranteed it will populate all.</returns>
-		Task<List<IDatabaseUser>> RetrieveAllUsersFromTableAsync(Enums.DatabaseTables table);
+		Task<List<IDatabaseUser>> RetrieveAllUsersFromTableAsync(DatabaseTables table);
 
 
 		/// <summary>
@@ -63,7 +64,7 @@ namespace EvilBot.Resources.Interfaces
 		/// <param name="orderRow">Only use this if you are pulling users from UserPoints.</param>
 		/// <returns>A List of users filled with data. In case of Filtered Users only Id and UserId.</returns>
 		Task<List<IDatabaseUser>> RetrieveNumberOfUsersFromTableAsync
-		(Enums.DatabaseTables table, int limit,
-			Enums.DatabaseUserPointsOrderRow orderRow = Enums.DatabaseUserPointsOrderRow.None);
+		(DatabaseTables table, int limit,
+			DatabaseUserPointsOrderRow orderRow = DatabaseUserPointsOrderRow.None);
 	}
 }

@@ -5,7 +5,7 @@ using EvilBot.DataStructures;
 using EvilBot.DataStructures.Database;
 using EvilBot.DataStructures.Interfaces;
 using EvilBot.Managers.Interfaces;
-using EvilBot.Resources;
+using EvilBot.Resources.Enums;
 using EvilBot.Resources.Interfaces;
 using Serilog;
 
@@ -58,14 +58,14 @@ namespace EvilBot.Managers
 			return !PollActive ? null : PollItems;
 		}
 
-		public async Task<Enums.PollAddVoteFinishState> PollAddVoteAsync(string userId, int votedNumber)
+		public async Task<PollAddVoteFinishState> PollAddVoteAsync(string userId, int votedNumber)
 		{
-			if (!PollActive) return Enums.PollAddVoteFinishState.PollNotActive;
-			if (userId == null) return Enums.PollAddVoteFinishState.VoteFailed;
-			if (_usersWhoVoted.Contains(userId)) return Enums.PollAddVoteFinishState.AlreadyVoted;
-			if (votedNumber > PollItems.Count || votedNumber < 1) return Enums.PollAddVoteFinishState.OptionOutOfRange;
+			if (!PollActive) return PollAddVoteFinishState.PollNotActive;
+			if (userId == null) return PollAddVoteFinishState.VoteFailed;
+			if (_usersWhoVoted.Contains(userId)) return PollAddVoteFinishState.AlreadyVoted;
+			if (votedNumber > PollItems.Count || votedNumber < 1) return PollAddVoteFinishState.OptionOutOfRange;
 
-			var user = await _dataAccess.RetrieveUserFromTableAsync(Enums.DatabaseTables.UserPoints, userId)
+			var user = await _dataAccess.RetrieveUserFromTableAsync(DatabaseTables.UserPoints, userId)
 				           .ConfigureAwait(false) ??
 			           new DatabaseUser {UserId = userId, Rank = "0"};
 			if (int.TryParse(user.Rank, out var rank) && rank < InfluencePoints.Count)
@@ -73,12 +73,12 @@ namespace EvilBot.Managers
 				PollItems[votedNumber - 1].Points += InfluencePoints[rank];
 				_usersWhoVoted.Add(userId);
 				Log.Debug("{UserID} voted", userId);
-				return Enums.PollAddVoteFinishState.VoteAdded;
+				return PollAddVoteFinishState.VoteAdded;
 			}
 
 			Log.Warning("Rank was not a parsable: {Rank} {Class}", user.Rank, this);
 
-			return Enums.PollAddVoteFinishState.VoteFailed;
+			return PollAddVoteFinishState.VoteFailed;
 		}
 	}
 }

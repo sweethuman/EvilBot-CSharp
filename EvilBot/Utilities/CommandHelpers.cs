@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using TwitchLib.Api.Core.Enums;
-using TwitchLib.Client.Models;
 using UserType = TwitchLib.Client.Enums.UserType;
 
 namespace EvilBot.Utilities
