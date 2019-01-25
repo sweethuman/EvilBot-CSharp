@@ -238,6 +238,8 @@ namespace EvilBot.Processors
 		public async Task<(string usersAnnouncement, string winnerAnnouncement)> GiveawayCommandAsync(
 			OnChatCommandReceivedArgs e)
 		{
+			if (string.IsNullOrEmpty(e.Command.ArgumentsAsString))
+				return (null, "/me Nu ai introdus nici un item pentru giveaway!");
 			Log.Information("Giveaway started!");
 			try
 			{
