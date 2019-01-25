@@ -304,7 +304,9 @@ namespace EvilBot.Processors
 
 		public async Task<string> PollCommandAsync(OnChatCommandReceivedArgs e)
 		{
-			if (e.Command.ArgumentsAsList == null || e.Command.ArgumentsAsList.Count == 0) return StandardMessages.PollMessages.PollManDefault;
+			if (e.Command.ArgumentsAsList == null || e.Command.ArgumentsAsList.Count == 0)
+				return CommandHelpers.ChangeOutputIfMod(e.Command.ChatMessage.UserType,
+					StandardMessages.PollMessages.PollDefault, StandardMessages.PollMessages.PollMod);
 			switch (e.Command.ArgumentsAsList[0].ToLower())
 			{
 				case "create":
@@ -319,7 +321,8 @@ namespace EvilBot.Processors
 				case "stats":
 					return PollStatsCommand();
 				default:
-					return StandardMessages.PollMessages.PollManDefault;
+					return CommandHelpers.ChangeOutputIfMod(e.Command.ChatMessage.UserType,
+						StandardMessages.PollMessages.PollDefault, StandardMessages.PollMessages.PollMod);
 			}
 		}
 

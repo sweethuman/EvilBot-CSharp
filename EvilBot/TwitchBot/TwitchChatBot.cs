@@ -12,6 +12,7 @@ using EvilBot.Resources;
 using EvilBot.Resources.Interfaces;
 using EvilBot.Trackers.Interfaces;
 using EvilBot.TwitchBot.Interfaces;
+using EvilBot.Utilities;
 using Serilog;
 using TwitchLib.Client.Enums;
 using TwitchLib.Client.Events;
@@ -40,7 +41,9 @@ namespace EvilBot.TwitchBot
 			new Dictionary<string, (Func<OnChatCommandReceivedArgs, Task<string>> runner, bool needMod)>();
 
 		private string PointRateString { get; }
-		private string CommandsString { get; }
+		private string CommandsString { get; set; }
+
+		private string CommandsModString { get; set; }
 
 		public TwitchChatBot(ITwitchConnections twitchConnection, IDataAccess dataAccess, IDataProcessor dataProcessor,
 			ICommandProcessor commandProcessor, IFilterManager filterManager, IConfiguration configuration,
@@ -60,7 +63,7 @@ namespace EvilBot.TwitchBot
 			PointRateString = string.Format(StandardMessages.PointRateString, configuration.LurkerPoints,
 				configuration.LurkerMinutes, configuration.TalkerPoints, configuration.TalkerMinutes);
 			Connect();
-			CommandsString = CommandsInitializer();
+			CommandsInitializer();
 		}
 
 		~TwitchChatBot()
@@ -90,7 +93,7 @@ namespace EvilBot.TwitchBot
 			Task.FromResult($"/me {StandardMessages.BotInformation.ChangelogBot}");
 
 		private Task<string> CommandsCommandAsync(OnChatCommandReceivedArgs e) =>
-			Task.FromResult(CommandsString);
+			Task.FromResult(CommandHelpers.ChangeOutputIfMod(e.Command.ChatMessage.UserType, CommandsString, CommandsModString));
 
 		private Task<string> PointRateCommandAsync(OnChatCommandReceivedArgs e) => Task.FromResult(PointRateString);
 
@@ -170,7 +173,7 @@ namespace EvilBot.TwitchBot
 			_twitchConnection.Client.OnMessageSent += Client_OnMessageSent;
 		}
 
-		private string CommandsInitializer()
+		private void CommandsInitializer()
 		{
 			_commands.Add("rank",		(RankCommandAsync, false));
 			_commands.Add("ranklist",	(RankListCommandAsync, false));
@@ -181,19 +184,24 @@ namespace EvilBot.TwitchBot
 			_commands.Add("giveaway",	(GiveawayCommandAsync, true));
 			_commands.Add("manage",		(ManageCommandAsync, true));
 			_commands.Add("filter",		(FilterCommandAsync, true));
-			_commands.Add("comenzi",	(CommandsCommandAsync, false));
+			_commands.Add("help",	(CommandsCommandAsync, false));
 			_commands.Add("about",		(AboutCommandAsync, false));
 			_commands.Add("changelog",	(ChangelogCommandAsync, false));
 
-			var builder = new StringBuilder();
-			builder.Append("/me");
+			var commandsBuilder = new StringBuilder();
+			var commandsModBuilder = new StringBuilder();
+			commandsBuilder.Append("/me Comenzi:");
+			commandsModBuilder.Append("/me Comenzi mod:");
 			foreach (var command in _commands)
 			{
-				builder.AppendFormat(" !{0}", command.Key);
-				if (command.Value.needMod) builder.Append("(mod)");
+				commandsModBuilder.AppendFormat(" !{0}", command.Key);
+				if (command.Value.needMod) commandsModBuilder.Append("(mod)");
+				if (!command.Value.needMod) commandsBuilder.AppendFormat(" !{0}", command.Key);
 			}
-			Log.Debug("CommandsString generated: {0}", builder.ToString());
-			return builder.ToString();
+			Log.Debug("CommandsString generated: {0}", commandsBuilder.ToString());
+			Log.Debug("CommandsModString generated: {0}", commandsModBuilder.ToString());
+			CommandsString = commandsBuilder.ToString();
+			CommandsModString = commandsModBuilder.ToString();
 		}
 
 		#endregion TwitchChatBot Initializers

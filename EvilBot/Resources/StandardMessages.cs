@@ -12,7 +12,8 @@
 		public static class PollMessages
 		{
 
-			public static string PollManDefault { get; } = "/me !poll vote/stats/create/end";
+			public static string PollDefault { get; } = "/me !poll vote/stats";
+			public static string PollMod { get; } = "/me !poll vote/stats/create/end";
 
 			public static string PollCreateText { get; } =
 				"/me Command format !poll create option1 | option2 | [option3] | [option4]";

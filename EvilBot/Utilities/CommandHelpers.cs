@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using TwitchLib.Api.Core.Enums;
+using TwitchLib.Client.Models;
+using UserType = TwitchLib.Client.Enums.UserType;
 
 namespace EvilBot.Utilities
 {
@@ -48,6 +51,11 @@ namespace EvilBot.Utilities
 
 			builder.Append(">");
 			return builder.ToString();
+		}
+
+		public static T ChangeOutputIfMod<T>(UserType type, T userOutput, T modOutput)
+		{
+			return type < UserType.Moderator ? userOutput : modOutput;
 		}
 	}
 }
