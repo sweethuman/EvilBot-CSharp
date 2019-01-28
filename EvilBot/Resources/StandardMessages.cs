@@ -6,7 +6,7 @@
 		{
 			public static string AboutBot { get; } = "EvilBot v0.5.4.1beta by M0rtuary";
 
-			public static string ChangelogBot { get; } = "Changelog: http://goo.gl/1mWQ18";
+			public static string ChangelogBot { get; } = "Changelog: https://goo.gl/mLvcct";
 		}
 
 		public static class PollMessages

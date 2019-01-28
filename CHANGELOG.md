@@ -1,6 +1,13 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+Versions number is **MAJOR.MINOR.IMPROVEMENT.FIX**
+
+**Major** releases imply a completely new version that can change the whole program in a massive way or represent a milestone.  
+**Minor** usually has a new feature or a massive change.  
+**Improvements** usually improve already used features and have changes or modifications in a non breaking way or general fixes.  
+**Fixes** are small modifications, typos and fast bug fixes.
+
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
