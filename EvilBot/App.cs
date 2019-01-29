@@ -1,5 +1,6 @@
 ﻿using System;
 using EvilBot.Resources;
+using EvilBot.TwitchBot;
 using EvilBot.TwitchBot.Interfaces;
 using Serilog;
 
@@ -9,10 +10,12 @@ namespace EvilBot
 	{
 		private readonly ITwitchChatBot _twitchChatBot;
 		private readonly ITwitchConnections _twitchConnection;
+		private readonly CommandsContainer _commandsContainer;
 
-		public App(ITwitchConnections twitchConnections, ITwitchChatBot twitchChatBot)
+		public App(ITwitchConnections twitchConnections, ITwitchChatBot twitchChatBot, CommandsContainer commandsContainer)
 		{
 			_twitchChatBot = twitchChatBot;
+			_commandsContainer = commandsContainer;
 			_twitchConnection = twitchConnections;
 		}
 

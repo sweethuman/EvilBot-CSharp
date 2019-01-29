@@ -3,7 +3,7 @@ using TwitchLib.Client.Events;
 
 namespace EvilBot.Processors.Interfaces
 {
-	internal interface ICommandProcessor
+	public interface ICommandProcessor
 	{
 		string RankListString { get; }
 		Task<string> RankCommandAsync(OnChatCommandReceivedArgs e);

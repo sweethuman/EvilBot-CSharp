@@ -33,6 +33,7 @@ namespace EvilBot
 			builder.RegisterType<SetsTalkerCounter>().As<ITalkerCounter>().SingleInstance();
 			builder.RegisterType<SetsPresenceCounter>().As<IPresenceCounter>().SingleInstance();
 			builder.RegisterType<RankManager>().As<IRankManager>().SingleInstance();
+			builder.RegisterType<CommandsContainer>().AsSelf().SingleInstance();
 
 			return builder.Build();
 		}

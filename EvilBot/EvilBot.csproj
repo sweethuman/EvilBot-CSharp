@@ -353,6 +353,7 @@
     <Compile Include="Trackers\SetsPresenceCounter.cs" />
     <Compile Include="Trackers\SetsTalkerCounter.cs" />
     <Compile Include="Trackers\TalkerCounter.cs" />
+    <Compile Include="TwitchBot\CommandsContainer.cs" />
     <Compile Include="TwitchBot\TwitchConnections.cs" />
     <Compile Include="Utilities\CommandHelpers.cs" />
     <Compile Include="Processors\DataProcessor.cs" />
