@@ -4,7 +4,7 @@
 	{
 		public static class BotInformation
 		{
-			public static string AboutBot { get; } = "EvilBot v0.5.4.1beta by M0rtuary";
+			public static string AboutBot { get; } = "EvilBot v0.6.0.0beta by M0rtuary";
 
 			public static string ChangelogBot { get; } = "Changelog: https://goo.gl/mLvcct";
 		}
