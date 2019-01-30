@@ -334,8 +334,6 @@
     <Compile Include="Managers\PollManager.cs" />
     <Compile Include="Managers\RankManager.cs" />
     <Compile Include="Managers\SetsFilterManager.cs" />
-    <Compile Include="Processors\CommandProcessors.cs" />
-    <Compile Include="Processors\Interfaces\ICommandProcessors.cs" />
     <Compile Include="Resources\ApiRetriever.cs" />
     <Compile Include="Resources\Configuration.cs" />
     <Compile Include="Resources\Enums\DatabaseTables.cs" />
@@ -354,6 +352,18 @@
     <Compile Include="Trackers\SetsTalkerCounter.cs" />
     <Compile Include="Trackers\TalkerCounter.cs" />
     <Compile Include="TwitchBot\CommandsContainer.cs" />
+    <Compile Include="TwitchBot\Commands\AboutCommand.cs" />
+    <Compile Include="TwitchBot\Commands\ChangelogCommand.cs" />
+    <Compile Include="TwitchBot\Commands\FilterCommand.cs" />
+    <Compile Include="TwitchBot\Commands\GiveawayCommand.cs" />
+    <Compile Include="TwitchBot\Commands\HelpCommand.cs" />
+    <Compile Include="TwitchBot\Commands\Interfaces\ITwitchCommand.cs" />
+    <Compile Include="TwitchBot\Commands\ManageCommand.cs" />
+    <Compile Include="TwitchBot\Commands\PointRateCommand.cs" />
+    <Compile Include="TwitchBot\Commands\PollCommand.cs" />
+    <Compile Include="TwitchBot\Commands\RankCommand.cs" />
+    <Compile Include="TwitchBot\Commands\RankListCommand.cs" />
+    <Compile Include="TwitchBot\Commands\TopCommand.cs" />
     <Compile Include="TwitchBot\TwitchConnections.cs" />
     <Compile Include="Utilities\CommandHelpers.cs" />
     <Compile Include="Processors\DataProcessor.cs" />

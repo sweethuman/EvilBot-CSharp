@@ -10,6 +10,7 @@ namespace EvilBot
 	{
 		private readonly ITwitchChatBot _twitchChatBot;
 		private readonly ITwitchConnections _twitchConnection;
+		// ReSharper disable once NotAccessedField.Local
 		private readonly CommandsContainer _commandsContainer;
 
 		public App(ITwitchConnections twitchConnections, ITwitchChatBot twitchChatBot, CommandsContainer commandsContainer)

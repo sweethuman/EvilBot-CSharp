@@ -31,6 +31,7 @@ namespace EvilBot.Managers
 			return FilteredUserIds.Add(user.UserId);
 		}
 
+		// ReSharper disable once UnusedMethodReturnValue.Local
 		private bool RemoveUser(IUserBase user)
 		{
 			Users.Remove(user);

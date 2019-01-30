@@ -45,6 +45,7 @@ namespace EvilBot.Tests
 			{
 				mock.Mock<IDataAccess>();
 				var cls = mock.Create<PollManager>();
+				// ReSharper disable once UnusedVariable
 				var state = cls.PollCreate(input);
 				var refutation = cls.PollStats();
 				var result = refutation.Select(t => t.Name);

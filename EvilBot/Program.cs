@@ -24,8 +24,7 @@ namespace EvilBot
 		private static void Main(string[] args)
 		{
 			DeleteMenu(GetSystemMenu(GetConsoleWindow(), false), SC_CLOSE, MF_BYCOMMAND);
-			var container = ContainerConfig.Config();
-			using (var scope = container.BeginLifetimeScope())
+			using (var scope = ContainerConfig.Container.BeginLifetimeScope())
 			{
 				var app = scope.Resolve<IApplication>();
 				app.Run();

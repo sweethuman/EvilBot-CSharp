@@ -8,6 +8,7 @@ using EvilBot.Resources.Interfaces;
 using EvilBot.Trackers;
 using EvilBot.Trackers.Interfaces;
 using EvilBot.TwitchBot;
+using EvilBot.TwitchBot.Commands;
 using EvilBot.TwitchBot.Interfaces;
 using EvilBot.Utilities;
 using EvilBot.Utilities.Interfaces;
@@ -16,12 +17,14 @@ namespace EvilBot
 {
 	public static class ContainerConfig
 	{
-		public static IContainer Config()
+
+		public static readonly IContainer Container = Config();
+
+		private static IContainer Config()
 		{
 			var builder = new ContainerBuilder();
 			builder.RegisterType<App>().As<IApplication>().SingleInstance();
 			builder.RegisterType<DataProcessor>().As<IDataProcessor>().SingleInstance();
-			builder.RegisterType<CommandProcessor>().As<ICommandProcessor>().SingleInstance();
 			builder.RegisterType<SqliteDataAccess>().As<IDataAccess>().SingleInstance();
 			builder.RegisterType<LoggerUtility>().As<ILoggerUtility>().SingleInstance();
 			builder.RegisterType<TwitchChatBot>().As<ITwitchChatBot>().SingleInstance();
@@ -34,6 +37,18 @@ namespace EvilBot
 			builder.RegisterType<SetsPresenceCounter>().As<IPresenceCounter>().SingleInstance();
 			builder.RegisterType<RankManager>().As<IRankManager>().SingleInstance();
 			builder.RegisterType<CommandsContainer>().AsSelf().SingleInstance();
+
+			builder.RegisterType<FilterCommand>().AsSelf().SingleInstance();
+			builder.RegisterType<GiveawayCommand>().AsSelf().SingleInstance();
+			builder.RegisterType<ManageCommand>().AsSelf().SingleInstance();
+			builder.RegisterType<PollCommand>().AsSelf().SingleInstance();
+			builder.RegisterType<RankCommand>().AsSelf().SingleInstance();
+			builder.RegisterType<TopCommand>().AsSelf().SingleInstance();
+			builder.RegisterType<AboutCommand>().AsSelf().SingleInstance();
+			builder.RegisterType<ChangelogCommand>().AsSelf().SingleInstance();
+			builder.RegisterType<PointRateCommand>().AsSelf().SingleInstance();
+			builder.RegisterType<RankListCommand>().AsSelf().SingleInstance();
+			builder.RegisterType<HelpCommand>().AsSelf().SingleInstance();
 
 			return builder.Build();
 		}

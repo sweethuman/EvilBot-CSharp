@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using EvilBot.DataStructures;
 using EvilBot.DataStructures.Interfaces;
@@ -16,12 +17,23 @@ namespace EvilBot.Managers
 	{
 		private readonly List<IRankItem> _ranks = new List<IRankItem>();
 		private readonly IDataAccess _dataAccess;
+		public string RankListString { get; private set; }
 
 
 		public RankManager(IDataAccess dataAccess)
 		{
 			_dataAccess = dataAccess;
 			InitializeRanks();
+			BuildRankListString();
+		}
+
+		private void BuildRankListString()
+		{
+			var rankList = GetRankList();
+			var builder = new StringBuilder();
+			for (var i = 1; i < rankList.Count; i++)
+				builder.AppendFormat("{0}.{1}:{2} ", rankList[i].Id, rankList[i].Name, rankList[i].RequiredPoints);
+			RankListString = builder.ToString();
 		}
 
 		public event EventHandler<RankUpdateEventArgs> RankUpdated;

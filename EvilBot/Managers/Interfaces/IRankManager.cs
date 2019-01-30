@@ -8,6 +8,7 @@ namespace EvilBot.Managers.Interfaces
 {
 	public interface IRankManager
 	{
+		string RankListString { get; }
 		event EventHandler<RankUpdateEventArgs> RankUpdated;
 		string GetRankFormatted(string rankString, string pointsString);
 		int GetRank(int points);
