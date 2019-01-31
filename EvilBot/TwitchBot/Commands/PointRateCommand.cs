@@ -12,7 +12,7 @@ namespace EvilBot.TwitchBot.Commands
 
 		public PointRateCommand(IConfiguration configuration)
 		{
-			PointRateString = string.Format(StandardMessages.PointRateString, configuration.LurkerPoints,
+			PointRateString = string.Format(StandardMessages.PointRate, configuration.LurkerPoints,
 				configuration.LurkerMinutes, configuration.TalkerPoints, configuration.TalkerMinutes);
 		}
 

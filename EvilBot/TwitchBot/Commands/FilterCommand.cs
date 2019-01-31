@@ -28,7 +28,7 @@ namespace EvilBot.TwitchBot.Commands
 
 		public async Task<string> ProcessorAsync(OnChatCommandReceivedArgs e)
 		{
-			if (e.Command.ArgumentsAsList.Count < 1) return StandardMessages.FilterText;
+			if (e.Command.ArgumentsAsList.Count < 1) return StandardMessages.FilterFormat;
 
 			User user = null;
 			if (e.Command.ArgumentsAsList.Count >= 2)
@@ -41,10 +41,10 @@ namespace EvilBot.TwitchBot.Commands
 				catch (Exception exception)
 				{
 					Log.Error(exception.Message, "Bad request {parameter}", e.Command.ArgumentsAsString);
-					return String.Format(StandardMessages.UserErrorMessages.InvalidName, e.Command.ArgumentsAsList[1]);
+					return String.Format(StandardMessages.ErrorMessages.InvalidName, e.Command.ArgumentsAsList[1]);
 				}
 
-				if (user == null) return String.Format(StandardMessages.UserErrorMessages.UserMissingText, e.Command.ArgumentsAsList[1]);
+				if (user == null) return String.Format(StandardMessages.ErrorMessages.UserMissing, e.Command.ArgumentsAsList[1]);
 			}
 
 			switch (e.Command.ArgumentsAsList[0])
@@ -67,7 +67,7 @@ namespace EvilBot.TwitchBot.Commands
 				}
 				case "add":
 				{
-					if (user == null) return StandardMessages.FilterText;
+					if (user == null) return StandardMessages.FilterFormat;
 					if (await _filterManager.AddToFilterAsync(new UserBase(user.DisplayName, user.Id))
 						.ConfigureAwait(false))
 						return $"/me {user.DisplayName} adaugat la Filtru!";
@@ -76,14 +76,14 @@ namespace EvilBot.TwitchBot.Commands
 				case "rem":
 				case "remove":
 				{
-					if (user == null) return StandardMessages.FilterText;
+					if (user == null) return StandardMessages.FilterFormat;
 					if (await _filterManager.RemoveFromFilterAsync(new UserBase(user.DisplayName, user.Id))
 						.ConfigureAwait(false))
 						return $"/me {user.DisplayName} sters din Filtru!";
 					return $"/me {user.DisplayName} nu este in Filtru!";
 				}
 				default:
-					return StandardMessages.FilterText;
+					return StandardMessages.FilterFormat;
 			}
 		}
 	}

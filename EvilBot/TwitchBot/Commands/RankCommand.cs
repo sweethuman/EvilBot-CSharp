@@ -54,19 +54,19 @@ namespace EvilBot.TwitchBot.Commands
 				catch (BadParameterException exception)
 				{
 					Log.Error(exception, "Bad parameter {parameter}", e.Command.ArgumentsAsString);
-					return String.Format(StandardMessages.UserErrorMessages.InvalidName, e.Command.ArgumentsAsList[0]);
+					return String.Format(StandardMessages.ErrorMessages.InvalidName, e.Command.ArgumentsAsList[0]);
 				}
 				catch (BadRequestException exception)
 				{
 					Log.Error(exception, "Bad request {parameter}", e.Command.ArgumentsAsString);
-					return String.Format(StandardMessages.UserErrorMessages.InvalidName, e.Command.ArgumentsAsList[0]);
+					return String.Format(StandardMessages.ErrorMessages.InvalidName, e.Command.ArgumentsAsList[0]);
 				}
 				catch (Exception exception)
 				{
 					Log.Error(exception, "WRONG PARAMETER {parameter}", e.Command.ArgumentsAsString);
 					return $"/me Unexpected error. Please report! Parameter: \"{e.Command.ArgumentsAsString}\"";
 				}
-				if(user == null) return String.Format(StandardMessages.UserErrorMessages.UserMissingText, e.Command.ArgumentsAsList[0].TrimStart('@'));
+				if(user == null) return String.Format(StandardMessages.ErrorMessages.UserMissing, e.Command.ArgumentsAsList[0].TrimStart('@'));
 
 				var results = await _dataAccess.RetrieveUserFromTableAsync(DatabaseTables.UserPoints, user.Id)
 					.ConfigureAwait(false);

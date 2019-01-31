@@ -10,13 +10,18 @@ Versions number is **MAJOR.MINOR.IMPROVEMENT.FIX**
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## Unreleased
+### Changed
+- Under the hood Command Structure Improved
+
 ## [v0.6.0.0-b] - 2019-01-29
 ### Changed
-- !commands command list is dynamically generated
+- !help command list is dynamically generated
+- !comenzi now is !help
 - Moderator checks for commands inside get unified
 - Logs generated in logs folder
 - All original Poll Commands unified under a !poll command
-- Normal User Gets Different Help Message than Mod
+- User and Mod get list only for commands that they can use
 - Giveaway doesn't work without item
 
 ## [v0.5.4.1-b] - 2019-01-20

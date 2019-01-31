@@ -30,7 +30,7 @@ namespace EvilBot.TwitchBot.Commands
 		public async Task<string> ProcessorAsync(OnChatCommandReceivedArgs e)
 		{
 			if (e.Command.ArgumentsAsList.Count < 2)
-				return StandardMessages.ManageCommandText;
+				return StandardMessages.ManageCommandFormat;
 
 			User user;
 			try
@@ -41,16 +41,16 @@ namespace EvilBot.TwitchBot.Commands
 			catch (Exception exception)
 			{
 				Log.Error(exception, "Invalid username {username}", e.Command.ArgumentsAsList[0].TrimStart('@'));
-				return string.Format(StandardMessages.UserErrorMessages.InvalidName, e.Command.ArgumentsAsList[0]);
+				return string.Format(StandardMessages.ErrorMessages.InvalidName, e.Command.ArgumentsAsList[0]);
 			}
 
 			if (user == null)
-				return string.Format(StandardMessages.UserErrorMessages.UserMissingText, e.Command.ArgumentsAsList[0].TrimStart('@'));
+				return string.Format(StandardMessages.ErrorMessages.UserMissing, e.Command.ArgumentsAsList[0].TrimStart('@'));
 
 			var (minuteString, pointsString) = CommandHelpers.ManageCommandSorter(
 				e.Command.ArgumentsAsList.ElementAtOrDefault(1), e.Command.ArgumentsAsList.ElementAtOrDefault(2));
-			if (!int.TryParse(minuteString ?? "0", out var minuteModifier)) return StandardMessages.ManageCommandText;
-			if (!int.TryParse(pointsString ?? "0", out var pointModifier)) return StandardMessages.ManageCommandText;
+			if (!int.TryParse(minuteString ?? "0", out var minuteModifier)) return StandardMessages.ManageCommandFormat;
+			if (!int.TryParse(pointsString ?? "0", out var pointModifier)) return StandardMessages.ManageCommandFormat;
 
 			await _dataAccess.ModifierUserIdAsync(user.Id, pointModifier, minuteModifier).ConfigureAwait(false);
 			var results = await _dataAccess.RetrieveUserFromTableAsync(DatabaseTables.UserPoints, user.Id)

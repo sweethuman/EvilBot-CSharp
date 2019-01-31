@@ -28,7 +28,7 @@ namespace EvilBot.TwitchBot.Commands
 		{
 			if (e.Command.ArgumentsAsList == null || e.Command.ArgumentsAsList.Count == 0)
 				return CommandHelpers.ChangeOutputIfMod(e.Command.ChatMessage.UserType,
-					StandardMessages.PollMessages.PollDefault, StandardMessages.PollMessages.PollMod);
+					StandardMessages.PollMessages.PollDefaultFormat, StandardMessages.PollMessages.PollModFormat);
 			switch (e.Command.ArgumentsAsList[0].ToLower())
 			{
 				case "create":
@@ -44,7 +44,7 @@ namespace EvilBot.TwitchBot.Commands
 					return PollStatsCommand();
 				default:
 					return CommandHelpers.ChangeOutputIfMod(e.Command.ChatMessage.UserType,
-						StandardMessages.PollMessages.PollDefault, StandardMessages.PollMessages.PollMod);
+						StandardMessages.PollMessages.PollDefaultFormat, StandardMessages.PollMessages.PollModFormat);
 			}
 		}
 
@@ -52,10 +52,10 @@ namespace EvilBot.TwitchBot.Commands
 		private string PollCreateCommand(string pollOptionsString)
 		{
 			if (string.IsNullOrEmpty(pollOptionsString) || pollOptionsString.Contains("||"))
-				return StandardMessages.PollMessages.PollCreateText;
+				return StandardMessages.PollMessages.PollCreateFormat;
 
 			var options = CommandHelpers.FilterAndPreparePollOptions(pollOptionsString);
-			if (options.Count < 2) return StandardMessages.PollMessages.PollCreateText;
+			if (options.Count < 2) return StandardMessages.PollMessages.PollCreateFormat;
 
 			var creationSuccess = _pollManager.PollCreate(options);
 			if (!creationSuccess)
@@ -82,7 +82,7 @@ namespace EvilBot.TwitchBot.Commands
 			switch (voteState)
 			{
 				case PollAddVoteFinishState.PollNotActive:
-					return StandardMessages.PollMessages.PollNotActiveText;
+					return StandardMessages.PollMessages.PollNotActive;
 				case PollAddVoteFinishState.VoteAdded:
 					return
 						$"/me {e.Command.ChatMessage.DisplayName} a votat pentru '{_pollManager.PollItems[votedNumber - 1].Name}'";
@@ -104,7 +104,7 @@ namespace EvilBot.TwitchBot.Commands
 		{
 			var resultItems = _pollManager.PollStats();
 			if (resultItems == null)
-				return StandardMessages.PollMessages.PollNotActiveText;
+				return StandardMessages.PollMessages.PollNotActive;
 
 			var builder = new StringBuilder();
 			builder.Append("Statistici :");
@@ -117,7 +117,7 @@ namespace EvilBot.TwitchBot.Commands
 		{
 			var resultItem = _pollManager.PollEnd();
 			if (resultItem == null)
-				return StandardMessages.PollMessages.PollNotActiveText;
+				return StandardMessages.PollMessages.PollNotActive;
 			PollOptionsString = null;
 			var message = $"A Castigat || {resultItem.Name} || cu {resultItem.Points} puncte";
 			return $"/me {message}";
