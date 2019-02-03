@@ -34,6 +34,7 @@ namespace EvilBot.TwitchBot
 				_commands.Add("ranks", scope.Resolve<RankListCommand>());
 				_commands.Add("top", scope.Resolve<TopCommand>());
 				_commands.Add("pointrate", scope.Resolve<PointRateCommand>());
+				_commands.Add("bet", scope.Resolve<BetCommand>());
 				_commands.Add("poll", scope.Resolve<PollCommand>());
 				_commands.Add("giveaway", scope.Resolve<GiveawayCommand>());
 				_commands.Add("manage", scope.Resolve<ManageCommand>());
@@ -51,6 +52,7 @@ namespace EvilBot.TwitchBot
 					if (command.Value.NeedMod) commandsModBuilder.Append("(mod)");
 					if (!command.Value.NeedMod) commandsBuilder.AppendFormat(" !{0}", command.Key);
 				}
+
 				Log.Debug("CommandsString generated: {0}", commandsBuilder.ToString());
 				Log.Debug("CommandsModString generated: {0}", commandsModBuilder.ToString());
 
@@ -58,14 +60,14 @@ namespace EvilBot.TwitchBot
 					new NamedParameter("commandsString", commandsBuilder.ToString()),
 					new NamedParameter("commandsModString", commandsModBuilder.ToString())));
 			}
-
 		}
 
 		#region Commands Logic
+
 		private async void Client_OnChatCommandReceivedAsync(object sender, OnChatCommandReceivedArgs e)
 		{
 			var success = _commands.TryGetValue(e.Command.CommandText.ToLower(), out var command);
-			if(success == false) return;
+			if (success == false) return;
 			if ((!command.NeedMod || e.Command.ChatMessage.UserType < UserType.Moderator) && command.NeedMod) return;
 			Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName,
 				e.Command.ChatMessage.Message);

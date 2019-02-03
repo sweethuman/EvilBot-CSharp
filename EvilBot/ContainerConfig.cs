@@ -1,4 +1,4 @@
-using Autofac;
+﻿using Autofac;
 using EvilBot.Managers;
 using EvilBot.Managers.Interfaces;
 using EvilBot.Processors;
@@ -50,6 +50,7 @@ namespace EvilBot
 			builder.RegisterType<PointRateCommand>().AsSelf().SingleInstance();
 			builder.RegisterType<RankListCommand>().AsSelf().SingleInstance();
 			builder.RegisterType<HelpCommand>().AsSelf().SingleInstance();
+			builder.RegisterType<BetCommand>().AsSelf().SingleInstance();
 
 			return builder.Build();
 		}
