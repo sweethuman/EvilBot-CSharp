@@ -1,4 +1,4 @@
-namespace EvilBot.Resources
+﻿namespace EvilBot.Resources
 {
 	public static class StandardMessages
 	{
@@ -25,7 +25,25 @@ namespace EvilBot.Resources
 			public static string PollNotActive { get; } = "/me Nu exista poll activ!";
 		}
 
-		public static class UserErrorMessages
+		public static class BetMessages
+		{
+
+			public static string EndBetFormat { get; } = "/me !bet end <1(yes),2(no)>";
+
+			public static string CreateFromat { get; } = "/me !bet create <betName>";
+
+			public static string MakeVoteFormat { get; } = "/me !bet vote <points> <1(yes),2(no)>";
+
+			public static string OptionInvalid { get; } = "/me Optiunea este invalida. Te rog alege YES(1) or NO(2)";
+
+			public static string MinPoints { get; } = "/me Trebuie sa pariezi minim 10 puncte";
+
+			public static string NotActive { get; } = "/me Nu exista pariu activ!";
+
+			public static string Locked { get; } = "/me Pariatul a fost INCHIS. Nu poti sa faci sau sa retragi pariuri.";
+		}
+
+		public static class ErrorMessages
 		{
 			/// <summary>
 			/// <c>{0}</c> is the Name

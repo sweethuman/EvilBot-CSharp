@@ -1,4 +1,4 @@
-﻿using Autofac;
+using Autofac;
 using EvilBot.Managers;
 using EvilBot.Managers.Interfaces;
 using EvilBot.Processors;
@@ -29,13 +29,14 @@ namespace EvilBot
 			builder.RegisterType<LoggerUtility>().As<ILoggerUtility>().SingleInstance();
 			builder.RegisterType<TwitchChatBot>().As<ITwitchChatBot>().SingleInstance();
 			builder.RegisterType<TwitchConnections>().As<ITwitchConnections>().SingleInstance();
-			builder.RegisterType<PollManager>().As<IPollManager>().SingleInstance();
-			builder.RegisterType<SetsFilterManager>().As<IFilterManager>().SingleInstance();
-			builder.RegisterType<Configuration>().As<IConfiguration>().SingleInstance();
 			builder.RegisterType<ApiRetriever>().As<IApiRetriever>().SingleInstance();
+			builder.RegisterType<PollManager>().As<IPollManager>().SingleInstance();
+			builder.RegisterType<RankManager>().As<IRankManager>().SingleInstance();
+			builder.RegisterType<BetManager>().As<IBetManager>().SingleInstance();
+			builder.RegisterType<SetsFilterManager>().As<IFilterManager>().SingleInstance();
 			builder.RegisterType<SetsTalkerCounter>().As<ITalkerCounter>().SingleInstance();
 			builder.RegisterType<SetsPresenceCounter>().As<IPresenceCounter>().SingleInstance();
-			builder.RegisterType<RankManager>().As<IRankManager>().SingleInstance();
+			builder.RegisterType<Configuration>().As<IConfiguration>().SingleInstance();
 			builder.RegisterType<CommandsContainer>().AsSelf().SingleInstance();
 
 			builder.RegisterType<FilterCommand>().AsSelf().SingleInstance();

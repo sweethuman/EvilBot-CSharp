@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -327,7 +327,9 @@
     <Compile Include="DataStructures\UserBase.cs" />
     <Compile Include="DataStructures\UserStructureData.cs" />
     <Compile Include="EventArguments\RankUpdateEventArgs.cs" />
+    <Compile Include="Managers\BetManager.cs" />
     <Compile Include="Managers\FilterManager.cs" />
+    <Compile Include="Managers\IBetManager.cs" />
     <Compile Include="Managers\Interfaces\IFilterManager.cs" />
     <Compile Include="Managers\Interfaces\IPollManager.cs" />
     <Compile Include="Managers\Interfaces\IRankManager.cs" />
@@ -336,6 +338,7 @@
     <Compile Include="Managers\SetsFilterManager.cs" />
     <Compile Include="Resources\ApiRetriever.cs" />
     <Compile Include="Resources\Configuration.cs" />
+    <Compile Include="Resources\Enums\BetState.cs" />
     <Compile Include="Resources\Enums\DatabaseTables.cs" />
     <Compile Include="Resources\Enums\DatabaseUserPointsOrderRow.cs" />
     <Compile Include="Resources\Enums\FilteredUsersDatabaseAction.cs" />
