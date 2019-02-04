@@ -2,6 +2,8 @@
 {
 	public static class StandardMessages
 	{
+
+		//TODO move command formats inside commands, and try to make it auto generated for every command
 		public static class BotInformation
 		{
 			public static string AboutBot { get; } = "EvilBot v0.6.0.0beta by M0rtuary";
@@ -45,6 +47,8 @@
 
 		public static class ErrorMessages
 		{
+			public static string BigError { get; } = "/me Ok. UMM, SOMETHING HUGE FAILED, PLEASE REPORT ERORR";
+
 			/// <summary>
 			/// <c>{0}</c> is the Name
 			/// </summary>
@@ -56,6 +60,13 @@
 			public static string InvalidName { get; } =  "/me Numele \"{0}\" este invalid.";
 
 			public static string NotNumber { get; } = "/me Optiunea data nu este un numar!";
+
+			/// <summary>
+			/// <c>{0}</c> is the username of the user not present.
+			/// </summary>
+			public static string NotInDatabase { get; } = "/me \"{0}\" nu este inca in baza de date.";
+
+			public static string NotEnoughPoints { get; } = "/me Nu ai destule puncte.";
 
 			//TODO make a not nuber with the format
 //			/// <summary>
@@ -71,9 +82,6 @@
 			"/me Command format !manage <username> <(-)pointnumber> <(-)minutenumber>m";
 
 		public static string FilterFormat { get; } = "/me !filter get/add/remove <username>";
-
-		public static string BigError { get; } = "/me Ok. UMM, SOMETHING HUGE FAILED, PLEASE REPORT ERORR";
-
 
 		/// <summary>
 		/// <c>{0}</c> is LurkerPoints

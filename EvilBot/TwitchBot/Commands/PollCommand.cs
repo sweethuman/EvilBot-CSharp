@@ -61,7 +61,7 @@ namespace EvilBot.TwitchBot.Commands
 			if (!creationSuccess)
 			{
 				Log.Error("Something major failed when creating the poll {paramString}", pollOptionsString);
-				return StandardMessages.BigError;
+				return StandardMessages.ErrorMessages.BigError;
 			}
 
 			var resultItems = _pollManager.PollStats();

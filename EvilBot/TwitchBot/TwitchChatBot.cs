@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Timers;
 using EvilBot.DataStructures;
@@ -24,6 +24,7 @@ namespace EvilBot.TwitchBot
 		private readonly ITalkerCounter _talkerCounter;
 		private readonly ITwitchConnections _twitchConnection;
 		private readonly IRankManager _rankManager;
+		private readonly Random _random = new Random();
 
 		private readonly List<string> _timedMessages = new List<string>();
 		private Timer _addLurkerPointsTimer;
@@ -118,9 +119,8 @@ namespace EvilBot.TwitchBot
 
 		private void MessageRepeater_Elapsed(object sender, ElapsedEventArgs e)
 		{
-			var rnd = new Random();
 			_twitchConnection.Client.SendMessage(_configuration.ChannelName,
-				$"/me {_timedMessages[rnd.Next(0, _timedMessages.Count)]}");
+				$"/me {_timedMessages[_random.Next(0, _timedMessages.Count)]}");
 		}
 
 		private static void Client_OnConnectionError(object sender, OnConnectionErrorArgs e)

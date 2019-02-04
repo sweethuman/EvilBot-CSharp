@@ -17,14 +17,15 @@ namespace EvilBot.TwitchBot.Commands
 {
 	public class GiveawayCommand : ITwitchCommand
 	{
-
 		private readonly IApiRetriever _apiRetriever;
 		private readonly IDataAccess _dataAccess;
 		private readonly IConfiguration _configuration;
 		private readonly IFilterManager _filterManager;
 		private readonly ITwitchConnections _twitchConnection;
+		private readonly Random _random = new Random();
 
-		public GiveawayCommand(IFilterManager filterManager, IConfiguration configuration, IDataAccess dataAccess, IApiRetriever apiRetriever, ITwitchConnections twitchConnection)
+		public GiveawayCommand(IFilterManager filterManager, IConfiguration configuration, IDataAccess dataAccess,
+			IApiRetriever apiRetriever, ITwitchConnections twitchConnection)
 		{
 			_filterManager = filterManager;
 			_configuration = configuration;
@@ -72,8 +73,7 @@ namespace EvilBot.TwitchBot.Commands
 				if (sourceAccounts.Count < 1)
 					return "/me Nu exista oameni eligibili pentru giveaway";
 
-				var randomNumber = new Random()
-					.Next(0, sourceAccounts.Count);
+				var randomNumber = _random.Next(0, sourceAccounts.Count);
 				var winner =
 					$"/me {sourceAccounts[randomNumber].DisplayName} a castigat {e.Command.ArgumentsAsString}!";
 				var builder = new StringBuilder();

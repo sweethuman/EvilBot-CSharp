@@ -231,7 +231,7 @@ namespace EvilBot.TwitchBot.Commands
 				case BetState.BetLocked:
 					return StandardMessages.BetMessages.Locked;
 				case BetState.NotEnoughPoints:
-					return "/me Iti lipsesc punctele necesare pentru a face pariul.";
+					return StandardMessages.ErrorMessages.NotEnoughPoints;
 				case BetState.OptionInvalid:
 					return StandardMessages.BetMessages.OptionInvalid;
 			}
