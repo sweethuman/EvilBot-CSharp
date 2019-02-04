@@ -41,6 +41,7 @@ namespace EvilBot.TwitchBot
 				_commands.Add("filter", scope.Resolve<FilterCommand>());
 				_commands.Add("about", scope.Resolve<AboutCommand>());
 				_commands.Add("changelog", scope.Resolve<ChangelogCommand>());
+				_commands.Add("gamble", scope.Resolve<GambleCommand>());
 
 				var commandsBuilder = new StringBuilder();
 				var commandsModBuilder = new StringBuilder();

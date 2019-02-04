@@ -51,6 +51,7 @@ namespace EvilBot
 			builder.RegisterType<RankListCommand>().AsSelf().SingleInstance();
 			builder.RegisterType<HelpCommand>().AsSelf().SingleInstance();
 			builder.RegisterType<BetCommand>().AsSelf().SingleInstance();
+			builder.RegisterType<GambleCommand>().AsSelf().SingleInstance();
 
 			return builder.Build();
 		}

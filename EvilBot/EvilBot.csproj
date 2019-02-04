@@ -359,6 +359,7 @@
     <Compile Include="TwitchBot\Commands\BetCommand.cs" />
     <Compile Include="TwitchBot\Commands\ChangelogCommand.cs" />
     <Compile Include="TwitchBot\Commands\FilterCommand.cs" />
+    <Compile Include="TwitchBot\Commands\GambleCommand.cs" />
     <Compile Include="TwitchBot\Commands\GiveawayCommand.cs" />
     <Compile Include="TwitchBot\Commands\HelpCommand.cs" />
     <Compile Include="TwitchBot\Commands\Interfaces\ITwitchCommand.cs" />
