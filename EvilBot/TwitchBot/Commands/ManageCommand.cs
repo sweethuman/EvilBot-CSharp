@@ -56,7 +56,7 @@ namespace EvilBot.TwitchBot.Commands
 			var results = await _dataAccess.RetrieveUserFromTableAsync(DatabaseTables.UserPoints, user.Id)
 				.ConfigureAwait(false);
 			var hoursWatched = Math.Round(double.Parse(results.Minutes, CultureInfo.InvariantCulture) / 60, 1);
-			return $"/me Modificat {user.DisplayName} cu {pointModifier} puncte si {minuteModifier} minute. Acum are {results.Points}xp si {hoursWatched}h";
+			return $"/me Modificat {user.DisplayName} cu {pointModifier}XP si {minuteModifier} minute. Acum are {results.Points}XP si {hoursWatched}h";
 		}
 	}
 }

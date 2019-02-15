@@ -33,7 +33,7 @@ namespace EvilBot.TwitchBot
 				_commands.Add("ranklist", scope.Resolve<RankListCommand>());
 				_commands.Add("ranks", scope.Resolve<RankListCommand>());
 				_commands.Add("top", scope.Resolve<TopCommand>());
-				_commands.Add("pointrate", scope.Resolve<PointRateCommand>());
+				_commands.Add("xprate", scope.Resolve<PointRateCommand>());
 				_commands.Add("bet", scope.Resolve<BetCommand>());
 				_commands.Add("poll", scope.Resolve<PollCommand>());
 				_commands.Add("giveaway", scope.Resolve<GiveawayCommand>());

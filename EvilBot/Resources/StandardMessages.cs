@@ -1,4 +1,4 @@
-﻿namespace EvilBot.Resources
+namespace EvilBot.Resources
 {
 	public static class StandardMessages
 	{
@@ -66,7 +66,7 @@
 			/// </summary>
 			public static string NotInDatabase { get; } = "/me \"{0}\" nu este inca in baza de date.";
 
-			public static string NotEnoughPoints { get; } = "/me Nu ai destule puncte.";
+			public static string NotEnoughPoints { get; } = "/me Nu ai destul XP.";
 
 			//TODO make a not nuber with the format
 //			/// <summary>

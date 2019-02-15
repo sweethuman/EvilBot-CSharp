@@ -25,7 +25,7 @@ namespace EvilBot.TwitchBot.Commands
 		private readonly Dictionary<string, int> _lostGambles = new Dictionary<string, int>();
 		private readonly Random _random = new Random();
 
-		private string GambleFormat { get; } = "/me !gamble <points>";
+		private string GambleFormat { get; } = "/me !gamble <XP>";
 
 		public async Task<string> ProcessorAsync(OnChatCommandReceivedArgs e)
 		{
@@ -43,7 +43,7 @@ namespace EvilBot.TwitchBot.Commands
 
 			if (!int.TryParse(databaseUser.Points, out var userPoints))
 			{
-				Log.Error("COULDN'T parse databse poitns {points}", databaseUser.Points);
+				Log.Error("COULDN'T parse databse points {points}", databaseUser.Points);
 				return StandardMessages.ErrorMessages.BigError;
 			}
 
@@ -60,7 +60,7 @@ namespace EvilBot.TwitchBot.Commands
 			{
 				_lostGambles[e.Command.ChatMessage.UserId] = 0;
 				await _dataAccess.ModifierUserIdAsync(e.Command.ChatMessage.UserId, points).ConfigureAwait(false);
-				return $"/me {e.Command.ChatMessage.DisplayName} ai castigat : {points * 2}XP ";
+				return $"/me {e.Command.ChatMessage.DisplayName} ai castigat : {points * 2}XP";
 			}
 
 

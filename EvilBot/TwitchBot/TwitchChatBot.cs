@@ -81,10 +81,10 @@ namespace EvilBot.TwitchBot
 			//_timedMessages.Add("Pentru a migra punctele te rog da !myrank si tag unui moderator");
 			_timedMessages.Add("Incearca !rank si vezi cat de activ ai fost");
 			_timedMessages.Add("Fii activ ca sa castigi XP");
-			_timedMessages.Add("Subscriberii primesc x2 puncte!");
+			_timedMessages.Add("Subscriberii primesc x2 XP!");
 			_timedMessages.Add("Daca iti place, apasa butonul de FOLLOW! Multumesc pentru sustinere!");
-			_timedMessages.Add("Joaca la !gamble ca sa iti dublezi punctele!");
-			_timedMessages.Add("Joaca la !gamble ca sa iti dublezi punctele!");
+			_timedMessages.Add("Joaca la !gamble ca sa iti dublezi XP-ul!");
+			_timedMessages.Add("Joaca la !gamble ca sa iti dublezi XP-ul!");
 		}
 
 		private void TimerInitializer()
@@ -157,7 +157,7 @@ namespace EvilBot.TwitchBot
 					new List<IUserBase> {new UserBase(e.ChatMessage.DisplayName, e.ChatMessage.UserId)},
 					e.ChatMessage.Bits * _configuration.BitsPointsMultiplier + 11, subCheck: false);
 				message =
-					$"/me {e.ChatMessage.DisplayName} a fost recompensat {e.ChatMessage.Bits * _configuration.BitsPointsMultiplier + 11} puncte! Bravo!";
+					$"/me {e.ChatMessage.DisplayName} a fost recompensat {e.ChatMessage.Bits * _configuration.BitsPointsMultiplier + 11}XP! Bravo!";
 			}
 			catch (Exception exception)
 			{
