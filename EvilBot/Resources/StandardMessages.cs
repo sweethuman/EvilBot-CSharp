@@ -30,15 +30,15 @@ namespace EvilBot.Resources
 		public static class BetMessages
 		{
 
-			public static string EndBetFormat { get; } = "/me !bet end <1(yes),2(no)>";
+			public static string EndBetFormat { get; } = "/me !bet end <YES(1), NO(2)>";
 
 			public static string CreateFromat { get; } = "/me !bet create <betName>";
 
-			public static string MakeVoteFormat { get; } = "/me !bet vote <points> <1(yes),2(no)>";
+			public static string MakeVoteFormat { get; } = "/me !bet vote <XP> <YES(1), NO(2)>";
 
 			public static string OptionInvalid { get; } = "/me Optiunea este invalida. Te rog alege YES(1) or NO(2)";
 
-			public static string MinPoints { get; } = "/me Trebuie sa pariezi minim 10 puncte";
+			public static string MinPoints { get; } = "/me Trebuie sa pariezi minim 1XP";
 
 			public static string NotActive { get; } = "/me Nu exista pariu activ!";
 

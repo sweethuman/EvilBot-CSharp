@@ -76,7 +76,7 @@ namespace EvilBot.Managers
 		{
 			if (!BetActive) return BetState.BetNotActive;
 			if (BetLocked) return BetState.BetLocked;
-			if (points <= 10) return BetState.ActionFailed;
+			if (points <= 0) return BetState.ActionFailed;
 			if (string.IsNullOrEmpty(userId)) return BetState.ActionError;
 			if (!IsOptionValid(option)) return BetState.OptionInvalid;
 			Log.Debug("Bet made for {userId} of {points} to option {option}", userId, points, option);

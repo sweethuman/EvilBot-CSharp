@@ -327,9 +327,9 @@
     <Compile Include="DataStructures\UserBase.cs" />
     <Compile Include="DataStructures\UserStructureData.cs" />
     <Compile Include="EventArguments\RankUpdateEventArgs.cs" />
-    <Compile Include="Managers\BetManager.cs" />
     <Compile Include="Managers\FilterManager.cs" />
     <Compile Include="Managers\IBetManager.cs" />
+    <Compile Include="Managers\Interfaces\BetManager.cs" />
     <Compile Include="Managers\Interfaces\IFilterManager.cs" />
     <Compile Include="Managers\Interfaces\IPollManager.cs" />
     <Compile Include="Managers\Interfaces\IRankManager.cs" />

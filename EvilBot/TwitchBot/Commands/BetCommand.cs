@@ -40,10 +40,10 @@ namespace EvilBot.TwitchBot.Commands
 			_commands.Add("cancel", (CancelBetAsync, true, false));
 			_commands.Add("end", (EndBetAsync, true, false));
 			_commands.Add("vote", (MakeVoteAsync, false, true));
-			_commands.Add("undo", (UndoBetAsync, false, true));
-			_commands.Add("open", (OpenBetAsync, true, true));
-			_commands.Add("close", (CloseBetAsync, true, true));
-			_commands.Add("state", (StateOfBetAsync, false, true));
+			_commands.Add("votecancel", (UndoBetAsync, false, true));
+			_commands.Add("openvoting", (OpenBetAsync, true, true));
+			_commands.Add("closevoting", (CloseBetAsync, true, true));
+			_commands.Add("stats", (StateOfBetAsync, false, true));
 			_commands.Add("check", (CheckUserAsync, false, true));
 
 			var commandsBuilder = new StringBuilder();
@@ -87,15 +87,15 @@ namespace EvilBot.TwitchBot.Commands
 			var betName = e.Command.ArgumentsAsString.Remove(0, e.Command.ArgumentsAsList[0].Length);
 			if(string.IsNullOrEmpty(betName)) return Task.FromResult(StandardMessages.BetMessages.CreateFromat);
 			if (_betManager.CreateBet(betName))
-				return Task.FromResult($"/me Pariatul a inceput cu subiectul: {_betManager.BetName}");
-			return Task.FromResult("/me Creating bet failed. Please SEND LOGS.");
+				return Task.FromResult($"/me Pariul {_betManager.BetName} a inceput: Poti vota cu XP pe YES(1) sau NO(2)");
+			return Task.FromResult("/me Pariu deja activ. Termina sau anuleaza pariul curent.");
 		}
 
 		private Task<string> CancelBetAsync(OnChatCommandReceivedArgs e)
 		{
 			var state = _betManager.CancelBet();
 			if (state == BetState.ActionSucceeded)
-				return Task.FromResult($"/me Pariul \"{_betManager.BetName}\" a fost anulat.");
+				return Task.FromResult($"/me Pariul \"{_betManager.BetName}\" este anulat si XP-ul a fost returnat.");
 			return Task.FromResult(DefaultMessages(state));
 		}
 
@@ -106,7 +106,7 @@ namespace EvilBot.TwitchBot.Commands
 				return StandardMessages.BetMessages.OptionInvalid;
 			var state = await _betManager.EndBetAsync(option).ConfigureAwait(false);
 			if (state != BetState.ActionSucceeded) return DefaultMessages(state);
-			return $"/me Optiunea \"{OptionToString(option)}\" a castigat. Loz: {_betManager.LatestPrize}xp";
+			return $"/me Pariul s-a termiant, a castigat optiunea \"{OptionToString(option)}\". Loz: {_betManager.LatestPrize}xp";
 		}
 
 		private async Task<string> MakeVoteAsync(OnChatCommandReceivedArgs e)
@@ -124,7 +124,7 @@ namespace EvilBot.TwitchBot.Commands
 				case BetState.ActionSucceeded:
 					var vote = _betManager.GetUserVote(e.Command.ChatMessage.UserId);
 					return
-						$"/me {e.Command.ChatMessage.DisplayName}, {vote.points}XP pariat in total pentru {OptionToString(vote.option)} | Bucata detinuta momentan: {Stake(e.Command.ChatMessage.UserId)}";
+						$"/me {e.Command.ChatMessage.DisplayName}, ai pariat {vote.points}XP pe {OptionToString(vote.option)} | Bucata detinuta momentan: {Stake(e.Command.ChatMessage.UserId)}";
 				default: return DefaultMessages(state);
 			}
 		}
@@ -137,7 +137,7 @@ namespace EvilBot.TwitchBot.Commands
 				case BetState.ActionFailed:
 					return Task.FromResult($"/me {e.Command.ChatMessage.DisplayName} nu ai pariat.");
 				case BetState.ActionSucceeded:
-					return Task.FromResult($"/me {e.Command.ChatMessage.DisplayName}, pariul a fost sters.");
+					return Task.FromResult($"/me {e.Command.ChatMessage.DisplayName}, pariul a fost anulat.");
 				default: return Task.FromResult(DefaultMessages(state));
 			}
 		}
@@ -157,7 +157,7 @@ namespace EvilBot.TwitchBot.Commands
 		private Task<string> StateOfBetAsync(OnChatCommandReceivedArgs e)
 		{
 			var builder = new StringBuilder("/me Stare:");
-			builder.Append(_betManager.BetLocked ? " Blocat" : " Deblocat");
+			builder.Append(_betManager.BetLocked ? " Inchis" : " Deschis");
 			builder.Append(" | Pariuri: ");
 			builder.Append(PoolState());
 			return Task.FromResult(builder.ToString());
@@ -169,7 +169,7 @@ namespace EvilBot.TwitchBot.Commands
 			var restultTwo = _betManager.GetOptionAttributes(2);
 			var builder = new StringBuilder("YES: ");
 			builder.AppendFormat("{0} voturi si {1}XP ", restultOne.voters, restultOne.poolSum);
-			builder.Append(" NO: ");
+			builder.Append("NO: ");
 			builder.AppendFormat("{0} voturi si {1}XP ", restultTwo.voters, restultTwo.poolSum);
 			return builder.ToString();
 		}
