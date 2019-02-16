@@ -30,18 +30,18 @@ namespace EvilBot.TwitchBot
 			using (var scope = ContainerConfig.Container.BeginLifetimeScope())
 			{
 				_commands.Add("rank", scope.Resolve<RankCommand>());
-				_commands.Add("ranklist", scope.Resolve<RankListCommand>());
-				_commands.Add("ranks", scope.Resolve<RankListCommand>());
+				_commands.Add("gamble", scope.Resolve<GambleCommand>());
 				_commands.Add("top", scope.Resolve<TopCommand>());
-				_commands.Add("xprate", scope.Resolve<PointRateCommand>());
 				_commands.Add("bet", scope.Resolve<BetCommand>());
 				_commands.Add("poll", scope.Resolve<PollCommand>());
+				_commands.Add("ranklist", scope.Resolve<RankListCommand>());
+				_commands.Add("ranks", scope.Resolve<RankListCommand>());
+				_commands.Add("xprate", scope.Resolve<PointRateCommand>());
 				_commands.Add("giveaway", scope.Resolve<GiveawayCommand>());
 				_commands.Add("manage", scope.Resolve<ManageCommand>());
 				_commands.Add("filter", scope.Resolve<FilterCommand>());
 				_commands.Add("about", scope.Resolve<AboutCommand>());
 				_commands.Add("changelog", scope.Resolve<ChangelogCommand>());
-				_commands.Add("gamble", scope.Resolve<GambleCommand>());
 
 				var commandsBuilder = new StringBuilder();
 				var commandsModBuilder = new StringBuilder();

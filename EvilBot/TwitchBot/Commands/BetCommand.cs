@@ -210,7 +210,7 @@ namespace EvilBot.TwitchBot.Commands
 
 				var vote = _betManager.GetUserVote(user.Id);
 				if (vote.option == 0)
-					return $"/me {e.Command.ChatMessage.DisplayName} nu a pariat";
+					return $"/me {user.DisplayName} nu a pariat";
 				return $"/me {user.DisplayName} a pariat {vote.points}XP pe {OptionToString(vote.option)}  | Castig Potential: {_betManager.PotentialWin(user.Id)}XP Bucata detinuta: {Stake(user.Id)}";
 
 			}

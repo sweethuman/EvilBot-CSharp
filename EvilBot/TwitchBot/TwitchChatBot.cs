@@ -81,7 +81,7 @@ namespace EvilBot.TwitchBot
 			//_timedMessages.Add("Pentru a migra punctele te rog da !myrank si tag unui moderator");
 			_timedMessages.Add("Incearca !rank si vezi cat de activ ai fost");
 			_timedMessages.Add("Fii activ ca sa castigi XP");
-			_timedMessages.Add("Subscriberii primesc x2 XP!");
+			_timedMessages.Add("Subscriberii primesc X2 XP!");
 			_timedMessages.Add("Daca iti place, apasa butonul de FOLLOW! Multumesc pentru sustinere!");
 			_timedMessages.Add("Joaca la !gamble ca sa iti dublezi XP-ul!");
 			_timedMessages.Add("Joaca la !gamble ca sa iti dublezi XP-ul!");
