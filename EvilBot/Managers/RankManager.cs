@@ -84,6 +84,11 @@ namespace EvilBot.Managers
 		}
 
 
+		public Task UpdateRankAsync(IUserBase user)
+		{
+			return UpdateRankAsync(new[] {user});
+		}
+
 		public async Task UpdateRankAsync(IReadOnlyList<IUserBase> userList)
 		{
 			Log.Debug("Checking Ranks for {userCount}", userList.Count);

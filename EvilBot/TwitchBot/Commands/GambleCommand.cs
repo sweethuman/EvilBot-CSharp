@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using EvilBot.DataStructures;
+using EvilBot.Managers.Interfaces;
 using EvilBot.Resources;
 using EvilBot.Resources.Enums;
 using EvilBot.Resources.Interfaces;
@@ -14,10 +16,12 @@ namespace EvilBot.TwitchBot.Commands
 	{
 
 		private readonly IDataAccess _dataAccess;
+		private readonly IRankManager _rankManager;
 
-		public GambleCommand(IDataAccess dataAccess)
+		public GambleCommand(IDataAccess dataAccess, IRankManager rankManager)
 		{
 			_dataAccess = dataAccess;
+			_rankManager = rankManager;
 		}
 
 		public bool NeedMod { get; } = false;
@@ -31,9 +35,9 @@ namespace EvilBot.TwitchBot.Commands
 		{
 			if (string.IsNullOrEmpty(e.Command.ArgumentsAsString))
 				return GambleFormat;
-
 			if (!int.TryParse(e.Command.ArgumentsAsList[0], out var points))
 				return StandardMessages.ErrorMessages.NotNumber;
+			if (points <= 0) return "Trebuie sa joci minim 1XP";
 
 			var databaseUser =
 				await _dataAccess.RetrieveUserFromTableAsync(DatabaseTables.UserPoints, e.Command.ChatMessage.UserId).ConfigureAwait(false);
@@ -66,6 +70,9 @@ namespace EvilBot.TwitchBot.Commands
 
 			_lostGambles[e.Command.ChatMessage.UserId] = tries + 1;
 			await _dataAccess.ModifierUserIdAsync(e.Command.ChatMessage.UserId, -1 * points).ConfigureAwait(false);
+			await _rankManager
+				.UpdateRankAsync(new UserBase(e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.UserId))
+				.ConfigureAwait(false);
 			return $"/me {e.Command.ChatMessage.DisplayName} ai pierdut : {points}XP";
 		}
 	}

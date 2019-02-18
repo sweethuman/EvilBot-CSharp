@@ -12,6 +12,7 @@ namespace EvilBot.Managers.Interfaces
 		event EventHandler<RankUpdateEventArgs> RankUpdated;
 		string GetRankFormatted(string rankString, string pointsString);
 		int GetRank(int points);
+		Task UpdateRankAsync(IUserBase user);
 		Task UpdateRankAsync(IReadOnlyList<IUserBase> userList);
 		List<IRankItem> GetRankList();
 	}
