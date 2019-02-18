@@ -10,6 +10,16 @@ Versions number is **MAJOR.MINOR.IMPROVEMENT.FIX**
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [v0.7.1.0-b] - 2019-02-18
+
+### Changed
+
+- Update rank after gamble
+
+### Fixed
+
+- Can't Gamble negative or 0 points
+
 ## [v0.7.0.0-b] - 2019-02-16
 
 ### Added
@@ -95,6 +105,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [v0.2.3-b] - 2018-10-13
 - first proper versioning of the program as I see
 
+[v0.7.1.0-b]: https://dev.azure.com/sweethuman/_git/EvilBot?version=GTv0.7.1.0-b
 [v0.7.0.0-b]: https://dev.azure.com/sweethuman/_git/EvilBot?version=GTv0.7.0.0-b
 [v0.6.0.0-b]: https://dev.azure.com/sweethuman/_git/EvilBot?version=GTv0.6.0.0-b
 [v0.5.4.1-b]: https://dev.azure.com/sweethuman/_git/EvilBot?version=GTv0.5.4.1-b

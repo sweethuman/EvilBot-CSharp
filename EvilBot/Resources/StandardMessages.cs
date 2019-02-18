@@ -6,7 +6,7 @@ namespace EvilBot.Resources
 		//TODO move command formats inside commands, and try to make it auto generated for every command
 		public static class BotInformation
 		{
-			public static string AboutBot { get; } = "EvilBot v0.7.0.0beta by M0rtuary";
+			public static string AboutBot { get; } = "EvilBot v0.7.1.0beta by M0rtuary";
 
 			public static string ChangelogBot { get; } = "Changelog: https://bit.ly/evil-changelog";
 		}
