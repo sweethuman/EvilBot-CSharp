@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using EvilBot.Managers.Interfaces;
 using EvilBot.Resources.Enums;
 using EvilBot.Resources.Interfaces;
 using Serilog;

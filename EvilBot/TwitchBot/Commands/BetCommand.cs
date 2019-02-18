@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using EvilBot.Managers;
+using EvilBot.Managers.Interfaces;
 using EvilBot.Resources;
 using EvilBot.Resources.Enums;
 using EvilBot.Resources.Interfaces;

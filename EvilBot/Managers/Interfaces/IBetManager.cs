@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using EvilBot.Resources.Enums;
 
-namespace EvilBot.Managers
+namespace EvilBot.Managers.Interfaces
 {
 	public interface IBetManager
 	{
