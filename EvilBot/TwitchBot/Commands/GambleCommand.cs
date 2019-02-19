@@ -64,6 +64,9 @@ namespace EvilBot.TwitchBot.Commands
 			{
 				_lostGambles[e.Command.ChatMessage.UserId] = 0;
 				await _dataAccess.ModifierUserIdAsync(e.Command.ChatMessage.UserId, points).ConfigureAwait(false);
+				await _rankManager
+					.UpdateRankAsync(new UserBase(e.Command.ChatMessage.DisplayName, e.Command.ChatMessage.UserId))
+					.ConfigureAwait(false);
 				return $"/me {e.Command.ChatMessage.DisplayName} ai castigat : {points * 2}XP";
 			}
 
