@@ -369,6 +369,7 @@
     <Compile Include="TwitchBot\Commands\RankCommand.cs" />
     <Compile Include="TwitchBot\Commands\RankListCommand.cs" />
     <Compile Include="TwitchBot\Commands\TopCommand.cs" />
+    <Compile Include="TwitchBot\MessageHandler.cs" />
     <Compile Include="TwitchBot\TwitchConnections.cs" />
     <Compile Include="Utilities\CommandHelpers.cs" />
     <Compile Include="Processors\DataProcessor.cs" />

@@ -38,6 +38,7 @@ namespace EvilBot
 			builder.RegisterType<SetsPresenceCounter>().As<IPresenceCounter>().SingleInstance();
 			builder.RegisterType<Configuration>().As<IConfiguration>().SingleInstance();
 			builder.RegisterType<CommandsContainer>().AsSelf().SingleInstance();
+			builder.RegisterType<MessageHandler>().AsSelf().SingleInstance();
 
 			builder.RegisterType<FilterCommand>().AsSelf().SingleInstance();
 			builder.RegisterType<GiveawayCommand>().AsSelf().SingleInstance();
