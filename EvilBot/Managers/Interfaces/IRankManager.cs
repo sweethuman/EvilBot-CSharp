@@ -13,6 +13,7 @@ namespace EvilBot.Managers.Interfaces
 		string GetRankFormatted(string rankString, string pointsString);
 		int GetRank(int points);
 		Task UpdateRankAsync(IUserBase user);
+		Task UpdateRankAsync(IEnumerable<string> userIds);
 		Task UpdateRankAsync(IReadOnlyList<IUserBase> userList);
 		List<IRankItem> GetRankList();
 	}

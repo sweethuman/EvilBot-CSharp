@@ -25,7 +25,7 @@ namespace EvilBot.Tests
 		[InlineData("8", "60000", "Emperor (Lvl.8) XP: 60000")]
 		public void GetRankFormatted_ShouldReturnCorrectString(string rankString, string pointsString, string expected)
 		{
-			var rankManager = new RankManager(null);
+			var rankManager = new RankManager(null, null);
 			var result = rankManager.GetRankFormatted(rankString, pointsString);
 			Assert.Equal(expected, result);
 		}

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using EvilBot.Managers.Interfaces;
 using EvilBot.Resources.Enums;
@@ -10,11 +11,13 @@ namespace EvilBot.Managers
 	public class BetManager : IBetManager
 	{
 		private readonly IDataAccess _dataAccess;
+		private readonly IRankManager _rankManager;
 		private Dictionary<string, (int points, int option)> _voteData;
 
-		public BetManager(IDataAccess dataAccess)
+		public BetManager(IDataAccess dataAccess, IRankManager rankManager)
 		{
 			_dataAccess = dataAccess;
+			_rankManager = rankManager;
 		}
 
 		public string BetName { get; private set; }
@@ -70,6 +73,10 @@ namespace EvilBot.Managers
 			await Task.WhenAll(pointsTasks).ConfigureAwait(false);
 			winners.Sort((x, y) => x.points - y.points);
 			Winners = winners;
+
+			var votedUserIds = _voteData.Select(x => x.Key);
+			await _rankManager.UpdateRankAsync(votedUserIds).ConfigureAwait(false);
+
 			return BetState.ActionSucceeded;
 		}
 

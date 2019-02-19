@@ -17,12 +17,14 @@ namespace EvilBot.Managers
 	{
 		private readonly List<IRankItem> _ranks = new List<IRankItem>();
 		private readonly IDataAccess _dataAccess;
+		private readonly IApiRetriever _apiRetriever;
 		public string RankListString { get; private set; }
 
 
-		public RankManager(IDataAccess dataAccess)
+		public RankManager(IDataAccess dataAccess, IApiRetriever apiRetriever)
 		{
 			_dataAccess = dataAccess;
+			_apiRetriever = apiRetriever;
 			InitializeRanks();
 			BuildRankListString();
 		}
@@ -83,6 +85,16 @@ namespace EvilBot.Managers
 			return place;
 		}
 
+
+		public async Task UpdateRankAsync(IEnumerable<string> userIds)
+		{
+			var userList = userIds.ToList();
+			var countOfRemovedItems = userList.RemoveAll(x => x == null);
+			if (countOfRemovedItems != 0 ) Log.Warning("THERE ARE NULLS inside the UserIds that need to be Rank Updated. REMOVED.");
+			var usersApi = await _apiRetriever.GetUsersHelixAsync(userList).ConfigureAwait(false);
+			var userBaseUsers = usersApi.Select(x => new UserBase(x.DisplayName, x.Id)).ToList<IUserBase>();
+			await UpdateRankAsync(userBaseUsers).ConfigureAwait(false);
+		}
 
 		public Task UpdateRankAsync(IUserBase user)
 		{
