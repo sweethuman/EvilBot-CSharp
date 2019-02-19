@@ -20,6 +20,7 @@ namespace EvilBot.Managers
 		{
 			_dataAccess = dataAccess;
 			_apiRetriever = apiRetriever;
+			InitializeFilterAsync().Wait();
 		}
 
 		private HashSet<IUserBase> Users { get; } = new HashSet<IUserBase>(new ComparerIUserBase());
@@ -38,7 +39,7 @@ namespace EvilBot.Managers
 			return FilteredUserIds.Remove(user.UserId);
 		}
 
-		public async Task InitializeFilterAsync()
+		private async Task InitializeFilterAsync()
 		{
 			Log.Debug("Initializing filter!");
 			var users = await _dataAccess.RetrieveAllUsersFromTableAsync(DatabaseTables.FilteredUsers)

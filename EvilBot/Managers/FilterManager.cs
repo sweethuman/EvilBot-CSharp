@@ -19,12 +19,13 @@ namespace EvilBot.Managers
 		{
 			_dataAccess = dataAccess;
 			_apiRetriever = apiRetriever;
+			InitializeFilterAsync().Wait();
 		}
 
 		//TODO add somewhere code that if FilteredUsers table does not exist to be created
 		private List<IUserBase> FilteredUsers { get; } = new List<IUserBase>();
 
-		public async Task InitializeFilterAsync()
+		private async Task InitializeFilterAsync()
 		{
 			Log.Debug("Initializing filter!");
 			var users = await _dataAccess.RetrieveAllUsersFromTableAsync(DatabaseTables.FilteredUsers)

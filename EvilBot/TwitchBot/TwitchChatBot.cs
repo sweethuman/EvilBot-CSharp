@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Timers;
 using EvilBot.DataStructures;
@@ -65,7 +65,6 @@ namespace EvilBot.TwitchBot
 			EventInitializer();
 			TimedMessageInitializer();
 			TimerInitializer();
-			_filterManager.InitializeFilterAsync().Wait();
 		}
 
 		public void Disconnect()

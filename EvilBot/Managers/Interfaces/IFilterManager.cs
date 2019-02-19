@@ -6,8 +6,6 @@ namespace EvilBot.Managers.Interfaces
 {
 	public interface IFilterManager
 	{
-		Task InitializeFilterAsync();
-
 		Task<bool> AddToFilterAsync(IUserBase user);
 
 		Task<bool> RemoveFromFilterAsync(IUserBase user);
