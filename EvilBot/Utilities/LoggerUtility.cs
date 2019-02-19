@@ -10,7 +10,6 @@ namespace EvilBot.Utilities
 	{
 		public LoggerUtility()
 		{
-			//NOTE remove logging to seq
 			ILogger clientSerilogLogger = new LoggerConfiguration()
 				.Enrich.FromLogContext()
 				.WriteTo.Console()

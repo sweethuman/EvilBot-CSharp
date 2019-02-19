@@ -54,6 +54,8 @@ namespace EvilBot.TwitchBot.Commands
 			if (string.IsNullOrEmpty(pollOptionsString) || pollOptionsString.Contains("||"))
 				return StandardMessages.PollMessages.PollCreateFormat;
 
+			if(_pollManager.PollActive) return "Poll deja activ. Inchide Pollul anterior.";
+
 			var options = CommandHelpers.FilterAndPreparePollOptions(pollOptionsString);
 			if (options.Count < 2) return StandardMessages.PollMessages.PollCreateFormat;
 

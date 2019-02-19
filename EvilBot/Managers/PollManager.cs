@@ -27,9 +27,11 @@ namespace EvilBot.Managers
 
 		public bool PollActive { get; private set; }
 
+
+		//TODO Bool is not enough, see if you can use enum, research return option Enum VS Bool and how they should be used in telling state.
 		public bool PollCreate(List<string> optionsList)
 		{
-			if (optionsList == null || optionsList.Count < 2 || optionsList.Exists(string.IsNullOrEmpty)) return false;
+			if (optionsList == null || optionsList.Count < 2 || optionsList.Exists(string.IsNullOrEmpty) || PollActive) return false;
 			Log.Debug("PollStarting");
 			PollItems = optionsList.Select((t, i) => new PollItem(i, 0, t)).ToList<IPollItem>();
 			_usersWhoVoted = new List<string>();
