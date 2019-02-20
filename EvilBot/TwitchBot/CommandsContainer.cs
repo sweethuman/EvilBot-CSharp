@@ -70,7 +70,7 @@ namespace EvilBot.TwitchBot
 			var success = _commands.TryGetValue(e.Command.CommandText.ToLower(), out var command);
 			if (success == false) return;
 			if ((!command.NeedMod || e.Command.ChatMessage.UserType < UserType.Moderator) && command.NeedMod) return;
-			Log.Verbose("{username}:{message}", e.Command.ChatMessage.DisplayName,
+			Log.Information("{username}:{message}", e.Command.ChatMessage.DisplayName,
 				e.Command.ChatMessage.Message);
 			_twitchConnection.Client.SendMessage(e.Command.ChatMessage.Channel,
 				await command.ProcessorAsync(e).ConfigureAwait(false));

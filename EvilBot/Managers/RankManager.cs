@@ -47,7 +47,7 @@ namespace EvilBot.Managers
 
 		private void InitializeRanks()
 		{
-			_ranks.Add(new RankItem(0, "Fara Rank", 0));
+			_ranks.Add(new RankItem(0, "Newbie", 0));
 			_ranks.Add(new RankItem(1, "Rookie", 50));
 			_ranks.Add(new RankItem(2, "Alpha", 500));
 			_ranks.Add(new RankItem(3, "Thug", 2500));
@@ -73,7 +73,7 @@ namespace EvilBot.Managers
 			return null;
 		}
 
-		public int GetRank(int points)
+		public int CalculateRank(int points)
 		{
 			var place = 0;
 			for (var i = 0; i < _ranks.Count - 1; i++)
@@ -83,6 +83,19 @@ namespace EvilBot.Managers
 			}
 
 			return place;
+		}
+
+		public IRankItem GetRank(int rank)
+		{
+			if (rank < _ranks.Count && rank >= 0) return _ranks[rank];
+			Log.Error("ASKED FOR INEXISTENT RANK. OUT OF BOUNDS.");
+			return new RankItem(rank, "INEXISTENT", 0);
+
+		}
+
+		public List<IRankItem> GetRankList()
+		{
+			return _ranks;
 		}
 
 
@@ -137,7 +150,7 @@ namespace EvilBot.Managers
 						continue;
 					}
 
-					var currentRank = GetRank(points);
+					var currentRank = CalculateRank(points);
 					if (currentRank == rank) continue;
 					databaseRankUpdateTasks.Add(_dataAccess.ModifyUserIdRankAsync(userList[i].UserId, currentRank));
 					users[i].Rank = currentRank.ToString();
@@ -164,11 +177,6 @@ namespace EvilBot.Managers
 			for (var i = 0; i < usersUpdated.Count; i++)
 				OnRankUpdated(usersUpdated[i].DisplayName,
 					$"{_ranks[int.Parse(usersUpdated[i].Rank)].Name} (Lvl. {usersUpdated[i].Rank})");
-		}
-
-		public List<IRankItem> GetRankList()
-		{
-			return _ranks;
 		}
 	}
 }

@@ -6,6 +6,7 @@ using EvilBot.DataStructures.Interfaces;
 using EvilBot.EventArguments;
 using EvilBot.Managers.Interfaces;
 using EvilBot.Processors.Interfaces;
+using EvilBot.Resources.Enums;
 using EvilBot.Resources.Interfaces;
 using EvilBot.Trackers.Interfaces;
 using EvilBot.TwitchBot.Interfaces;
@@ -18,6 +19,7 @@ namespace EvilBot.TwitchBot
 	{
 
 		private readonly IRankManager _rankManager;
+		private readonly IDataAccess _dataAccess;
 		private readonly ITwitchConnections _twitchConnection;
 		private readonly IConfiguration _configuration;
 		private readonly IDataProcessor _dataProcessor;
@@ -25,11 +27,12 @@ namespace EvilBot.TwitchBot
 		private readonly IPresenceCounter _presenceCounter;
 		private readonly ITalkerCounter _talkerCounter;
 
-		public MessageHandler(IRankManager rankManager, ITwitchConnections twitchConnections,
+		public MessageHandler(IRankManager rankManager, IDataAccess dataAccess, ITwitchConnections twitchConnections,
 			IConfiguration configuration, IDataProcessor dataProcessor, IFilterManager filterManager,
 			IPresenceCounter presenceCounter, ITalkerCounter talkerCounter)
 		{
 			_rankManager = rankManager;
+			_dataAccess = dataAccess;
 			_twitchConnection = twitchConnections;
 			_configuration = configuration;
 			_dataProcessor = dataProcessor;
@@ -80,15 +83,30 @@ namespace EvilBot.TwitchBot
 			_twitchConnection.Client.SendMessage(_configuration.ChannelName, $"/me {e.Name} ai avansat la {e.Rank}");
 		}
 
-		private void WelcomeMessageCheck(object sender, OnMessageReceivedArgs e)
+		private async void WelcomeMessageCheck(object sender, OnMessageReceivedArgs e)
 		{
 			if (e.ChatMessage.Message.StartsWith("!")) return;
 			if (_filterManager.CheckIfUserIdFiltered(e.ChatMessage.UserId)) return;
 			_talkerCounter.AddTalker(new UserBase(e.ChatMessage.DisplayName, e.ChatMessage.UserId));
 			if (_presenceCounter.CheckIfPresent(e.ChatMessage.UserId)) return;
 			_presenceCounter.MakePresent(e.ChatMessage.UserId);
+			var user = await _dataAccess.RetrieveUserFromTableAsync(DatabaseTables.UserPoints, e.ChatMessage.UserId).ConfigureAwait(false);
+			if(user == null)
+			{
+				_twitchConnection.Client.SendMessage(e.ChatMessage.Channel,
+					$"/me Bine ai venit {e.ChatMessage.DisplayName}!");
+				return;
+			}
+
+			if (!int.TryParse(user.Rank, out var userRank))
+			{
+				_twitchConnection.Client.SendMessage(e.ChatMessage.Channel,
+					"/me Could not parse rank. Send LOGS!");
+				Log.Error("Could Not Parse Rank {rank}, {user}", userRank, user);
+				return;
+			}
 			_twitchConnection.Client.SendMessage(e.ChatMessage.Channel,
-				$"/me Bine ai venit {e.ChatMessage.DisplayName}!");
+				$"/me Bine ai venit {_rankManager.GetRank(userRank).Name} {e.ChatMessage.DisplayName}!");
 		}
 
 		private async void BitsCheck(object sender, OnMessageReceivedArgs e)
