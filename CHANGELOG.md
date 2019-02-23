@@ -10,6 +10,21 @@ Versions number is **MAJOR.MINOR.IMPROVEMENT.FIX**
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [v0.7.2.0-b] - 2019-02-23
+
+### Added
+
+- Custom Rank Based Welcome Message
+
+### Changed
+
+- Update Rank after a bet ends and people gain or lose points
+- Poll creation fails if a poll is already active and sends message why
+
+### Fixed
+
+- Didn't Update Rank if you won at Gamble
+
 ## [v0.7.1.0-b] - 2019-02-18
 
 ### Changed
@@ -105,6 +120,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [v0.2.3-b] - 2018-10-13
 - first proper versioning of the program as I see
 
+[v0.7.2.0-b]: https://dev.azure.com/sweethuman/_git/EvilBot?version=GTv0.7.2.0-b
 [v0.7.1.0-b]: https://dev.azure.com/sweethuman/_git/EvilBot?version=GTv0.7.1.0-b
 [v0.7.0.0-b]: https://dev.azure.com/sweethuman/_git/EvilBot?version=GTv0.7.0.0-b
 [v0.6.0.0-b]: https://dev.azure.com/sweethuman/_git/EvilBot?version=GTv0.6.0.0-b
