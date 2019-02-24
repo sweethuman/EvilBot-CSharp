@@ -31,6 +31,14 @@ namespace EvilBot
 				{
 					var app = scope.Resolve<IApplication>();
 					app.Run();
+					var stop = false;
+					do
+					{
+						var keyPress = Console.ReadKey();
+						if (keyPress.Modifiers == (ConsoleModifiers.Control | ConsoleModifiers.Shift) &&
+						    keyPress.Key == ConsoleKey.Oem3) stop = true;
+					} while (!stop);
+					app.Stop();
 				}
 			}
 		}

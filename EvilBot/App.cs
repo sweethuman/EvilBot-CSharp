@@ -21,14 +21,10 @@ namespace EvilBot
 		{
 			AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 			SetConsoleMode();
-			var stop = false;
-			do
-			{
-				var keyPress = Console.ReadKey();
-				if (keyPress.Modifiers == (ConsoleModifiers.Control | ConsoleModifiers.Shift) &&
-				    keyPress.Key == ConsoleKey.Oem3) stop = true;
-			} while (!stop);
+		}
 
+		public void Stop()
+		{
 			_twitchChatBot.Disconnect();
 			_twitchConnection.Disconnect();
 		}
