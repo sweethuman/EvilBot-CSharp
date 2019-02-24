@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using Autofac;
+using Sentry;
 
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedParameter.Local
@@ -24,10 +25,13 @@ namespace EvilBot
 		private static void Main(string[] args)
 		{
 			DeleteMenu(GetSystemMenu(GetConsoleWindow(), false), SC_CLOSE, MF_BYCOMMAND);
-			using (var scope = ContainerConfig.Container.BeginLifetimeScope())
+			using (SentrySdk.Init("https://e115c16b1ca7429aabb761ecacaaea74@sentry.io/1401263"))
 			{
-				var app = scope.Resolve<IApplication>();
-				app.Run();
+				using (var scope = ContainerConfig.Container.BeginLifetimeScope())
+				{
+					var app = scope.Resolve<IApplication>();
+					app.Run();
+				}
 			}
 		}
 	}

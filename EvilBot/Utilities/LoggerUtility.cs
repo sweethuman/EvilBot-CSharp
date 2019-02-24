@@ -1,6 +1,7 @@
 ﻿using EvilBot.Utilities.Interfaces;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Events;
 using TwitchLib.Client;
 using ILogger = Serilog.ILogger;
 
@@ -16,6 +17,13 @@ namespace EvilBot.Utilities
 				.Enrich.WithProperty("Source", "TwitchClient", true)
 				.WriteTo.Seq("http://localhost:5341")
 				.WriteTo.File("logs/logfile.log", rollingInterval: RollingInterval.Day, shared: true)
+				.WriteTo.Sentry(o =>
+				{
+					// Debug and higher are stored as breadcrumbs (default is Information)
+					o.MinimumBreadcrumbLevel = LogEventLevel.Debug;
+					// Warning and higher is sent as event (default is Error)
+					o.MinimumEventLevel = LogEventLevel.Error;
+				})
 				.MinimumLevel.Debug()
 				.CreateLogger();
 			ClientLogger = new LoggerFactory()
@@ -27,6 +35,13 @@ namespace EvilBot.Utilities
 				.WriteTo.Console()
 				.WriteTo.Seq("http://localhost:5341")
 				.WriteTo.File("logs/logfile.log", rollingInterval: RollingInterval.Day, shared: true)
+				.WriteTo.Sentry(o =>
+				{
+					// Debug and higher are stored as breadcrumbs (default is Information)
+					o.MinimumBreadcrumbLevel = LogEventLevel.Debug;
+					// Warning and higher is sent as event (default is Error)
+					o.MinimumEventLevel = LogEventLevel.Error;
+				})
 				.MinimumLevel.Debug()
 				.CreateLogger();
 			ApiLoggerFactory = new LoggerFactory()
@@ -41,6 +56,13 @@ namespace EvilBot.Utilities
 					outputTemplate:
 					"{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}",
 					shared: true)
+				.WriteTo.Sentry(o =>
+				{
+					// Debug and higher are stored as breadcrumbs (default is Information)
+					o.MinimumBreadcrumbLevel = LogEventLevel.Debug;
+					// Warning and higher is sent as event (default is Error)
+					o.MinimumEventLevel = LogEventLevel.Error;
+				})
 				.MinimumLevel.Verbose()
 				.CreateLogger();
 		}
