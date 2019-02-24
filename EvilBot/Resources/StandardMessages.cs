@@ -1,3 +1,5 @@
+using System.Reflection;
+
 namespace EvilBot.Resources
 {
 	public static class StandardMessages
@@ -6,7 +8,7 @@ namespace EvilBot.Resources
 		//TODO move command formats inside commands, and try to make it auto generated for every command
 		public static class BotInformation
 		{
-			public static string AboutBot { get; } = "EvilBot v0.7.2.0beta by M0rtuary";
+			public static string AboutBot { get; } = $"EvilBot v{Assembly.GetEntryAssembly().GetName().Version}beta by M0rtuary";
 
 			public static string ChangelogBot { get; } = "Changelog: https://bit.ly/evil-changelog";
 		}
