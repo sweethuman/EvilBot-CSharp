@@ -13,10 +13,10 @@ namespace EvilBot.Utilities
 		{
 			ILogger clientSerilogLogger = new LoggerConfiguration()
 				.Enrich.FromLogContext()
-				.WriteTo.Console()
 				.Enrich.WithProperty("Source", "TwitchClient", true)
 				.WriteTo.Seq("http://localhost:5341")
-				.WriteTo.File("logs/logfile.log", rollingInterval: RollingInterval.Day, shared: true)
+				.WriteTo.Async(a => a.File("logs/logfile.log", rollingInterval: RollingInterval.Day, shared: true))
+				.WriteTo.Async(a => a.Console())
 				.WriteTo.Sentry(o =>
 				{
 					// Debug and higher are stored as breadcrumbs (default is Information)
@@ -32,9 +32,9 @@ namespace EvilBot.Utilities
 			ILogger apiSerilogLogger = new LoggerConfiguration()
 				.Enrich.FromLogContext()
 				.Enrich.WithProperty("Source", "TwitchAPI", true)
-				.WriteTo.Console()
 				.WriteTo.Seq("http://localhost:5341")
-				.WriteTo.File("logs/logfile.log", rollingInterval: RollingInterval.Day, shared: true)
+				.WriteTo.Async(a => a.File("logs/logfile.log", rollingInterval: RollingInterval.Day, shared: true))
+				.WriteTo.Async(a => a.Console())
 				.WriteTo.Sentry(o =>
 				{
 					// Debug and higher are stored as breadcrumbs (default is Information)
@@ -50,12 +50,12 @@ namespace EvilBot.Utilities
 			Log.Logger = new LoggerConfiguration()
 				.Enrich.FromLogContext()
 				.Enrich.WithProperty("Source", "TwitchChatBot", true)
-				.WriteTo.Console()
 				.WriteTo.Seq("http://localhost:5341")
-				.WriteTo.File("logs/logfile.log", rollingInterval: RollingInterval.Day,
+				.WriteTo.Async(a => a.File("logs/logfile.log", rollingInterval: RollingInterval.Day,
 					outputTemplate:
 					"{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}",
-					shared: true)
+					shared: true))
+				.WriteTo.Async(a => a.Console())
 				.WriteTo.Sentry(o =>
 				{
 					// Debug and higher are stored as breadcrumbs (default is Information)
