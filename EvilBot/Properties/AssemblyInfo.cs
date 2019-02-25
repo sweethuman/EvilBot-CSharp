@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("EvilBot")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A TwitchBot made by M0rtuary for EvilStar")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("EvilBot")]
-[assembly: AssemblyCopyright("Copyright © M0rtuary 2018")]
+[assembly: AssemblyCopyright("Copyright © M0rtuary 2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

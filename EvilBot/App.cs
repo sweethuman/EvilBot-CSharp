@@ -27,6 +27,7 @@ namespace EvilBot
 		{
 			_twitchChatBot.Disconnect();
 			_twitchConnection.Disconnect();
+			Log.CloseAndFlush();
 		}
 
 		private static void SetConsoleMode()
@@ -38,6 +39,7 @@ namespace EvilBot
 		private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
 		{
 			Log.Fatal(e.ExceptionObject as Exception, "Unhandled exception blew UP");
+			Log.CloseAndFlush();
 		}
 	}
 }
