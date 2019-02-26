@@ -1,5 +1,4 @@
 ﻿using System;
-using EvilBot.Resources;
 using EvilBot.TwitchBot.Interfaces;
 using Serilog;
 
@@ -20,7 +19,6 @@ namespace EvilBot
 		public void Run()
 		{
 			AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-			SetConsoleMode();
 		}
 
 		public void Stop()
@@ -28,12 +26,6 @@ namespace EvilBot
 			_twitchChatBot.Disconnect();
 			_twitchConnection.Disconnect();
 			Log.CloseAndFlush();
-		}
-
-		private static void SetConsoleMode()
-		{
-			Console.Title = StandardMessages.BotInformation.AboutBot;
-			Console.TreatControlCAsInput = true;
 		}
 
 		private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)

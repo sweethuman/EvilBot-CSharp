@@ -1,6 +1,6 @@
 ﻿namespace EvilBot
 {
-	internal interface IApplication
+	public interface IApplication
 	{
 		void Run();
 		void Stop();
