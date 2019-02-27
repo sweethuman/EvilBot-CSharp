@@ -20,7 +20,7 @@ namespace EvilBot.Utilities
 				.WriteTo.Sentry(o =>
 				{
 					// Debug and higher are stored as breadcrumbs (default is Information)
-					o.MinimumBreadcrumbLevel = LogEventLevel.Debug;
+					o.MinimumBreadcrumbLevel = LogEventLevel.Verbose;
 					// Warning and higher is sent as event (default is Error)
 					o.MinimumEventLevel = LogEventLevel.Error;
 				})
@@ -38,7 +38,7 @@ namespace EvilBot.Utilities
 				.WriteTo.Sentry(o =>
 				{
 					// Debug and higher are stored as breadcrumbs (default is Information)
-					o.MinimumBreadcrumbLevel = LogEventLevel.Debug;
+					o.MinimumBreadcrumbLevel = LogEventLevel.Verbose;
 					// Warning and higher is sent as event (default is Error)
 					o.MinimumEventLevel = LogEventLevel.Error;
 				})
@@ -59,7 +59,7 @@ namespace EvilBot.Utilities
 				.WriteTo.Sentry(o =>
 				{
 					// Debug and higher are stored as breadcrumbs (default is Information)
-					o.MinimumBreadcrumbLevel = LogEventLevel.Debug;
+					o.MinimumBreadcrumbLevel = LogEventLevel.Verbose;
 					// Warning and higher is sent as event (default is Error)
 					o.MinimumEventLevel = LogEventLevel.Error;
 				})
