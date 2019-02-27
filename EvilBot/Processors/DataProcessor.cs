@@ -11,6 +11,7 @@ using EvilBot.Resources.Interfaces;
 using EvilBot.Trackers.Interfaces;
 using EvilBot.TwitchBot.Interfaces;
 using Serilog;
+using TwitchLib.Api.Core.Exceptions;
 
 namespace EvilBot.Processors
 {
@@ -79,7 +80,7 @@ namespace EvilBot.Processors
 			catch (Exception exception)
 			{
 				Log.Error(exception, "AddLurkerTimer failed");
-				_twitchConnections.SendErrorMessage("A esuat sa updateze lurkerii. SEND LOGS.");
+				_twitchConnections.SendErrorMessage("A esuat sa updateze Lurkerii. SEND LOGS.");
 			}
 		}
 
@@ -95,7 +96,7 @@ namespace EvilBot.Processors
 			catch (Exception exception)
 			{
 				Log.Error(exception, "AddPointsTimer failed");
-				_twitchConnections.SendErrorMessage("A esuat sa updateze chatterii. SEND LOGS.");
+				_twitchConnections.SendErrorMessage("A esuat sa updateze Talkerii. SEND LOGS.");
 			}
 		}
 
@@ -113,29 +114,39 @@ namespace EvilBot.Processors
 				userList = RemoveFilteredUsers(userList);
 
 				var pointsMultiplier = _configuration.PointsMultiplier;
-				List<IUserBase> channelSubscribers;
-				try
+				var channelSubscribers = new List<IUserBase>();
+				if (subCheck)
 				{
-					if (subCheck)
-						channelSubscribers = await _apiRetriever
-							.GetChannelSubscribersAsync(_apiRetriever.TwitchChannelId)
-							.ConfigureAwait(false);
-					else
-						channelSubscribers = new List<IUserBase>();
-				}
-				catch (Exception ex)
-				{
-					Log.Error(ex, "Failed to GetSubscribers or ChannelId");
-					throw;
+					for (var attempt = 0; attempt < 5; attempt++)
+					{
+						try
+						{
+							channelSubscribers = await _apiRetriever
+								.GetChannelSubscribersAsync(_apiRetriever.TwitchChannelId)
+								.ConfigureAwait(false);
+							break;
+						}
+						catch (GatewayTimeoutException ex)
+						{
+							if (attempt == 4) throw;
+							Log.Warning(ex, "Failed. Gateway Timed Out. Retrying in 20 Seconds");
+						}
+						catch (Exception ex)
+						{
+							Log.Error(ex, "Failed to GetSubscribers or ChannelId");
+							throw;
+						}
+						await Task.Delay(20000).ConfigureAwait(false);
+					}
 				}
 
 				var addPointsTasks = new List<Task>();
-				for (var i = 0; i < userList.Count; i++)
+				foreach (var user in userList)
 				{
 					var pointAdderValue = points;
-					if (channelSubscribers.Any(x => x.UserId == userList[i].UserId))
+					if (channelSubscribers.Any(x => x.UserId == user.UserId))
 						pointAdderValue = (int) (pointAdderValue * pointsMultiplier);
-					addPointsTasks.Add(_dataAccess.ModifierUserIdAsync(userList[i].UserId, pointAdderValue, minutes));
+					addPointsTasks.Add(_dataAccess.ModifierUserIdAsync(user.UserId, pointAdderValue, minutes));
 				}
 
 				await Task.WhenAll(addPointsTasks).ConfigureAwait(false);
