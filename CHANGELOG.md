@@ -10,6 +10,19 @@ Versions number is **MAJOR.MINOR.IMPROVEMENT.FIX**
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [v0.7.3.0-b] - 2019-03-05
+
+### Changed
+
+- More Logging is Sent to Sentry
+- Project Details, Such Description, Copyright, etc.
+
+### Fixed
+
+- No More Logs will be lost when Crashing or Closing
+- If Twitch Responds with a Gateway Timeout it Tries again after a set amount of time
+- Fixed Version Changing if Used in Another Project
+
 ## [v0.7.2.1-b] - 2019-02-24
 
 ### Added
@@ -131,6 +144,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [v0.2.3-b] - 2018-10-13
 - first proper versioning of the program as I see
 
+[v0.7.3.0-b]: https://dev.azure.com/sweethuman/_git/EvilBot?version=GTv0.7.3.0-b
 [v0.7.2.1-b]: https://dev.azure.com/sweethuman/_git/EvilBot?version=GTv0.7.2.1-b
 [v0.7.2.0-b]: https://dev.azure.com/sweethuman/_git/EvilBot?version=GTv0.7.2.0-b
 [v0.7.1.0-b]: https://dev.azure.com/sweethuman/_git/EvilBot?version=GTv0.7.1.0-b
