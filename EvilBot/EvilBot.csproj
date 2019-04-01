@@ -138,8 +138,8 @@
       <HintPath>..\packages\Sentry.PlatformAbstractions.1.0.0\lib\net471\Sentry.PlatformAbstractions.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Sentry.Protocol, Version=1.0.4.0, Culture=neutral, PublicKeyToken=fba2ec45388e2af0">
-      <HintPath>..\packages\Sentry.Protocol.1.0.4\lib\net46\Sentry.Protocol.dll</HintPath>
+    <Reference Include="Sentry.Protocol, Version=1.0.5.0, Culture=neutral, PublicKeyToken=fba2ec45388e2af0">
+      <HintPath>..\packages\Sentry.Protocol.1.0.5\lib\net46\Sentry.Protocol.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Sentry.Serilog, Version=1.1.2.0, Culture=neutral, PublicKeyToken=fba2ec45388e2af0">
@@ -193,8 +193,9 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Data.SQLite, Version=1.0.109.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Data.SQLite.Core.1.0.109.2\lib\net46\System.Data.SQLite.dll</HintPath>
+    <Reference Include="System.Data.SQLite, Version=1.0.110.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139">
+      <HintPath>..\packages\System.Data.SQLite.Core.1.0.110.0\lib\net46\System.Data.SQLite.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System.IdentityModel.Tokens.Jwt, Version=5.4.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <HintPath>..\packages\System.IdentityModel.Tokens.Jwt.5.4.0\lib\net461\System.IdentityModel.Tokens.Jwt.dll</HintPath>
@@ -283,51 +284,53 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="TwitchLib.Api, Version=3.0.1.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\TwitchLib.Api.3.0.1-CI-20190120-063133\lib\netstandard2.0\TwitchLib.Api.dll</HintPath>
+    <Reference Include="TwitchLib.Api, Version=3.0.2.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\TwitchLib.Api.3.0.6-CI-20190317-060258\lib\netstandard2.0\TwitchLib.Api.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="TwitchLib.Api.Core, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\TwitchLib.Api.Core.3.0.1-CI-20190120-063148\lib\netstandard2.0\TwitchLib.Api.Core.dll</HintPath>
+    <Reference Include="TwitchLib.Api.Core, Version=3.0.2.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\TwitchLib.Api.Core.3.0.6-CI-20190317-060258\lib\netstandard2.0\TwitchLib.Api.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="TwitchLib.Api.Core.Enums, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\TwitchLib.Api.Core.Enums.3.0.1-CI-20190120-063157\lib\netstandard2.0\TwitchLib.Api.Core.Enums.dll</HintPath>
+    <Reference Include="TwitchLib.Api.Core.Enums, Version=3.0.2.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\TwitchLib.Api.Core.Enums.3.0.6-CI-20190317-060258\lib\netstandard2.0\TwitchLib.Api.Core.Enums.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="TwitchLib.Api.Core.Interfaces, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\TwitchLib.Api.Core.Interfaces.3.0.1-CI-20190120-063154\lib\netstandard2.0\TwitchLib.Api.Core.Interfaces.dll</HintPath>
+    <Reference Include="TwitchLib.Api.Core.Interfaces, Version=3.0.2.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\TwitchLib.Api.Core.Interfaces.3.0.6-CI-20190317-060258\lib\netstandard2.0\TwitchLib.Api.Core.Interfaces.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="TwitchLib.Api.Core.Models, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\TwitchLib.Api.Core.Models.3.0.1-CI-20190120-063151\lib\netstandard2.0\TwitchLib.Api.Core.Models.dll</HintPath>
+    <Reference Include="TwitchLib.Api.Core.Models, Version=3.0.2.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\TwitchLib.Api.Core.Models.3.0.6-CI-20190317-060258\lib\netstandard2.0\TwitchLib.Api.Core.Models.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="TwitchLib.Api.Helix, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\TwitchLib.Api.Helix.3.0.1-CI-20190120-063136\lib\netstandard2.0\TwitchLib.Api.Helix.dll</HintPath>
+    <Reference Include="TwitchLib.Api.Helix, Version=3.0.2.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\TwitchLib.Api.Helix.3.0.6-CI-20190317-060258\lib\netstandard2.0\TwitchLib.Api.Helix.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="TwitchLib.Api.Helix.Models, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\TwitchLib.Api.Helix.Models.3.0.1-CI-20190120-063142\lib\netstandard2.0\TwitchLib.Api.Helix.Models.dll</HintPath>
+    <Reference Include="TwitchLib.Api.Helix.Models, Version=3.0.2.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\TwitchLib.Api.Helix.Models.3.0.6-CI-20190317-060258\lib\netstandard2.0\TwitchLib.Api.Helix.Models.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="TwitchLib.Api.V5, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\TwitchLib.Api.V5.3.0.1-CI-20190120-063139\lib\netstandard2.0\TwitchLib.Api.V5.dll</HintPath>
+    <Reference Include="TwitchLib.Api.V5, Version=3.0.2.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\TwitchLib.Api.V5.3.0.6-CI-20190317-060258\lib\netstandard2.0\TwitchLib.Api.V5.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="TwitchLib.Api.V5.Models, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\TwitchLib.Api.V5.Models.3.0.1-CI-20190120-063145\lib\netstandard2.0\TwitchLib.Api.V5.Models.dll</HintPath>
+    <Reference Include="TwitchLib.Api.V5.Models, Version=3.0.2.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\TwitchLib.Api.V5.Models.3.0.6-CI-20190317-060258\lib\netstandard2.0\TwitchLib.Api.V5.Models.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="TwitchLib.Client, Version=3.0.4.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\TwitchLib.Client.3.0.4\lib\netstandard2.0\TwitchLib.Client.dll</HintPath>
+      <HintPath>..\packages\TwitchLib.Client.3.0.6-CI-20190317-060125\lib\netstandard2.0\TwitchLib.Client.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="TwitchLib.Client.Enums, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\TwitchLib.Client.Enums.1.1.0\lib\netstandard2.0\TwitchLib.Client.Enums.dll</HintPath>
+    <Reference Include="TwitchLib.Client.Enums, Version=3.0.4.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\TwitchLib.Client.Enums.3.0.6-CI-20190317-060125\lib\netstandard2.0\TwitchLib.Client.Enums.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="TwitchLib.Client.Models, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\TwitchLib.Client.Models.1.1.0\lib\netstandard2.0\TwitchLib.Client.Models.dll</HintPath>
+    <Reference Include="TwitchLib.Client.Models, Version=3.0.4.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\TwitchLib.Client.Models.3.0.6-CI-20190317-060125\lib\netstandard2.0\TwitchLib.Client.Models.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="TwitchLib.Communication, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\TwitchLib.Communication.1.0.3\lib\netstandard2.0\TwitchLib.Communication.dll</HintPath>
@@ -434,11 +437,11 @@
     </BootstrapperPackage>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\System.Data.SQLite.Core.1.0.109.2\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.109.2\build\net46\System.Data.SQLite.Core.targets')" />
+  <Import Project="..\packages\System.Data.SQLite.Core.1.0.110.0\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.110.0\build\net46\System.Data.SQLite.Core.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105.The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\System.Data.SQLite.Core.1.0.109.2\build\net46\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Data.SQLite.Core.1.0.109.2\build\net46\System.Data.SQLite.Core.targets'))" />
+    <Error Condition="!Exists('..\packages\System.Data.SQLite.Core.1.0.110.0\build\net46\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Data.SQLite.Core.1.0.110.0\build\net46\System.Data.SQLite.Core.targets'))" />
   </Target>
 </Project>
